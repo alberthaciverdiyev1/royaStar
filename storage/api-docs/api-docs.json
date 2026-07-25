@@ -1,0 +1,3622 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "RoyaStar Backend API",
+        "description": "LMS platform for managing students, teachers, schools, and curriculum.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/certificates": {
+            "get": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "List all certificates",
+                "operationId": "a7b18a735c9558ba7df94d641730f934",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of certificates"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Create certificate",
+                "operationId": "eed063f91e3ef68b7265bd0879992983",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "template_html"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "template_html": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Certificate created"
+                    }
+                }
+            }
+        },
+        "/certificates/{certificate}": {
+            "get": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Get certificate by ID",
+                "operationId": "4c330acd1ab5a1eb88f70ad736a9f4cb",
+                "parameters": [
+                    {
+                        "name": "certificate",
+                        "in": "path",
+                        "description": "Certificate ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Certificate data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Update certificate",
+                "operationId": "a344acc61c7789bd25d9f0537238cdb3",
+                "responses": {
+                    "200": {
+                        "description": "Certificate updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Delete certificate",
+                "operationId": "695346e8fd354acb04970eab9976b5e7",
+                "responses": {
+                    "200": {
+                        "description": "Certificate deleted"
+                    }
+                }
+            }
+        },
+        "/certificates/issue": {
+            "post": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Issue certificate to student",
+                "operationId": "c894f8d5d5803bd6b900a83901bacd1c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "student_id",
+                                    "certificate_id"
+                                ],
+                                "properties": {
+                                    "student_id": {
+                                        "type": "integer"
+                                    },
+                                    "certificate_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Certificate issued"
+                    }
+                }
+            }
+        },
+        "/cities": {
+            "get": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "List all cities",
+                "operationId": "e25de57040f79e34bde45fbad1555991",
+                "parameters": [
+                    {
+                        "name": "all",
+                        "in": "query",
+                        "description": "Set to true to get all cities without pagination",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of cities"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/admin/cities": {
+            "post": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Create city",
+                "operationId": "ca44ee4f9aa208894481777e393d5347",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "properties": {
+                                            "az": {
+                                                "type": "string"
+                                            },
+                                            "en": {
+                                                "type": "string"
+                                            },
+                                            "ru": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "City created"
+                    }
+                }
+            }
+        },
+        "/cities/{city}": {
+            "get": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Get city by ID",
+                "operationId": "28e843404afd450f4e22680c1c42c0ba",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "path",
+                        "description": "City ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "City data"
+                    }
+                }
+            }
+        },
+        "/admin/cities/{city}": {
+            "put": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Update city",
+                "operationId": "a87c8e245f7a73fc79b01cf7e0517cb8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "properties": {
+                                            "az": {
+                                                "type": "string"
+                                            },
+                                            "en": {
+                                                "type": "string"
+                                            },
+                                            "ru": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "City updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Delete city",
+                "operationId": "50aa46271b0540390d7aca973e963239",
+                "responses": {
+                    "200": {
+                        "description": "City deleted"
+                    }
+                }
+            }
+        },
+        "/grades": {
+            "get": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "List all grades",
+                "operationId": "76fce6f015ff6699e282c0374f2029a4",
+                "parameters": [
+                    {
+                        "name": "all",
+                        "in": "query",
+                        "description": "Set to true to get all grades without pagination",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of grades"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/admin/grades": {
+            "post": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Create grade",
+                "operationId": "b16174552b1284b1209bc0012c743b7f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Grade created"
+                    }
+                }
+            }
+        },
+        "/admin/grades/{grade}": {
+            "get": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Get grade by ID",
+                "operationId": "d0a0cec83ca83cd8f9b164aacccbfac6",
+                "parameters": [
+                    {
+                        "name": "grade",
+                        "in": "path",
+                        "description": "Grade ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grade data"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Update grade",
+                "operationId": "fd13d206ecada4682e8e1fbba33c5fbd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Grade updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Grades"
+                ],
+                "summary": "Delete grade",
+                "operationId": "e7d830c91b854114034044d74abf5261",
+                "responses": {
+                    "200": {
+                        "description": "Grade deleted"
+                    }
+                }
+            }
+        },
+        "/topics/{topic}/lessons": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "List lessons by topic",
+                "operationId": "6dce5c5bb89abcf1275631d936d68784",
+                "parameters": [
+                    {
+                        "name": "topic",
+                        "in": "path",
+                        "description": "Topic ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of lessons in topic"
+                    }
+                }
+            }
+        },
+        "/admin/topics/{topic}/lessons": {
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Create lesson in topic",
+                "operationId": "52c377b372a0879aac1b42feae411117",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "bunny_stream_video_ids": {
+                                        "description": "Bunny Stream video IDs of pre-uploaded videos",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Lesson created"
+                    }
+                }
+            }
+        },
+        "/topics/{topic}/lessons/{lesson}": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get lesson by ID within topic",
+                "operationId": "f0fe7c3152b829d35554291ed6b58f72",
+                "parameters": [
+                    {
+                        "name": "topic",
+                        "in": "path",
+                        "description": "Topic ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "description": "Lesson ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lesson data with progress if student"
+                    }
+                }
+            }
+        },
+        "/topics/{topic}/lessons/{lesson}/progress": {
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Track lesson watch progress (student only)",
+                "operationId": "ed301a4393c05ac6fbff499c7eef56b1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "progress"
+                                ],
+                                "properties": {
+                                    "progress": {
+                                        "description": "Watch progress 0-100",
+                                        "type": "integer"
+                                    },
+                                    "position": {
+                                        "description": "Last watched position in seconds",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Progress saved"
+                    }
+                }
+            }
+        },
+        "/admin/topics/{topic}/lessons/{lesson}": {
+            "put": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Update lesson",
+                "operationId": "75e1427410ed757589b0bcaef833e79c",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "bunny_stream_video_ids": {
+                                        "description": "Bunny Stream video IDs to replace existing videos",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lesson updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Delete lesson from topic",
+                "operationId": "e7ca9222530ccac4f7a67b2f16c58b8e",
+                "responses": {
+                    "200": {
+                        "description": "Lesson deleted"
+                    }
+                }
+            }
+        },
+        "/videos": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "List all videos",
+                "operationId": "555e20ea8f656d0a1575e693caf51c39",
+                "parameters": [
+                    {
+                        "name": "lesson_id",
+                        "in": "query",
+                        "description": "Filter by lesson ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (pending_upload, ready)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of videos"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Create video",
+                "operationId": "dffe90eee1548387a8703bba957be3da",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Video created with upload link"
+                    }
+                }
+            }
+        },
+        "/videos/{video}": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Get video by ID",
+                "operationId": "a1af100e9eb8ec89fdd5c7199ac8e09a",
+                "parameters": [
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "description": "Video ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Video data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Update video",
+                "operationId": "ec42a8ab546f092484a1c73e564ee0de",
+                "responses": {
+                    "200": {
+                        "description": "Video updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Delete video",
+                "operationId": "22d78d0da83052bf7714131712512d03",
+                "responses": {
+                    "200": {
+                        "description": "Video deleted"
+                    }
+                }
+            }
+        },
+        "/families": {
+            "get": {
+                "tags": [
+                    "Families"
+                ],
+                "summary": "List all families",
+                "operationId": "aee266d16751868cf81543fdd0d9c28e",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of families"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Families"
+                ],
+                "summary": "Create family",
+                "operationId": "b7915af70530bb9d6442bb5f3d100e7c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Family created"
+                    }
+                }
+            }
+        },
+        "/families/{family}": {
+            "get": {
+                "tags": [
+                    "Families"
+                ],
+                "summary": "Get family by ID",
+                "operationId": "081d0e7e899956fab1d05a93641b2c6b",
+                "parameters": [
+                    {
+                        "name": "family",
+                        "in": "path",
+                        "description": "Family ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Family data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Families"
+                ],
+                "summary": "Update family",
+                "operationId": "068c4e483ba8b72805999f79728f11cc",
+                "responses": {
+                    "200": {
+                        "description": "Family updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Families"
+                ],
+                "summary": "Delete family",
+                "operationId": "4f1dfd2c51e1d19244b099ada315c69a",
+                "responses": {
+                    "200": {
+                        "description": "Family deleted"
+                    }
+                }
+            }
+        },
+        "/plans": {
+            "get": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "List all subscription plans",
+                "operationId": "57817bedaf78a8bd085cfe0f7960678c",
+                "parameters": [
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, price, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of plans"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Create subscription plan",
+                "operationId": "0baf36b066ebad1fc7f0ee539c7994dc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "price",
+                                    "duration"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Translated name",
+                                        "type": "object"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "duration": {
+                                        "description": "Duration in days",
+                                        "type": "integer"
+                                    },
+                                    "old_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Plan created"
+                    }
+                }
+            }
+        },
+        "/plans/{plan}": {
+            "get": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Get subscription plan by ID",
+                "operationId": "a17afa3f588379c9664cf6947c9a684f",
+                "parameters": [
+                    {
+                        "name": "plan",
+                        "in": "path",
+                        "description": "Plan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plan data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Update subscription plan",
+                "operationId": "56b54b3787c0edf8ec3e299df04e63e7",
+                "responses": {
+                    "200": {
+                        "description": "Plan updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Plans"
+                ],
+                "summary": "Delete subscription plan",
+                "operationId": "662351fae909bcf2231f1d3bd9f2667f",
+                "responses": {
+                    "200": {
+                        "description": "Plan deleted"
+                    }
+                }
+            }
+        },
+        "/subscriptions": {
+            "get": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "List all subscriptions",
+                "operationId": "441d98192b26b3ce926e5a1733fbb763",
+                "parameters": [
+                    {
+                        "name": "school_id",
+                        "in": "query",
+                        "description": "Filter by school ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "teacher_id",
+                        "in": "query",
+                        "description": "Filter by teacher ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of subscriptions"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Create subscription",
+                "operationId": "e47d2f6a6ae5c9973af2f332aa637150",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "subscription_plan_id",
+                                    "start_date",
+                                    "expires_at",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "subscription_plan_id": {
+                                        "type": "integer"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "school_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "teacher_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Subscription created"
+                    }
+                }
+            }
+        },
+        "/subscriptions/{subscription}": {
+            "get": {
+                "tags": [
+                    "Subscriptions"
+                ],
+                "summary": "Get subscription by ID",
+                "operationId": "1a077e8b5fa3898aa55b34d33edade2d",
+                "parameters": [
+                    {
+                        "name": "subscription",
+                        "in": "path",
+                        "description": "Subscription ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subscription data"
+                    }
+                }
+            }
+        },
+        "/admin/questions": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "List questions",
+                "operationId": "c052ebc3a7aedb9c51b4a5d20e165fc9",
+                "parameters": [
+                    {
+                        "name": "topic_id",
+                        "in": "query",
+                        "description": "Filter by single topic ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "topic_ids",
+                        "in": "query",
+                        "description": "Filter by multiple topic IDs (comma-separated)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by type (regular, open)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "difficulty_level",
+                        "in": "query",
+                        "description": "Filter by difficulty level",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by question text",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of questions"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Create question",
+                "operationId": "46b31cc056835f2f7611717d5096188b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "type",
+                                    "topic_id",
+                                    "difficulty_level"
+                                ],
+                                "properties": {
+                                    "question": {
+                                        "description": "Question content (type + content)",
+                                        "type": "array"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "regular",
+                                            "open"
+                                        ]
+                                    },
+                                    "explanation": {
+                                        "type": "array",
+                                        "nullable": true
+                                    },
+                                    "difficulty_level": {
+                                        "type": "string"
+                                    },
+                                    "topic_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Question created"
+                    }
+                }
+            }
+        },
+        "/admin/questions/{question}": {
+            "get": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Get question by ID",
+                "operationId": "ba0bfede1775d79f79bf4de9fbc51023",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "description": "Question ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question data"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Update question",
+                "operationId": "b3932538310fd3ff53da5ff7a647796d",
+                "responses": {
+                    "200": {
+                        "description": "Question updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Questions"
+                ],
+                "summary": "Delete question",
+                "operationId": "6d8e801bd1605fe0901c2df020609788",
+                "responses": {
+                    "200": {
+                        "description": "Question deleted"
+                    }
+                }
+            }
+        },
+        "/quizzes": {
+            "get": {
+                "tags": [
+                    "Quizzes"
+                ],
+                "summary": "List all quizzes",
+                "operationId": "a202584e6b1fd11d7aa27dfa4c245573",
+                "parameters": [
+                    {
+                        "name": "topic_id",
+                        "in": "query",
+                        "description": "Filter by topic ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "lesson_id",
+                        "in": "query",
+                        "description": "Filter by lesson ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by type (topic_based, general)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of quizzes"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/admin/quizzes": {
+            "post": {
+                "tags": [
+                    "Quizzes"
+                ],
+                "summary": "Create quiz with existing questions",
+                "operationId": "fb8f973c708d9dcb40760a0e32447908",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "Translated name",
+                                        "type": "object"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "topic_based",
+                                            "general"
+                                        ]
+                                    },
+                                    "topic_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "lesson_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "question_ids": {
+                                        "description": "IDs of existing questions to attach",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Quiz created"
+                    }
+                }
+            }
+        },
+        "/quizzes/{quiz}": {
+            "get": {
+                "tags": [
+                    "Quizzes"
+                ],
+                "summary": "Get quiz by ID",
+                "operationId": "474f57e7e79b0c98a025ca58c0e7f768",
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "description": "Quiz ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Quiz data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/admin/quizzes/{quiz}": {
+            "put": {
+                "tags": [
+                    "Quizzes"
+                ],
+                "summary": "Update quiz",
+                "operationId": "7e06a00cd841f729becb8828599ee4e3",
+                "responses": {
+                    "200": {
+                        "description": "Quiz updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Quizzes"
+                ],
+                "summary": "Delete quiz",
+                "operationId": "a2b23219750a0c4c663725e1a389fa77",
+                "responses": {
+                    "200": {
+                        "description": "Quiz deleted"
+                    }
+                }
+            }
+        },
+        "/schools": {
+            "get": {
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "List all schools",
+                "operationId": "940d5e9a2c9cbd6345084ef16c290243",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "query",
+                        "description": "Filter by city ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of schools"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "Create school",
+                "operationId": "053c8b7c89f5a7f49372b197d685de76",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "name"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "city_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "no": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "School created"
+                    }
+                }
+            }
+        },
+        "/schools/{school}": {
+            "get": {
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "Get school by ID",
+                "operationId": "756e6acd2f3b46ec18aa0f1af9178e16",
+                "parameters": [
+                    {
+                        "name": "school",
+                        "in": "path",
+                        "description": "School ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "School data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "Update school",
+                "operationId": "f15d80fb5988faf8a684cb5dd4654612",
+                "responses": {
+                    "200": {
+                        "description": "School updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Schools"
+                ],
+                "summary": "Delete school",
+                "operationId": "332efb8caac01f1a6691458ad89c75bf",
+                "responses": {
+                    "200": {
+                        "description": "School deleted"
+                    }
+                }
+            }
+        },
+        "/settings": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Get settings",
+                "operationId": "a4a70dd03c480e33c3f927045ed288a1",
+                "responses": {
+                    "200": {
+                        "description": "Settings data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/admin/settings": {
+            "put": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Update settings",
+                "operationId": "2dec89a48d60988331fa3ca467da6957",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "app_name": {
+                                        "type": "object"
+                                    },
+                                    "description": {
+                                        "type": "object"
+                                    },
+                                    "keywords": {
+                                        "type": "string"
+                                    },
+                                    "logo": {
+                                        "type": "string"
+                                    },
+                                    "favicon": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "facebook": {
+                                        "type": "string"
+                                    },
+                                    "instagram": {
+                                        "type": "string"
+                                    },
+                                    "maintenance_mode": {
+                                        "type": "boolean"
+                                    },
+                                    "registration_open": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Settings updated"
+                    }
+                }
+            }
+        },
+        "/students": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "List all students",
+                "operationId": "0df87646b50d15aea77868bb24a975ec",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "grade_id",
+                        "in": "query",
+                        "description": "Filter by grade ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "query",
+                        "description": "Filter by city ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "school_name",
+                        "in": "query",
+                        "description": "Filter by school name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of students"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Create student",
+                "operationId": "5c9b91c56de266e807f1492095c80fcf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "grade_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "city_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "school_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Student created"
+                    }
+                }
+            }
+        },
+        "/students/{student}": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get student by ID",
+                "operationId": "b07fc5d36d18f74880bc1a42d1bb8f3c",
+                "parameters": [
+                    {
+                        "name": "student",
+                        "in": "path",
+                        "description": "Student ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Student data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Update student",
+                "operationId": "923393f56a6f512daab6beeb6173d8fc",
+                "responses": {
+                    "200": {
+                        "description": "Student updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Delete student",
+                "operationId": "a3309f52e5c198745d464b0e1712e7b8",
+                "responses": {
+                    "200": {
+                        "description": "Student deleted"
+                    }
+                }
+            }
+        },
+        "/students/activities": {
+            "get": {
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Get authenticated student activities",
+                "operationId": "1a1cb159895bdc08f023dcb502543db4",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by activity type (lesson_completed, quiz_completed)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of activities"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/subjects": {
+            "get": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "List all subjects",
+                "operationId": "01864eab025655bc2bfda152550929b1",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "grade_ids",
+                        "in": "query",
+                        "description": "Comma-separated grade IDs (e.g. ?grade_ids=5,6)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "created_at_min",
+                        "in": "query",
+                        "description": "Start date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_at_max",
+                        "in": "query",
+                        "description": "End date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of subjects"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Create subject",
+                "operationId": "b6d13bb7a2ece5093fbbcfea58e1cbb7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Subject created"
+                    }
+                }
+            }
+        },
+        "/subjects/{subject}": {
+            "get": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Get subject by ID",
+                "operationId": "c58a4fcdbc179cef4a64baa8cb604351",
+                "parameters": [
+                    {
+                        "name": "subject",
+                        "in": "path",
+                        "description": "Subject ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subject data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Update subject",
+                "operationId": "c93e6aa705c238f5a82fd9214a7f4cf0",
+                "responses": {
+                    "200": {
+                        "description": "Subject updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Subjects"
+                ],
+                "summary": "Delete subject",
+                "operationId": "87f7116bf470db0b60a0823203ebb7d4",
+                "responses": {
+                    "200": {
+                        "description": "Subject deleted"
+                    }
+                }
+            }
+        },
+        "/teacher-tasks": {
+            "get": {
+                "tags": [
+                    "Teacher Tasks"
+                ],
+                "summary": "List all teacher tasks",
+                "operationId": "67f1642cfdcc86980607e4df12553da5",
+                "parameters": [
+                    {
+                        "name": "teacher_id",
+                        "in": "query",
+                        "description": "Filter by teacher ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "topic_id",
+                        "in": "query",
+                        "description": "Filter by topic ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "grade_id",
+                        "in": "query",
+                        "description": "Filter by grade ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter by task type",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of teacher tasks"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Teacher Tasks"
+                ],
+                "summary": "Create teacher task",
+                "operationId": "c7d58aa83ec61728ae0994b8ca264963",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "teacher_id",
+                                    "topic_id",
+                                    "quiz_id",
+                                    "grade_id",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "teacher_id": {
+                                        "type": "integer"
+                                    },
+                                    "topic_id": {
+                                        "type": "integer"
+                                    },
+                                    "quiz_id": {
+                                        "type": "integer"
+                                    },
+                                    "grade_id": {
+                                        "type": "integer"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Teacher task created"
+                    }
+                }
+            }
+        },
+        "/teacher-tasks/{teacher_task}": {
+            "get": {
+                "tags": [
+                    "Teacher Tasks"
+                ],
+                "summary": "Get teacher task by ID",
+                "operationId": "ff449e11ba4b814e20ba6e380b6d728c",
+                "parameters": [
+                    {
+                        "name": "teacher_task",
+                        "in": "path",
+                        "description": "Teacher Task ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Teacher task data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Teacher Tasks"
+                ],
+                "summary": "Update teacher task",
+                "operationId": "0291faaa7ac533976bf43242ddae28f6",
+                "responses": {
+                    "200": {
+                        "description": "Teacher task updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Teacher Tasks"
+                ],
+                "summary": "Delete teacher task",
+                "operationId": "a86def0c40f7dc0d379e091567524ea5",
+                "responses": {
+                    "200": {
+                        "description": "Teacher task deleted"
+                    }
+                }
+            }
+        },
+        "/teachers": {
+            "get": {
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "List all teachers",
+                "operationId": "968514d1bd9e4de757cf75b3a895c452",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city_id",
+                        "in": "query",
+                        "description": "Filter by city ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of teachers"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Create teacher",
+                "operationId": "b0b3d4e66f2e9381600d5fa02add6b2d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "city_id": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "birth_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Teacher created"
+                    }
+                }
+            }
+        },
+        "/teachers/{teacher}": {
+            "get": {
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Get teacher by ID",
+                "operationId": "80a4357f66a50b72788157f7f5ddeedf",
+                "parameters": [
+                    {
+                        "name": "teacher",
+                        "in": "path",
+                        "description": "Teacher ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Teacher data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Update teacher",
+                "operationId": "f1d7223ac1ac2518cbbd42ade2b75c2c",
+                "responses": {
+                    "200": {
+                        "description": "Teacher updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Teachers"
+                ],
+                "summary": "Delete teacher",
+                "operationId": "280ec40ede31b3fab62674c7a8d137c7",
+                "responses": {
+                    "200": {
+                        "description": "Teacher deleted"
+                    }
+                }
+            }
+        },
+        "/subjects/{subject}/topics": {
+            "get": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "List topics in subject",
+                "operationId": "3b3cab9cad6edd54a2aaf60ef5cb9ee8",
+                "parameters": [
+                    {
+                        "name": "subject",
+                        "in": "path",
+                        "description": "Subject ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "difficulty_level",
+                        "in": "query",
+                        "description": "Filter by difficulty level (1-5)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "grade_ids",
+                        "in": "query",
+                        "description": "Comma-separated grade IDs (e.g. ?grade_ids=5,6)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "created_at_min",
+                        "in": "query",
+                        "description": "Start date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_at_max",
+                        "in": "query",
+                        "description": "End date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. name, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of topics"
+                    }
+                }
+            }
+        },
+        "/admin/subjects/{subject}/topics": {
+            "post": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Create topic in subject",
+                "operationId": "7bc24543723974645bfe4acdcb519685",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "difficulty_level"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "difficulty_level": {
+                                        "description": "1=Beginner, 2=Elementary, 3=Intermediate, 4=Advanced, 5=Expert",
+                                        "type": "integer"
+                                    },
+                                    "grade_ids": {
+                                        "description": "Array of grade IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Topic created"
+                    }
+                }
+            }
+        },
+        "/subjects/{subject}/topics/{topic}": {
+            "get": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Get topic by ID within subject",
+                "operationId": "31521fc504d10d5f66bd7a970d9dd846",
+                "parameters": [
+                    {
+                        "name": "subject",
+                        "in": "path",
+                        "description": "Subject ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "topic",
+                        "in": "path",
+                        "description": "Topic ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Topic data"
+                    }
+                }
+            }
+        },
+        "/admin/subjects/{subject}/topics/{topic}": {
+            "put": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Update topic",
+                "operationId": "064e0f2a2245b2d879232b4814b02565",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "difficulty_level": {
+                                        "description": "1=Beginner, 2=Elementary, 3=Intermediate, 4=Advanced, 5=Expert",
+                                        "type": "integer"
+                                    },
+                                    "grade_ids": {
+                                        "description": "Array of grade IDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Topic updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Delete topic",
+                "operationId": "4443c36c87e752cdb7dd0b0582055539",
+                "responses": {
+                    "200": {
+                        "description": "Topic deleted"
+                    }
+                }
+            }
+        },
+        "/translates": {
+            "get": {
+                "tags": [
+                    "Translates"
+                ],
+                "summary": "List all translates",
+                "operationId": "d44a410ac5e8d0c3def3a853b3b6dcf5",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by key or label",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. key, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of translates"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Translates"
+                ],
+                "summary": "Create translate",
+                "operationId": "4cae15674e36a765bf824798035213cb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "key": {
+                                        "type": "string"
+                                    },
+                                    "label": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "value": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Translate created"
+                    }
+                }
+            }
+        },
+        "/translates/{translate}": {
+            "get": {
+                "tags": [
+                    "Translates"
+                ],
+                "summary": "Get translate by ID",
+                "operationId": "4468dc7dc0a43f29333b25a9bb986a6f",
+                "parameters": [
+                    {
+                        "name": "translate",
+                        "in": "path",
+                        "description": "Translate ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Translate data"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Translates"
+                ],
+                "summary": "Update translate",
+                "operationId": "82b4c86eba46d19f9e24188138f3013e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "key": {
+                                        "type": "string"
+                                    },
+                                    "label": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "value": {
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Translate updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Translates"
+                ],
+                "summary": "Delete translate",
+                "operationId": "ef6473eb5acb9f51f410e1866a3377cc",
+                "responses": {
+                    "200": {
+                        "description": "Translate deleted"
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "operationId": "6535290507fbf3a0a4459475136f4a05",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered / School request pending"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationError"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "operationId": "05a4834111390b8216b8a8cb1a1bc0ac",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "description": "Phone number or email",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token returned"
+                    },
+                    "422": {
+                        "description": "Invalid credentials"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/auth/send-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send OTP",
+                "operationId": "25badcdb2b6c8843f9432bfd87a2d84a",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "phone": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/auth/verify-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify OTP",
+                "operationId": "ec01eaf4af3c1dc827c8fb241183c74c",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "maxLength": 6,
+                                        "minLength": 6
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP verified"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/auth/admin-login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Admin login",
+                "operationId": "423c8b679c9ae90e40850c02d84896a8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token returned"
+                    },
+                    "422": {
+                        "description": "Invalid credentials"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout (Bearer)",
+                "operationId": "ee211fe2ca06511050c01942ccdb183c",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get authenticated user profile",
+                "operationId": "af60b687ece4bc5b06976fd7da973434",
+                "responses": {
+                    "200": {
+                        "description": "User profile data"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profile",
+                "operationId": "e344b32de7e538b9486db4aa955a880e",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "surname": {
+                                        "type": "string"
+                                    },
+                                    "avatar": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 8
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "SuccessResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "status_code": {
+                        "type": "integer",
+                        "example": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": ""
+                    }
+                },
+                "type": "object"
+            },
+            "DataResponse": {
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "status_code": {
+                        "type": "integer",
+                        "example": 422
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Something went wrong."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "field": [
+                                "Error message"
+                            ]
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer"
+                    },
+                    "last_page": {
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "has_more_pages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "required": [
+                    "email",
+                    "type"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Required for non-school types",
+                        "type": "string"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "description": "Required for non-school types",
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "description": "Required for non-school types",
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "description": "Must match password, required with password",
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "default": "student",
+                        "enum": [
+                            "student",
+                            "teacher",
+                            "parent",
+                            "school",
+                            "admin"
+                        ]
+                    },
+                    "teacher": {
+                        "properties": {
+                            "city_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "student": {
+                        "properties": {
+                            "grade_id": {
+                                "type": "integer"
+                            },
+                            "city_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "school": {
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "no": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "city_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "ValidationError": {
+                "description": "Validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "bearer",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Certificates",
+            "description": "Certificates"
+        },
+        {
+            "name": "Cities",
+            "description": "Cities"
+        },
+        {
+            "name": "Grades",
+            "description": "Grades"
+        },
+        {
+            "name": "Lessons",
+            "description": "Lessons"
+        },
+        {
+            "name": "Videos",
+            "description": "Videos"
+        },
+        {
+            "name": "Families",
+            "description": "Families"
+        },
+        {
+            "name": "Plans",
+            "description": "Plans"
+        },
+        {
+            "name": "Subscriptions",
+            "description": "Subscriptions"
+        },
+        {
+            "name": "Questions",
+            "description": "Questions"
+        },
+        {
+            "name": "Quizzes",
+            "description": "Quizzes"
+        },
+        {
+            "name": "Schools",
+            "description": "Schools"
+        },
+        {
+            "name": "Settings",
+            "description": "Settings"
+        },
+        {
+            "name": "Students",
+            "description": "Students"
+        },
+        {
+            "name": "Subjects",
+            "description": "Subjects"
+        },
+        {
+            "name": "Teacher Tasks",
+            "description": "Teacher Tasks"
+        },
+        {
+            "name": "Teachers",
+            "description": "Teachers"
+        },
+        {
+            "name": "Topics",
+            "description": "Topics"
+        },
+        {
+            "name": "Translates",
+            "description": "Translates"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
+        }
+    ]
+}

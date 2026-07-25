@@ -1,0 +1,10 @@
+{
+    "name": "City",
+    "alias": "city",
+    "description": "",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,10 @@
+{
+    "name": "Star",
+    "alias": "star",
+    "description": "Star module",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": ["User"]
+}

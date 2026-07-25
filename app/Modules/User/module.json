@@ -1,0 +1,10 @@
+{
+    "name": "User",
+    "alias": "user",
+    "description": "",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,15 @@
+{
+    "City": true,
+    "Course": false,
+    "Grade": true,
+    "Lesson": true,
+    "Payment": true,
+    "Question": true,
+    "Quiz": true,
+    "Setting": true,
+    "Student": true,
+    "Subject": true,
+    "Topic": true,
+    "User": true,
+    "Star": false
+}

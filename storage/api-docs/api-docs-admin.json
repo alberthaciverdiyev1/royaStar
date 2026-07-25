@@ -1,0 +1,200 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "RoyaStar Backend API",
+        "description": "LMS platform for managing students, teachers, schools, and curriculum.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "API Server"
+        }
+    ],
+    "paths": {},
+    "components": {
+        "schemas": {
+            "SuccessResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "status_code": {
+                        "type": "integer",
+                        "example": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": ""
+                    }
+                },
+                "type": "object"
+            },
+            "DataResponse": {
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "status_code": {
+                        "type": "integer",
+                        "example": 422
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Something went wrong."
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "field": [
+                                "Error message"
+                            ]
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedMeta": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer"
+                    },
+                    "last_page": {
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "has_more_pages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "required": [
+                    "email",
+                    "type"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Required for non-school types",
+                        "type": "string"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "description": "Required for non-school types",
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "description": "Required for non-school types",
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "description": "Must match password, required with password",
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "default": "student",
+                        "enum": [
+                            "student",
+                            "teacher",
+                            "parent",
+                            "school",
+                            "admin"
+                        ]
+                    },
+                    "teacher": {
+                        "properties": {
+                            "city_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "student": {
+                        "properties": {
+                            "grade_id": {
+                                "type": "integer"
+                            },
+                            "city_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "school": {
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "no": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "city_id": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "ValidationError": {
+                "description": "Validation error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "bearer",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

@@ -1,0 +1,13 @@
+.env
+.git
+.gitignore
+.vscode
+.docker
+node_modules
+vendor
+storage/framework/cache/data/*
+storage/logs/*
+!storage/logs/.gitkeep
+docker-compose.yml
+Dockerfile
+*.md
