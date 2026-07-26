@@ -13,8 +13,8 @@ class LessonResource extends BaseResource
         $data = [
             'id' => $this->id,
             'topic_id' => $this->topic_id,
-            'name' => $this->translate('name'),
-            'description' => $this->translate('description'),
+            'name' => $this->name,
+            'description' => $this->description,
             'view_count' => $this->view?->count ?? 0,
             'created_at' => $this->created_at,
             $this->mergeWhen($this->relationLoaded('videos'), [

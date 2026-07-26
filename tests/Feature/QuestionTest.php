@@ -4,6 +4,7 @@ use App\Modules\Question\Models\Question;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Topic\Enums\DifficultyLevel;
 use App\Modules\Topic\Models\Topic;
+use App\Modules\Lesson\Models\Lesson;
 use App\Modules\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -12,11 +13,16 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Role::create(['name' => 'admin', 'guard_name' => 'api']);
-    $this->subject = Subject::create(['name' => ['en' => 'Math']]);
+    $this->subject = Subject::create(['name' => 'Math']);
     $this->topic = Topic::create([
         'subject_id' => $this->subject->id,
-        'name' => ['en' => 'Algebra', 'az' => 'Cəbr'],
+        'name' => 'Algebra',
         'difficulty_level' => DifficultyLevel::Beginner->value,
+    ]);
+    $this->lesson = Lesson::create([
+        'topic_id' => $this->topic->id,
+        'name' => 'Test Lesson',
+        'description' => 'Test lesson description',
     ]);
     $this->admin = User::factory()->create(['type' => 'admin']);
     $this->admin->assignRole('admin');
@@ -34,7 +40,7 @@ function loc(string $en, string $az): array
     return ['en' => t($en), 'az' => t($az)];
 }
 
-function regularQuestionData($topicId, $overrides = []): array
+function regularQuestionData($lessonId, $overrides = []): array
 {
     return array_merge([
         'question' => loc('What is 2+2?', '2+2 neçədir?'),
@@ -48,11 +54,11 @@ function regularQuestionData($topicId, $overrides = []): array
         'open_answer' => null,
         'explanation' => loc('Basic addition', 'Sadə toplama'),
         'difficulty_level' => DifficultyLevel::Beginner->value,
-        'topic_id' => $topicId,
+        'lesson_id' => $lessonId,
     ], $overrides);
 }
 
-function openQuestionData($topicId, $overrides = []): array
+function openQuestionData($lessonId, $overrides = []): array
 {
     return array_merge([
         'question' => loc('Explain gravity', 'Cazibə qüvvəsini izah edin'),
@@ -61,14 +67,14 @@ function openQuestionData($topicId, $overrides = []): array
         'open_answer' => loc('A force that attracts', 'Cəlb edən qüvvə'),
         'explanation' => loc('Physics concept', 'Fizika anlayışı'),
         'difficulty_level' => DifficultyLevel::Advanced->value,
-        'topic_id' => $topicId,
+        'lesson_id' => $lessonId,
     ], $overrides);
 }
 
 function assertQuestionStructure($data, $expectedType = null): void
 {
     expect($data)->toHaveKeys([
-        'id', 'topic_id', 'type', 'right_answer', 'difficulty_level',
+        'id', 'lesson_id', 'type', 'right_answer', 'difficulty_level',
         'question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e',
         'open_answer', 'explanation', 'created_at',
     ]);
@@ -81,8 +87,8 @@ function assertQuestionStructure($data, $expectedType = null): void
 // ─── List Questions (Admin) ─────────────────────────────────────────
 
 it('lists all questions', function () {
-    Question::create(regularQuestionData($this->topic->id));
-    Question::create(openQuestionData($this->topic->id));
+    Question::create(regularQuestionData($this->lesson->id));
+    Question::create(openQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson('/api/admin/questions');
 
@@ -101,32 +107,37 @@ it('returns empty list when no questions exist', function () {
     expect($response->json('data'))->toBe([]);
 });
 
-it('filters questions by topic_id', function () {
+it('filters questions by lesson_id', function () {
     $topic2 = Topic::create([
         'subject_id' => $this->subject->id,
-        'name' => ['en' => 'Geometry'],
+        'name' => 'Geometry',
         'difficulty_level' => DifficultyLevel::Beginner->value,
     ]);
-    Question::create(regularQuestionData($this->topic->id));
-    Question::create(regularQuestionData($topic2->id));
+    $lesson2 = Lesson::create([
+        'topic_id' => $topic2->id,
+        'name' => 'Test Lesson 2',
+        'description' => 'Test lesson 2 description',
+    ]);
+    Question::create(regularQuestionData($this->lesson->id));
+    Question::create(regularQuestionData($lesson2->id));
 
-    $response = $this->actingAs($this->admin)->getJson('/api/admin/questions?topic_id=' . $this->topic->id);
+    $response = $this->actingAs($this->admin)->getJson('/api/admin/questions?lesson_id=' . $this->lesson->id);
 
     expect($response->json('data'))->toHaveCount(1);
-    expect($response->json('data.0.topic_id'))->toBe($this->topic->id);
+    expect($response->json('data.0.lesson_id'))->toBe($this->lesson->id);
 });
 
-it('includes topic relation in question list', function () {
-    Question::create(regularQuestionData($this->topic->id));
+it('includes lesson relation in question list', function () {
+    Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson('/api/admin/questions');
 
-    expect($response->json('data.0'))->toHaveKey('topic_id');
-    expect($response->json('data.0.topic_id'))->toBe($this->topic->id);
+    expect($response->json('data.0'))->toHaveKey('lesson_id');
+    expect($response->json('data.0.lesson_id'))->toBe($this->lesson->id);
 });
 
 it('allows admin to list questions', function () {
-    Question::create(regularQuestionData($this->topic->id));
+    Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson('/api/admin/questions');
 
@@ -144,7 +155,7 @@ it('blocks non-admin from listing questions', function () {
 // ─── Show Question (Admin) ─────────────────────────────────────────
 
 it('shows a question by id', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
 
@@ -155,7 +166,7 @@ it('shows a question by id', function () {
 });
 
 it('shows an open type question', function () {
-    $question = Question::create(openQuestionData($this->topic->id));
+    $question = Question::create(openQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
 
@@ -173,7 +184,7 @@ it('returns 404 for non-existent question', function () {
 });
 
 it('shows difficulty_level as enum value in question', function () {
-    $question = Question::create(regularQuestionData($this->topic->id, [
+    $question = Question::create(regularQuestionData($this->lesson->id, [
         'difficulty_level' => DifficultyLevel::Expert->value,
     ]));
 
@@ -183,7 +194,7 @@ it('shows difficulty_level as enum value in question', function () {
 });
 
 it('allows admin to show question', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
 
@@ -191,7 +202,7 @@ it('allows admin to show question', function () {
 });
 
 it('returns raw nested translation array for admin', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     // Admin access — returns raw translation array
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
@@ -204,7 +215,7 @@ it('returns raw nested translation array for admin', function () {
 it('creates a regular question as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $data = regularQuestionData($this->topic->id);
+    $data = regularQuestionData($this->lesson->id);
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', $data);
 
@@ -220,7 +231,7 @@ it('creates a regular question as admin', function () {
 it('creates an open question as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $data = openQuestionData($this->topic->id);
+    $data = openQuestionData($this->lesson->id);
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', $data);
 
@@ -235,13 +246,13 @@ it('creates an open question as admin', function () {
 it('fails to create question without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 
-    $response = $this->actingAs($user)->postJson('/api/admin/questions', regularQuestionData($this->topic->id));
+    $response = $this->actingAs($user)->postJson('/api/admin/questions', regularQuestionData($this->lesson->id));
 
     $response->assertStatus(403);
 });
 
 it('fails to create question without authentication', function () {
-    $response = $this->postJson('/api/admin/questions', regularQuestionData($this->topic->id));
+    $response = $this->postJson('/api/admin/questions', regularQuestionData($this->lesson->id));
 
     $response->assertStatus(401);
 });
@@ -262,7 +273,7 @@ it('validates question field is required', function () {
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
         'type' => 'regular',
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
         'difficulty_level' => DifficultyLevel::Beginner->value,
     ]);
 
@@ -289,7 +300,7 @@ it('rejects invalid type value', function () {
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
         'question' => ['en' => t('Test')],
         'type' => 'invalid_type',
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
         'difficulty_level' => DifficultyLevel::Beginner->value,
     ]);
 
@@ -304,21 +315,21 @@ it('validates difficulty_level must be a valid enum value', function () {
         'question' => ['en' => t('Test')],
         'type' => 'regular',
         'difficulty_level' => 99,
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(422);
     expect($response->json('errors'))->toHaveKey('difficulty_level');
 });
 
-it('validates topic_id must exist', function () {
+it('validates lesson_id must exist', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', regularQuestionData(99999));
 
     $response->assertStatus(422);
-    expect($response->json('errors'))->toHaveKey('topic_id');
+    expect($response->json('errors'))->toHaveKey('lesson_id');
 });
 
 // ─── Type-Specific Validation (Store) ───────────────────────────────
@@ -331,7 +342,7 @@ it('requires open_answer when type is open', function () {
         'question' => ['en' => t('Explain?')],
         'type' => 'open',
         'difficulty_level' => DifficultyLevel::Beginner->value,
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(422);
@@ -342,7 +353,7 @@ it('does not require variants when type is open', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $response = $this->actingAs($admin)->postJson('/api/admin/questions', openQuestionData($this->topic->id));
+    $response = $this->actingAs($admin)->postJson('/api/admin/questions', openQuestionData($this->lesson->id));
 
     $response->assertStatus(201);
 });
@@ -351,7 +362,7 @@ it('does not require open_answer when type is regular', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $response = $this->actingAs($admin)->postJson('/api/admin/questions', regularQuestionData($this->topic->id, [
+    $response = $this->actingAs($admin)->postJson('/api/admin/questions', regularQuestionData($this->lesson->id, [
         'open_answer' => null,
     ]));
 
@@ -366,7 +377,7 @@ it('requires variant_a, variant_b, variant_c when type is regular', function () 
         'question' => ['en' => t('Test')],
         'type' => 'regular',
         'difficulty_level' => DifficultyLevel::Beginner->value,
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(422);
@@ -387,7 +398,7 @@ it('allows variant_d and variant_e to be optional for regular questions', functi
         'variant_c' => ['en' => t('C')],
         'right_answer' => 'variant_a',
         'difficulty_level' => DifficultyLevel::Beginner->value,
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(201);
@@ -406,7 +417,7 @@ it('requires right_answer when type is regular', function () {
         'variant_b' => ['en' => t('B')],
         'variant_c' => ['en' => t('C')],
         'difficulty_level' => DifficultyLevel::Beginner->value,
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(422);
@@ -425,7 +436,7 @@ it('validates question.*.type must be text or image', function () {
         'variant_c' => ['en' => t('C')],
         'right_answer' => 'variant_a',
         'difficulty_level' => DifficultyLevel::Beginner->value,
-        'topic_id' => $this->topic->id,
+        'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(422);
@@ -436,7 +447,7 @@ it('stores an image-type variant', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $data = regularQuestionData($this->topic->id, [
+    $data = regularQuestionData($this->lesson->id, [
         'variant_a' => ['en' => ['type' => 'image', 'content' => 'variants/a.jpg']],
     ]);
 
@@ -450,7 +461,7 @@ it('stores a base64 image and replaces content with url on create', function () 
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $data = regularQuestionData($this->topic->id, [
+    $data = regularQuestionData($this->lesson->id, [
         'variant_a' => [
             'en' => [
                 'type' => 'image',
@@ -474,7 +485,7 @@ it('stores a base64 image and replaces content with url on create', function () 
 it('stores a base64 image on update', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'variant_a' => [
@@ -498,7 +509,7 @@ it('does not modify text content in image processing', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $data = regularQuestionData($this->topic->id);
+    $data = regularQuestionData($this->lesson->id);
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', $data);
 
     $response->assertStatus(201);
@@ -509,7 +520,7 @@ it('does not modify text content in image processing', function () {
 it('updates a regular question as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'question' => loc('What is 3+3?', '3+3 neçədir?'),
@@ -528,7 +539,7 @@ it('updates a regular question as admin', function () {
 it('updates an open question as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(openQuestionData($this->topic->id));
+    $question = Question::create(openQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'question' => ['en' => t('Explain dark matter')],
@@ -543,7 +554,7 @@ it('updates an open question as admin', function () {
 it('updates question type from regular to open', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'type' => 'open',
@@ -567,7 +578,7 @@ it('returns 404 when updating non-existent question', function () {
 });
 
 it('fails to update question without admin role', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->putJson("/api/admin/questions/{$question->id}", [
@@ -578,7 +589,7 @@ it('fails to update question without admin role', function () {
 });
 
 it('fails to update question without authentication', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->putJson("/api/admin/questions/{$question->id}", [
         'question' => ['en' => t('Hacked')],
@@ -590,7 +601,7 @@ it('fails to update question without authentication', function () {
 it('validates update with invalid difficulty_level', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'difficulty_level' => 99,
@@ -600,17 +611,17 @@ it('validates update with invalid difficulty_level', function () {
     expect($response->json('errors'))->toHaveKey('difficulty_level');
 });
 
-it('validates update with non-existent topic_id', function () {
+it('validates update with non-existent lesson_id', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
-        'topic_id' => 99999,
+        'lesson_id' => 99999,
     ]);
 
     $response->assertStatus(422);
-    expect($response->json('errors'))->toHaveKey('topic_id');
+    expect($response->json('errors'))->toHaveKey('lesson_id');
 });
 
 // ─── Update Type-Specific Validation ────────────────────────────────
@@ -618,7 +629,7 @@ it('validates update with non-existent topic_id', function () {
 it('validates open_answer required when updating type to open', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'type' => 'open',
@@ -631,7 +642,7 @@ it('validates open_answer required when updating type to open', function () {
 it('validates right_answer required when updating type to regular', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(openQuestionData($this->topic->id));
+    $question = Question::create(openQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'type' => 'regular',
@@ -649,7 +660,7 @@ it('validates right_answer required when updating type to regular', function () 
 it('deletes a question as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->deleteJson("/api/admin/questions/{$question->id}");
 
@@ -667,7 +678,7 @@ it('returns 404 when deleting non-existent question', function () {
 });
 
 it('fails to delete question without admin role', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->deleteJson("/api/admin/questions/{$question->id}");
@@ -676,7 +687,7 @@ it('fails to delete question without admin role', function () {
 });
 
 it('fails to delete question without authentication', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->deleteJson("/api/admin/questions/{$question->id}");
 
@@ -686,7 +697,7 @@ it('fails to delete question without authentication', function () {
 it('soft deletes question instead of hard delete', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $this->actingAs($admin)->deleteJson("/api/admin/questions/{$question->id}");
 
@@ -698,7 +709,7 @@ it('soft deletes question instead of hard delete', function () {
 it('excludes soft-deleted question from admin list', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
     $this->actingAs($admin)->deleteJson("/api/admin/questions/{$question->id}");
 
     $response = $this->actingAs($this->admin)->getJson('/api/admin/questions');
@@ -709,7 +720,7 @@ it('excludes soft-deleted question from admin list', function () {
 it('returns 404 when accessing deleted question', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
     $this->actingAs($admin)->deleteJson("/api/admin/questions/{$question->id}");
 
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
@@ -720,7 +731,7 @@ it('returns 404 when accessing deleted question', function () {
 // ─── Response Structure ─────────────────────────────────────────────
 
 it('returns correct response structure for question list', function () {
-    Question::create(regularQuestionData($this->topic->id));
+    Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson('/api/admin/questions');
 
@@ -728,13 +739,13 @@ it('returns correct response structure for question list', function () {
         'success',
         'status_code',
         'message',
-        'data' => [['id', 'topic_id', 'type', 'question']],
+        'data' => [['id', 'lesson_id', 'type', 'question']],
         'meta' => ['current_page', 'last_page', 'per_page', 'total'],
     ]);
 });
 
 it('formats created_at in Y-m-d H:i:s format', function () {
-    $question = Question::create(regularQuestionData($this->topic->id));
+    $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
 

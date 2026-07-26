@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subscription_plan_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('school_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('teacher_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('family_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('school_id')->nullable()->index();
+            $table->foreignId('teacher_id')->nullable()->index();
+            $table->foreignId('family_id')->nullable()->index();
             $table->foreignId('student_id')->nullable()->constrained()->cascadeOnDelete();
             $table->date('start_date')->comment('Subscription start date');
             $table->date('expires_at')->comment('Subscription end date');

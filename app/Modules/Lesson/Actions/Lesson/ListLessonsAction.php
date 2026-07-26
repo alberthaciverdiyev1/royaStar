@@ -16,7 +16,7 @@ class ListLessonsAction extends BaseListAction
 
     protected function defaultWith(): array
     {
-        return ['topic', 'view'];
+        return ['topic', 'view', 'videos'];
     }
 
     protected function applyFilters(Builder $query, array $params): void

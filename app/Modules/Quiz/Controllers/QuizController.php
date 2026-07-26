@@ -29,7 +29,6 @@ class QuizController extends Controller
     #[OA\Get(path: '/quizzes', tags: ['Quizzes'], summary: 'List all quizzes',
         security: [[]],
         parameters: [
-            new OA\QueryParameter(name: 'topic_id', description: 'Filter by topic ID', schema: new OA\Schema(type: 'integer')),
             new OA\QueryParameter(name: 'lesson_id', description: 'Filter by lesson ID', schema: new OA\Schema(type: 'integer')),
             new OA\QueryParameter(name: 'type', description: 'Filter by type (topic_based, general)', schema: new OA\Schema(type: 'string')),
             new OA\QueryParameter(name: 'order_by', description: 'Sort column (e.g. name, created_at)', schema: new OA\Schema(type: 'string')),
@@ -47,11 +46,10 @@ class QuizController extends Controller
     }
 
     #[OA\Post(path: '/admin/quizzes', tags: ['Quizzes'], summary: 'Create quiz with existing questions',
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['name', 'type'], properties: [
-            new OA\Property(property: 'name', type: 'object', description: 'Translated name'),
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['name', 'type', 'lesson_id'], properties: [
+            new OA\Property(property: 'name', type: 'string', description: 'Quiz name'),
             new OA\Property(property: 'type', type: 'string', enum: ['topic_based', 'general']),
-            new OA\Property(property: 'topic_id', type: 'integer', nullable: true),
-            new OA\Property(property: 'lesson_id', type: 'integer', nullable: true),
+            new OA\Property(property: 'lesson_id', type: 'integer'),
             new OA\Property(property: 'question_ids', type: 'array', nullable: true, description: 'IDs of existing questions to attach', items: new OA\Items(type: 'integer')),
         ])),
         responses: [new OA\Response(response: 201, description: 'Quiz created')]),

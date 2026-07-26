@@ -204,7 +204,10 @@ class AuthController extends Controller
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return apiResponse(
-            data: ['user' => new UserResource($user)]
+            data: [
+                'user' => new UserResource($user),
+                'token' => $token,
+            ]
         )->withCookie(createAuthCookie($token));
     }
 

@@ -11,15 +11,15 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Role::create(['name' => 'admin', 'guard_name' => 'api']);
-    $this->subject = Subject::create(['name' => ['en' => 'Math']]);
+    $this->subject = Subject::create(['name' => 'Math']);
 });
 
 // ─── List Topics ────────────────────────────────────────────────
 
 it('lists all topics', function () {
     $user = User::factory()->create(['type' => 'student']);
-    Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Algebra'], 'difficulty_level' => 1]);
-    Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Geometry'], 'difficulty_level' => 2]);
+    Topic::create(['subject_id' => $this->subject->id, 'name' => 'Algebra', 'difficulty_level' => 1]);
+    Topic::create(['subject_id' => $this->subject->id, 'name' => 'Geometry', 'difficulty_level' => 2]);
 
     $response = $this->actingAs($user)->getJson("/api/subjects/{$this->subject->id}/topics");
 
@@ -31,9 +31,9 @@ it('lists all topics', function () {
 
 it('lists topics filtered by subject_id', function () {
     $user = User::factory()->create(['type' => 'student']);
-    $subject2 = Subject::create(['name' => ['en' => 'Science']]);
-    Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Algebra'], 'difficulty_level' => 1]);
-    Topic::create(['subject_id' => $subject2->id, 'name' => ['en' => 'Physics'], 'difficulty_level' => 3]);
+    $subject2 = Subject::create(['name' => 'Science']);
+    Topic::create(['subject_id' => $this->subject->id, 'name' => 'Algebra', 'difficulty_level' => 1]);
+    Topic::create(['subject_id' => $subject2->id, 'name' => 'Physics', 'difficulty_level' => 3]);
 
     $response = $this->actingAs($user)->getJson("/api/subjects/{$this->subject->id}/topics");
 
@@ -55,7 +55,7 @@ it('returns empty array when no topics exist', function () {
 
 it('shows a topic by id', function () {
     $user = User::factory()->create(['type' => 'student']);
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Algebra'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Algebra', 'difficulty_level' => 1]);
 
     $response = $this->actingAs($user)->getJson("/api/subjects/{$this->subject->id}/topics/{$topic->id}");
 
@@ -81,13 +81,13 @@ it('creates a topic as admin', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson("/api/admin/subjects/{$this->subject->id}/topics", [
-        'name' => ['en' => 'Algebra', 'az' => 'Cebr'],
+        'name' => 'Algebra',
         'difficulty_level' => DifficultyLevel::Beginner->value,
     ]);
 
     $response->assertStatus(201)
         ->assertJson(['success' => true, 'status_code' => 201]);
-    expect($response->json('data.name.en'))->toBe('Algebra');
+    expect($response->json('data.name'))->toBe('Algebra');
     $this->assertDatabaseHas('topics', ['id' => $response->json('data.id')]);
 });
 
@@ -95,7 +95,7 @@ it('fails to create topic without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->postJson("/api/admin/subjects/{$this->subject->id}/topics", [
-        'name' => ['en' => 'Algebra'],
+        'name' => 'Algebra',
         'difficulty_level' => 1,
     ]);
 
@@ -104,7 +104,7 @@ it('fails to create topic without admin role', function () {
 
 it('fails to create topic without authentication', function () {
     $response = $this->postJson("/api/admin/subjects/{$this->subject->id}/topics", [
-        'name' => ['en' => 'Algebra'],
+        'name' => 'Algebra',
         'difficulty_level' => 1,
     ]);
 
@@ -116,7 +116,7 @@ it('fails to create topic with invalid difficulty_level', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson("/api/admin/subjects/{$this->subject->id}/topics", [
-        'name' => ['en' => 'Algebra'],
+        'name' => 'Algebra',
         'difficulty_level' => 99,
     ]);
 
@@ -129,7 +129,7 @@ it('fails to create topic with non-existent subject', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/subjects/99999/topics', [
-        'name' => ['en' => 'Algebra'],
+        'name' => 'Algebra',
         'difficulty_level' => 1,
     ]);
 
@@ -141,16 +141,16 @@ it('fails to create topic with non-existent subject', function () {
 it('updates a topic as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Old Topic'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Old Topic', 'difficulty_level' => 1]);
 
     $response = $this->actingAs($admin)->putJson("/api/admin/subjects/{$this->subject->id}/topics/{$topic->id}", [
-        'name' => ['en' => 'Updated Topic', 'az' => 'Yenilenmis Movzu'],
+        'name' => 'Updated Topic',
         'difficulty_level' => DifficultyLevel::Advanced->value,
     ]);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true, 'status_code' => 200]);
-    expect($response->json('data.name.en'))->toBe('Updated Topic');
+    expect($response->json('data.name'))->toBe('Updated Topic');
     expect($response->json('data.difficulty_level'))->toBe(DifficultyLevel::Advanced->value);
 });
 
@@ -159,18 +159,18 @@ it('returns 404 when updating non-existent topic', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->putJson("/api/admin/subjects/{$this->subject->id}/topics/99999", [
-        'name' => ['en' => 'Test'],
+        'name' => 'Test',
     ]);
 
     $response->assertStatus(404);
 });
 
 it('fails to update topic without admin role', function () {
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Test'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Test', 'difficulty_level' => 1]);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->putJson("/api/admin/subjects/{$this->subject->id}/topics/{$topic->id}", [
-        'name' => ['en' => 'Hacked'],
+        'name' => 'Hacked',
     ]);
 
     $response->assertStatus(403);
@@ -179,7 +179,7 @@ it('fails to update topic without admin role', function () {
 it('fails to update topic with invalid difficulty_level', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Test'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Test', 'difficulty_level' => 1]);
 
     $response = $this->actingAs($admin)->putJson("/api/admin/subjects/{$this->subject->id}/topics/{$topic->id}", [
         'difficulty_level' => 99,
@@ -193,7 +193,7 @@ it('fails to update topic with invalid difficulty_level', function () {
 it('deletes a topic as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'To Delete'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'To Delete', 'difficulty_level' => 1]);
 
     $response = $this->actingAs($admin)->deleteJson("/api/admin/subjects/{$this->subject->id}/topics/{$topic->id}");
 
@@ -211,7 +211,7 @@ it('returns 404 when deleting non-existent topic', function () {
 });
 
 it('fails to delete topic without admin role', function () {
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Test'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Test', 'difficulty_level' => 1]);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->deleteJson("/api/admin/subjects/{$this->subject->id}/topics/{$topic->id}");
@@ -222,7 +222,7 @@ it('fails to delete topic without admin role', function () {
 it('soft deletes topic instead of hard delete', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Soft Delete'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Soft Delete', 'difficulty_level' => 1]);
 
     $this->actingAs($admin)->deleteJson("/api/admin/subjects/{$this->subject->id}/topics/{$topic->id}");
 
@@ -236,7 +236,7 @@ it('soft deletes topic instead of hard delete', function () {
 it('allows admin to list topics', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Algebra'], 'difficulty_level' => 1]);
+    Topic::create(['subject_id' => $this->subject->id, 'name' => 'Algebra', 'difficulty_level' => 1]);
 
     $response = $this->actingAs($admin)->getJson("/api/subjects/{$this->subject->id}/topics");
 
@@ -247,7 +247,7 @@ it('allows admin to list topics', function () {
 it('allows admin to show a topic', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => ['en' => 'Algebra'], 'difficulty_level' => 1]);
+    $topic = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Algebra', 'difficulty_level' => 1]);
 
     $response = $this->actingAs($admin)->getJson("/api/subjects/{$this->subject->id}/topics/{$topic->id}");
 

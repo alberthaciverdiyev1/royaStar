@@ -11,8 +11,8 @@ class UpdateLessonRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|array',
-            'description' => 'nullable|array',
+            'name' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
             'videos' => 'nullable|array',
             'videos.*.youtube_url' => 'required|string|url|max:255',
             'videos.*.name' => 'nullable|string|max:255',

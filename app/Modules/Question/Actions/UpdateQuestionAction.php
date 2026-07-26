@@ -14,7 +14,7 @@ class UpdateQuestionAction extends BaseUpdateAction
 
     protected function beforeUpdate(array $data): array
     {
-        processQuestionImages($data);
+        processQuestionMedia($data);
 
         return $data;
     }

@@ -12,10 +12,9 @@ class StoreQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|array',
+            'name' => 'required|string|max:255',
             'type' => ['required', Rule::in(['topic_based', 'general'])],
-            'topic_id' => 'nullable|exists:topics,id',
-            'lesson_id' => 'nullable|exists:lessons,id',
+            'lesson_id' => 'required|exists:lessons,id',
             'question_ids' => 'nullable|array',
             'question_ids.*' => 'exists:questions,id',
         ];

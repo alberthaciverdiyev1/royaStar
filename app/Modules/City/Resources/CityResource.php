@@ -11,7 +11,7 @@ class CityResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->translate('name'),
+            'name' => $this->name,
             'created_at' => $this->created_at,
         ];
     }

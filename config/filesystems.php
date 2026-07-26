@@ -60,15 +60,6 @@ return [
             'report' => false,
         ],
 
-        'bunnycdn' => [
-            'driver' => 'bunnycdn',
-            'storage_zone' => env('BUNNYCDN_STORAGE_ZONE_NAME'),
-            'api_key' => env('BUNNYCDN_API_KEY'),
-            'region' => env('BUNNYCDN_REGION', 'de'),
-            'pull_zone_url' => env('BUNNYCDN_PULL_ZONE_URL'),
-            'throw' => false,
-            'report' => false,
-        ],
 
     ],
 

@@ -3,7 +3,6 @@
 namespace App\Modules\Lesson\Models;
 
 use App\Modules\Student\Models\Student;
-use App\Modules\Student\Models\StudentActivity;
 use App\Traits\SerializesDates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

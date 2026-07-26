@@ -2,12 +2,19 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            Schema::table('videos', function (Blueprint $table) {
+                $table->dropUnique('videos_bunny_stream_video_id_unique');
+            });
+        }
+
         Schema::table('videos', function (Blueprint $table) {
             $table->dropColumn(['url', 'duration', 'thumbnail', 'bunny_stream_video_id', 'status']);
             $table->string('youtube_url')->nullable()->after('name');
@@ -16,6 +23,12 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            Schema::table('videos', function (Blueprint $table) {
+                $table->string('bunny_stream_video_id')->nullable()->after('lang');
+            });
+        }
+
         Schema::table('videos', function (Blueprint $table) {
             $table->dropColumn('youtube_url');
             $table->string('url')->comment('Video url');

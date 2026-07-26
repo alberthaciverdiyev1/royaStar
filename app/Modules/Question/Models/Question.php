@@ -2,9 +2,8 @@
 
 namespace App\Modules\Question\Models;
 
+use App\Modules\Lesson\Models\Lesson;
 use App\Modules\Topic\Enums\DifficultyLevel;
-use App\Modules\Topic\Models\Topic;
-use App\Traits\HasTranslations;
 use App\Traits\SerializesDates;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,12 +11,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Question extends Model
 {
-    use SoftDeletes, HasTranslations, SerializesDates;
+    use SoftDeletes, SerializesDates;
 
     protected $fillable = [
         'question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e',
         'right_answer', 'open_answer', 'type', 'explanation',
-        'difficulty_level', 'topic_id', 'answer_type',
+        'difficulty_level', 'lesson_id', 'answer_type',
     ];
 
     protected function casts(): array
@@ -35,8 +34,8 @@ class Question extends Model
         ];
     }
 
-    public function topic(): BelongsTo
+    public function lesson(): BelongsTo
     {
-        return $this->belongsTo(Topic::class);
+        return $this->belongsTo(Lesson::class);
     }
 }

@@ -27,10 +27,10 @@ describe('Subjects', function () {
         $admin = User::factory()->create(['type' => 'admin']);
         $admin->assignRole('admin');
 
-        $response = $this->actingAs($admin)->postJson('/api/admin/subjects', ['name' => ['en' => 'Mathematics', 'az' => 'Riyaziyyat']]);
+        $response = $this->actingAs($admin)->postJson('/api/admin/subjects', ['name' => 'Mathematics']);
 
         $response->assertStatus(201)
-            ->assertJsonPath('data.name.en', 'Mathematics');
+            ->assertJsonPath('data.name', 'Mathematics');
     });
 
     it('shows a subject', function () {
@@ -47,7 +47,7 @@ describe('Subjects', function () {
         $admin->assignRole('admin');
         $subject = Subject::factory()->create();
 
-        $response = $this->actingAs($admin)->putJson("/api/admin/subjects/{$subject->id}", ['name' => ['en' => 'Updated']]);
+        $response = $this->actingAs($admin)->putJson("/api/admin/subjects/{$subject->id}", ['name' => 'Updated']);
 
         $response->assertStatus(200);
     });
@@ -80,7 +80,7 @@ describe('Topics', function () {
         $subject = Subject::factory()->create();
 
         $response = $this->actingAs($admin)->postJson("/api/admin/subjects/{$subject->id}/topics", [
-            'name' => ['en' => 'Algebra'],
+            'name' => 'Algebra',
             'difficulty_level' => 1,
         ]);
 
@@ -106,8 +106,8 @@ describe('Lessons', function () {
         $topic = Topic::factory()->create();
 
         $response = $this->actingAs($admin)->postJson("/api/admin/topics/{$topic->id}/lessons", [
-            'name' => ['en' => 'Linear Equations'],
-            'description' => ['en' => 'Introduction to linear equations'],
+            'name' => 'Linear Equations',
+            'description' => 'Introduction to linear equations',
         ]);
 
         $response->assertStatus(201);

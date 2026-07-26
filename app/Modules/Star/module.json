@@ -1,10 +1,1 @@
-{
-    "name": "Star",
-    "alias": "star",
-    "description": "Star module",
-    "priority": 0,
-    "providers": [],
-    "aliases": [],
-    "files": [],
-    "requires": ["User"]
-}
+{"name":"Star","alias":"star","description":"Star / point system","priority":0,"providers":[],"aliases":[],"files":[],"requires":["User"]}

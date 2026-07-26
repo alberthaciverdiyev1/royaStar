@@ -12,10 +12,11 @@ class UpdateQuizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|array',
+            'name' => 'sometimes|string|max:255',
             'type' => ['sometimes', Rule::in(['topic_based', 'general'])],
-            'topic_id' => 'nullable|exists:topics,id',
             'lesson_id' => 'nullable|exists:lessons,id',
+            'question_ids' => 'nullable|array',
+            'question_ids.*' => 'exists:questions,id',
         ];
     }
 }

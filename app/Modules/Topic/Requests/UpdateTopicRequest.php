@@ -15,7 +15,7 @@ class UpdateTopicRequest extends FormRequest
 
         return [
             'subject_id' => 'sometimes|exists:subjects,id',
-            'name' => 'sometimes|array',
+            'name' => 'sometimes|string|max:255',
             'difficulty_level' => "sometimes|integer|in:{$levels}",
             'grade_ids' => 'nullable|array',
             'grade_ids.*' => 'integer|exists:grades,id',

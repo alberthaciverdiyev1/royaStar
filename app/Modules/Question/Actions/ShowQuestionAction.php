@@ -14,6 +14,6 @@ class ShowQuestionAction extends BaseShowAction
 
     protected function defaultWith(): array
     {
-        return ['topic'];
+        return ['lesson'];
     }
 }

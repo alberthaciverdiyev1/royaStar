@@ -12,7 +12,7 @@ class SubjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => ['en' => fake()->word(), 'az' => fake()->word()],
+            'name' => fake()->word(),
         ];
     }
 }

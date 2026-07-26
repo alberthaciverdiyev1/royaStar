@@ -13,11 +13,11 @@ enum DifficultyLevel: int
     public function label(): string
     {
         return match ($this) {
-            self::Beginner => __('difficulty.beginner'),
-            self::Elementary => __('difficulty.elementary'),
-            self::Intermediate => __('difficulty.intermediate'),
-            self::Advanced => __('difficulty.advanced'),
-            self::Expert => __('difficulty.expert'),
+            self::Beginner => 'Başlanğıc',
+            self::Elementary => 'Elementar',
+            self::Intermediate => 'Orta',
+            self::Advanced => 'Qabaqcıl',
+            self::Expert => 'Ekspert',
         };
     }
 }

@@ -52,7 +52,7 @@ class GradeController extends Controller
 
     #[OA\Post(path: '/admin/grades', summary: 'Create grade',
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
-            new OA\Property(property: 'name', type: 'object'),
+            new OA\Property(property: 'name', type: 'string'),
         ])),
         tags: ['Grades'],
         responses: [new OA\Response(response: 201, description: 'Grade created')]),
@@ -75,7 +75,7 @@ class GradeController extends Controller
 
     #[OA\Put(path: '/admin/grades/{grade}', summary: 'Update grade',
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
-            new OA\Property(property: 'name', type: 'object'),
+            new OA\Property(property: 'name', type: 'string'),
         ])),
         tags: ['Grades'],
         responses: [new OA\Response(response: 200, description: 'Grade updated')]),

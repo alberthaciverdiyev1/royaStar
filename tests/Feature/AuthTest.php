@@ -12,8 +12,8 @@ beforeEach(function () {
     Spatie\Permission\Models\Role::create(['name' => 'parent', 'guard_name' => 'api']);
     Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'api']);
 
-    Grade::create(['name' => ['en' => 'Grade 1']]);
-    City::create(['name' => ['en' => 'Baku']]);
+    Grade::create(['name' => 'Grade 1']);
+    City::create(['name' => 'Baku']);
 });
 
 // ─── Register ───────────────────────────────────────────────────

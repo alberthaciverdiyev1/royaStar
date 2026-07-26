@@ -8,7 +8,7 @@ use App\Modules\Student\Models\Student;
 use App\Modules\Teacher\Models\Teacher;
 use App\Modules\Parent\Models\Family;
 use App\Modules\School\Models\School;
-use App\Modules\Xp\Models\UserPoint;
+use App\Modules\Star\Models\UserStar;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -63,8 +63,8 @@ class User extends Authenticatable
         return $this->hasOne(NotificationSetting::class);
     }
 
-    public function userPoints()
+    public function userStars()
     {
-        return $this->hasMany(UserPoint::class);
+        return $this->hasMany(UserStar::class);
     }
 }

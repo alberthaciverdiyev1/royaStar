@@ -1,36 +1,51 @@
 <?php
 
-if (!function_exists('processQuestionImages')) {
+if (!function_exists('processQuestionMedia')) {
 
     /**
-     * Scan translatable question fields for base64 images,
+     * Scan question fields for base64 images and audio,
      * save them to storage, and replace content with the URL.
      *
      * Fields: question, variant_a..e, open_answer, explanation
      */
-    function processQuestionImages(array &$data): void
+    function processQuestionMedia(array &$data): void
     {
-        $imageFields = ['question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e', 'open_answer', 'explanation'];
+        $mediaFields = ['question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e', 'open_answer', 'explanation'];
 
-        foreach ($imageFields as $field) {
+        $mimeMap = [
+            'image' => [
+                'pattern' => '/^data:image\/(\w+);base64,(.+)$/',
+                'dir' => 'questions',
+                'extMap' => ['jpeg' => 'jpg'],
+            ],
+            'audio' => [
+                'pattern' => '/^data:audio\/(\w+);base64,(.+)$/',
+                'dir' => 'questions/audio',
+                'extMap' => ['mpeg' => 'mp3', 'x-m4a' => 'm4a', 'x-wav' => 'wav', 'x-flac' => 'flac'],
+            ],
+        ];
+
+        foreach ($mediaFields as $field) {
             if (!isset($data[$field]) || !is_array($data[$field])) {
                 continue;
             }
 
-            foreach ($data[$field] as $locale => &$value) {
-                if (!is_array($value) || ($value['type'] ?? null) !== 'image') {
+            foreach ($data[$field] as &$value) {
+                if (!is_array($value) || !in_array($value['type'] ?? null, ['image', 'audio'], true)) {
                     continue;
                 }
 
+                $type = $value['type'];
+                $config = $mimeMap[$type];
                 $content = $value['content'] ?? '';
 
-                if (preg_match('/^data:image\/(\w+);base64,(.+)$/', $content, $matches)) {
-                    $extension = str_replace('jpeg', 'jpg', $matches[1]);
-                    $imageData = base64_decode($matches[2]);
+                if (preg_match($config['pattern'], $content, $matches)) {
+                    $extension = $config['extMap'][$matches[1]] ?? $matches[1];
+                    $fileData = base64_decode($matches[2]);
 
-                    $filename = 'questions/' . Illuminate\Support\Str::uuid() . '.' . $extension;
+                    $filename = $config['dir'] . '/' . Illuminate\Support\Str::uuid() . '.' . $extension;
 
-                    Illuminate\Support\Facades\Storage::disk('public')->put($filename, $imageData);
+                    Illuminate\Support\Facades\Storage::disk('public')->put($filename, $fileData);
 
                     $value['content'] = Illuminate\Support\Facades\Storage::disk('public')->url($filename);
                 }

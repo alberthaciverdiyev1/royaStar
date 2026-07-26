@@ -14,7 +14,7 @@ class StoreTopicRequest extends FormRequest
         $levels = implode(',', array_map(fn($case) => $case->value, DifficultyLevel::cases()));
 
         return [
-            'name' => 'required|array',
+            'name' => 'required|string|max:255',
             'difficulty_level' => "required|integer|in:{$levels}",
             'grade_ids' => 'nullable|array',
             'grade_ids.*' => 'integer|exists:grades,id',

@@ -11,5 +11,9 @@
     "Subject": true,
     "Topic": true,
     "User": true,
-    "Star": false
+    "Teacher": true,
+    "School": true,
+    "Parent": true,
+    "Star": true,
+    "Exam": true
 }

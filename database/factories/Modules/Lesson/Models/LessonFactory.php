@@ -14,8 +14,8 @@ class LessonFactory extends Factory
     {
         return [
             'topic_id' => Topic::factory(),
-            'name' => ['en' => fake()->sentence(), 'az' => fake()->sentence()],
-            'description' => ['en' => fake()->paragraph(), 'az' => fake()->paragraph()],
+            'name' => fake()->sentence(),
+            'description' => fake()->paragraph(),
         ];
     }
 }

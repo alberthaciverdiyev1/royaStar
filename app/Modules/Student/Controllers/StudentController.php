@@ -4,7 +4,6 @@ namespace App\Modules\Student\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Student\Actions\DeleteStudentAction;
-use App\Modules\Student\Actions\ListActivitiesAction;
 use App\Modules\Student\Actions\ListStudentsAction;
 use App\Modules\Student\Actions\ShowStudentAction;
 use App\Modules\Student\Actions\StoreStudentAction;
@@ -24,7 +23,6 @@ class StudentController extends Controller
         private readonly StoreStudentAction  $storeStudentAction,
         private readonly UpdateStudentAction $updateStudentAction,
         private readonly DeleteStudentAction $deleteStudentAction,
-        private readonly ListActivitiesAction $listActivitiesAction,
     ) {}
 
     #[OA\Get(path: '/students', tags: ['Students'], summary: 'List all students',
@@ -90,23 +88,5 @@ class StudentController extends Controller
     {
         $this->deleteStudentAction->execute($student);
         return apiResponse();
-    }
-
-    #[OA\Get(path: '/students/activities', tags: ['Students'], summary: 'Get authenticated student activities',
-        security: [['bearerAuth' => []]],
-        parameters: [
-            new OA\QueryParameter(name: 'type', description: 'Filter by activity type (lesson_completed, quiz_completed)', schema: new OA\Schema(type: 'string')),
-            new OA\QueryParameter(name: 'per_page', description: 'Items per page (default 20)', schema: new OA\Schema(type: 'integer')),
-            new OA\QueryParameter(name: 'page', description: 'Page number', schema: new OA\Schema(type: 'integer')),
-        ],
-        responses: [new OA\Response(response: 200, description: 'List of activities')]),
-    ]
-    public function activities(Request $request): JsonResponse
-    {
-        $user = $request->user();
-
-        return apiResponse(data: $user->student
-            ? $this->listActivitiesAction->execute($user->student->id)
-            : []);
     }
 }

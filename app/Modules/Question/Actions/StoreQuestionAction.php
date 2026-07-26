@@ -14,7 +14,7 @@ class StoreQuestionAction extends BaseStoreAction
 
     protected function beforeCreate(array $data): array
     {
-        processQuestionImages($data);
+        processQuestionMedia($data);
 
         return $data;
     }

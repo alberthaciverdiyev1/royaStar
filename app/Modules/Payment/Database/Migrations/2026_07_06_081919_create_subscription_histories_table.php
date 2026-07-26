@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('subscription_id')->constrained()->nullOnDelete();
             $table->foreignId('new_subscription_plan_id')->constrained('subscription_plans')->nullOnDelete();
             $table->foreignId('old_subscription_plan_id')->constrained('subscription_plans')->nullOnDelete();
-            $table->foreignId('school_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('teacher_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('family_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('school_id')->nullable()->index();
+            $table->foreignId('teacher_id')->nullable()->index();
+            $table->foreignId('family_id')->nullable()->index();
             $table->foreignId('student_id')->nullable()->constrained()->nullOnDelete();
             $table->date('start_date')->comment('Subscription start date');
             $table->date('expires_at')->comment('Subscription end date');

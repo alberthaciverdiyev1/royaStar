@@ -13,6 +13,6 @@ class StoreSubjectRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['name' => 'required'];
+        return ['name' => 'required|string|max:255'];
     }
 }

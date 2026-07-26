@@ -44,13 +44,6 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
-        'sqlite_activity' => [
-            'driver' => 'sqlite',
-            'database' => env('DB_ACTIVITY_DATABASE', database_path('activity.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ],
-
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
@@ -100,21 +93,6 @@ return [
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
-        ],
-
-        'pgsql_activity' => [
-            'driver' => env('DB_ACTIVITY_CONNECTION', 'pgsql'),
-            'url' => env('DB_ACTIVITY_URL'),
-            'host' => env('DB_ACTIVITY_HOST', env('DB_HOST', '127.0.0.1')),
-            'port' => env('DB_ACTIVITY_PORT', env('DB_PORT', '5432')),
-            'database' => env('DB_ACTIVITY_DATABASE', 'royastar_activities'),
-            'username' => env('DB_ACTIVITY_USERNAME', env('DB_USERNAME', 'root')),
-            'password' => env('DB_ACTIVITY_PASSWORD', env('DB_PASSWORD', '')),
-            'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',

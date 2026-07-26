@@ -12,8 +12,8 @@ beforeEach(function () {
 
 it('lists all grades', function () {
     $user = User::factory()->create(['type' => 'student']);
-    Grade::create(['name' => ['en' => 'Grade 1', 'az' => 'Sinif 1']]);
-    Grade::create(['name' => ['en' => 'Grade 2', 'az' => 'Sinif 2']]);
+    Grade::create(['name' => 'Grade 1']);
+    Grade::create(['name' => 'Grade 2']);
 
     $response = $this->actingAs($user)->getJson('/api/grades');
 
@@ -36,7 +36,7 @@ it('returns empty array when no grades exist', function () {
 
 it('shows a grade by id', function () {
     $user = User::factory()->create(['type' => 'student']);
-    $grade = Grade::create(['name' => ['en' => 'Grade 1']]);
+    $grade = Grade::create(['name' => 'Grade 1']);
 
     $response = $this->actingAs($user)->getJson("/api/grades/{$grade->id}");
 
@@ -56,7 +56,7 @@ it('returns 404 when showing non-existent grade', function () {
 it('allows admin to access public grades endpoint', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    Grade::create(['name' => ['en' => 'Grade 1']]);
+    Grade::create(['name' => 'Grade 1']);
 
     $response = $this->actingAs($admin)->getJson('/api/grades');
 
@@ -72,7 +72,7 @@ it('creates a grade as admin', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/grades', [
-        'name' => ['en' => 'Grade 1', 'az' => 'Sinif 1'],
+        'name' => 'Grade 1',
     ]);
 
     $response->assertStatus(201)
@@ -84,7 +84,7 @@ it('fails to create grade without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->postJson('/api/admin/grades', [
-        'name' => ['en' => 'Grade 1'],
+        'name' => 'Grade 1',
     ]);
 
     $response->assertStatus(403);
@@ -92,7 +92,7 @@ it('fails to create grade without admin role', function () {
 
 it('fails to create grade without authentication', function () {
     $response = $this->postJson('/api/admin/grades', [
-        'name' => ['en' => 'Grade 1'],
+        'name' => 'Grade 1',
     ]);
 
     $response->assertStatus(401);
@@ -102,9 +102,7 @@ it('fails to create grade with invalid data', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $response = $this->actingAs($admin)->postJson('/api/admin/grades', [
-        'name' => 'not-an-array',
-    ]);
+    $response = $this->actingAs($admin)->postJson('/api/admin/grades', []);
 
     $response->assertStatus(422)
         ->assertJson(['success' => false]);
@@ -115,15 +113,15 @@ it('fails to create grade with invalid data', function () {
 it('updates a grade as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $grade = Grade::create(['name' => ['en' => 'Old Name']]);
+    $grade = Grade::create(['name' => 'Old Name']);
 
     $response = $this->actingAs($admin)->putJson("/api/admin/grades/{$grade->id}", [
-        'name' => ['en' => 'Updated Grade', 'az' => 'Yenilənmiş Sinif'],
+        'name' => 'Updated Grade',
     ]);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true, 'status_code' => 200]);
-    expect($response->json('data.name.en'))->toBe('Updated Grade');
+    expect($response->json('data.name'))->toBe('Updated Grade');
 });
 
 it('returns 404 when updating non-existent grade', function () {
@@ -131,18 +129,18 @@ it('returns 404 when updating non-existent grade', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->putJson('/api/admin/grades/99999', [
-        'name' => ['en' => 'Test'],
+        'name' => 'Test',
     ]);
 
     $response->assertStatus(404);
 });
 
 it('fails to update grade without admin role', function () {
-    $grade = Grade::create(['name' => ['en' => 'Test']]);
+    $grade = Grade::create(['name' => 'Test']);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->putJson("/api/admin/grades/{$grade->id}", [
-        'name' => ['en' => 'Hacked'],
+        'name' => 'Hacked',
     ]);
 
     $response->assertStatus(403);
@@ -153,7 +151,7 @@ it('fails to update grade without admin role', function () {
 it('deletes a grade as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $grade = Grade::create(['name' => ['en' => 'To Delete']]);
+    $grade = Grade::create(['name' => 'To Delete']);
 
     $response = $this->actingAs($admin)->deleteJson("/api/admin/grades/{$grade->id}");
 
@@ -171,7 +169,7 @@ it('returns 404 when deleting non-existent grade', function () {
 });
 
 it('fails to delete grade without admin role', function () {
-    $grade = Grade::create(['name' => ['en' => 'Test']]);
+    $grade = Grade::create(['name' => 'Test']);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->deleteJson("/api/admin/grades/{$grade->id}");
@@ -182,7 +180,7 @@ it('fails to delete grade without admin role', function () {
 it('soft deletes grade instead of hard delete', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $grade = Grade::create(['name' => ['en' => 'Soft Delete Test']]);
+    $grade = Grade::create(['name' => 'Soft Delete Test']);
 
     $this->actingAs($admin)->deleteJson("/api/admin/grades/{$grade->id}");
 

@@ -15,7 +15,7 @@ class TopicResource extends BaseResource
         return [
             'id' => $this->id,
             'subject_id' => $this->subject_id,
-            'name' => $this->translate('name'),
+            'name' => $this->name,
             'difficulty_level' => $this->difficulty_level?->value,
             'difficulty_label' => $this->difficulty_level?->label(),
             'created_at' => $this->created_at,

@@ -12,7 +12,7 @@ class SubjectResource extends BaseResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->translate('name'),
+            'name' => $this->name,
             'image' => $this->image,
             'created_at' => $this->created_at,
             $this->mergeWhen($this->relationLoaded('topics'), [

@@ -13,7 +13,8 @@ class QuestionResource extends BaseResource
 
         $data = [
             'id' => $this->id,
-            'topic_id' => $this->topic_id,
+            'lesson_id' => $this->lesson_id,
+            'lesson_name' => $this->relationLoaded('lesson') ? $this->lesson?->name : null,
             'type' => $this->type,
             'answer_type' => $this->answer_type,
             'right_answer' => $this->right_answer,
@@ -22,7 +23,7 @@ class QuestionResource extends BaseResource
         ];
 
         foreach ($textFields as $field) {
-            $data[$field] = $this->translate($field);
+            $data[$field] = $this->{$field};
         }
 
         return $data;

@@ -15,12 +15,12 @@ class ListQuizzesAction extends BaseListAction
 
     protected function defaultWith(): array
     {
-        return ['lesson', 'topic'];
+        return ['lesson'];
     }
 
     protected function applyFilters(Builder $query, array $params): void
     {
         $this->applySearch($query, ['name'], $params);
-        $this->applyExactFilters($query, ['topic_id', 'lesson_id', 'type'], $params);
+        $this->applyExactFilters($query, ['lesson_id', 'type'], $params);
     }
 }

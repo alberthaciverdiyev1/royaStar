@@ -28,8 +28,8 @@ class QuestionController extends Controller
     #[OA\Get(path: '/admin/questions', summary: 'List questions',
         tags: ['Questions'],
         parameters: [
-            new OA\QueryParameter(name: 'topic_id', description: 'Filter by single topic ID', schema: new OA\Schema(type: 'integer')),
-            new OA\QueryParameter(name: 'topic_ids', description: 'Filter by multiple topic IDs (comma-separated)', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'lesson_id', description: 'Filter by single lesson ID', schema: new OA\Schema(type: 'integer')),
+            new OA\QueryParameter(name: 'lesson_ids', description: 'Filter by multiple lesson IDs (comma-separated)', schema: new OA\Schema(type: 'string')),
             new OA\QueryParameter(name: 'type', description: 'Filter by type (regular, open)', schema: new OA\Schema(type: 'string')),
             new OA\QueryParameter(name: 'difficulty_level', description: 'Filter by difficulty level', schema: new OA\Schema(type: 'integer')),
             new OA\QueryParameter(name: 'search', description: 'Search by question text', schema: new OA\Schema(type: 'string')),
@@ -47,12 +47,12 @@ class QuestionController extends Controller
         return apiPaginated($paginator, transform: fn($question) => new QuestionResource($question));
     }
 
-    #[OA\Post(path: '/admin/questions', summary: 'Create question', requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['type', 'topic_id', 'difficulty_level'], properties: [
+    #[OA\Post(path: '/admin/questions', summary: 'Create question', requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['type', 'lesson_id', 'difficulty_level'], properties: [
         new OA\Property(property: 'question', description: 'Question content (type + content)', type: 'array'),
         new OA\Property(property: 'type', type: 'string', enum: ['regular', 'open']),
         new OA\Property(property: 'explanation', type: 'array', nullable: true),
         new OA\Property(property: 'difficulty_level', type: 'string'),
-        new OA\Property(property: 'topic_id', type: 'integer'),
+        new OA\Property(property: 'lesson_id', type: 'integer'),
     ])),
         tags: ['Questions'],
         responses: [new OA\Response(response: 201, description: 'Question created')]),

@@ -28,7 +28,7 @@ class UpdateLessonAction extends BaseUpdateAction
                 'lesson_id' => $model->id,
                 'youtube_url' => $video['youtube_url'],
                 'name' => $video['name'] ?? null,
-                'lang' => $video['lang'] ?? null,
+                'lang' => $video['lang'] ?? 'az',
             ]);
         }
     }

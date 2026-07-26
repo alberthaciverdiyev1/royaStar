@@ -8,21 +8,19 @@ use App\Modules\Topic\Enums\DifficultyLevel;
 use App\Modules\Grade\Models\Grade;
 use App\Modules\Subject\Models\Subject;
 use App\Modules\Lesson\Models\Lesson;
-use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Topic extends Model
 {
-    use HasFactory, SoftDeletes, HasTranslations, SerializesDates;
+    use HasFactory, SoftDeletes, SerializesDates;
 
     protected $fillable = ['subject_id', 'name', 'difficulty_level'];
 
     protected function casts(): array
     {
         return [
-            'name' => 'array',
             'difficulty_level' => DifficultyLevel::class,
         ];
     }

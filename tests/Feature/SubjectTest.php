@@ -15,8 +15,8 @@ beforeEach(function () {
 
 it('lists all subjects', function () {
     $user = User::factory()->create(['type' => 'student']);
-    Subject::create(['name' => ['en' => 'Math']]);
-    Subject::create(['name' => ['en' => 'Science']]);
+    Subject::create(['name' => 'Math']);
+    Subject::create(['name' => 'Science']);
 
     $response = $this->actingAs($user)->getJson('/api/subjects');
 
@@ -40,7 +40,7 @@ it('returns empty array when no subjects exist', function () {
 
 it('shows a subject by id', function () {
     $user = User::factory()->create(['type' => 'student']);
-    $subject = Subject::create(['name' => ['en' => 'Mathematics']]);
+    $subject = Subject::create(['name' => 'Mathematics']);
 
     $response = $this->actingAs($user)->getJson("/api/subjects/{$subject->id}");
 
@@ -66,12 +66,12 @@ it('creates a subject as admin', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/subjects', [
-        'name' => ['en' => 'Mathematics', 'az' => 'Riyaziyyat'],
+        'name' => 'Mathematics',
     ]);
 
     $response->assertStatus(201)
         ->assertJson(['success' => true, 'status_code' => 201]);
-    expect($response->json('data.name.en'))->toBe('Mathematics');
+    expect($response->json('data.name'))->toBe('Mathematics');
     $this->assertDatabaseHas('subjects', ['id' => $response->json('data.id')]);
 });
 
@@ -79,7 +79,7 @@ it('fails to create subject without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->postJson('/api/admin/subjects', [
-        'name' => ['en' => 'Mathematics'],
+        'name' => 'Mathematics',
     ]);
 
     $response->assertStatus(403);
@@ -87,7 +87,7 @@ it('fails to create subject without admin role', function () {
 
 it('fails to create subject without authentication', function () {
     $response = $this->postJson('/api/admin/subjects', [
-        'name' => ['en' => 'Mathematics'],
+        'name' => 'Mathematics',
     ]);
 
     $response->assertStatus(401);
@@ -108,15 +108,15 @@ it('fails to create subject with missing name', function () {
 it('updates a subject as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $subject = Subject::create(['name' => ['en' => 'Old Name']]);
+    $subject = Subject::create(['name' => 'Old Name']);
 
     $response = $this->actingAs($admin)->putJson("/api/admin/subjects/{$subject->id}", [
-        'name' => ['en' => 'Updated Name', 'az' => 'Yeni Ad'],
+        'name' => 'Updated Name',
     ]);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true, 'status_code' => 200]);
-    expect($response->json('data.name.en'))->toBe('Updated Name');
+    expect($response->json('data.name'))->toBe('Updated Name');
 });
 
 it('returns 404 when updating non-existent subject', function () {
@@ -124,18 +124,18 @@ it('returns 404 when updating non-existent subject', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->putJson('/api/admin/subjects/99999', [
-        'name' => ['en' => 'Test'],
+        'name' => 'Test',
     ]);
 
     $response->assertStatus(404);
 });
 
 it('fails to update subject without admin role', function () {
-    $subject = Subject::create(['name' => ['en' => 'Test']]);
+    $subject = Subject::create(['name' => 'Test']);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->putJson("/api/admin/subjects/{$subject->id}", [
-        'name' => ['en' => 'Hacked'],
+        'name' => 'Hacked',
     ]);
 
     $response->assertStatus(403);
@@ -146,7 +146,7 @@ it('fails to update subject without admin role', function () {
 it('deletes a subject as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $subject = Subject::create(['name' => ['en' => 'To Delete']]);
+    $subject = Subject::create(['name' => 'To Delete']);
 
     $response = $this->actingAs($admin)->deleteJson("/api/admin/subjects/{$subject->id}");
 
@@ -164,7 +164,7 @@ it('returns 404 when deleting non-existent subject', function () {
 });
 
 it('fails to delete subject without admin role', function () {
-    $subject = Subject::create(['name' => ['en' => 'Test']]);
+    $subject = Subject::create(['name' => 'Test']);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->deleteJson("/api/admin/subjects/{$subject->id}");
@@ -175,7 +175,7 @@ it('fails to delete subject without admin role', function () {
 it('soft deletes subject instead of hard delete', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $subject = Subject::create(['name' => ['en' => 'Soft Delete']]);
+    $subject = Subject::create(['name' => 'Soft Delete']);
 
     $this->actingAs($admin)->deleteJson("/api/admin/subjects/{$subject->id}");
 
@@ -189,7 +189,7 @@ it('soft deletes subject instead of hard delete', function () {
 it('allows admin to list subjects', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    Subject::create(['name' => ['en' => 'Math']]);
+    Subject::create(['name' => 'Math']);
 
     $response = $this->actingAs($admin)->getJson('/api/subjects');
 
@@ -200,7 +200,7 @@ it('allows admin to list subjects', function () {
 it('allows admin to show a subject', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $subject = Subject::create(['name' => ['en' => 'Math']]);
+    $subject = Subject::create(['name' => 'Math']);
 
     $response = $this->actingAs($admin)->getJson("/api/subjects/{$subject->id}");
 
@@ -209,10 +209,10 @@ it('allows admin to show a subject', function () {
 
 it('shows subject with topics', function () {
     $user = User::factory()->create(['type' => 'student']);
-    $subject = Subject::create(['name' => ['en' => 'Math']]);
+    $subject = Subject::create(['name' => 'Math']);
     $topic = \App\Modules\Topic\Models\Topic::create([
         'subject_id' => $subject->id,
-        'name' => ['en' => 'Algebra'],
+        'name' => 'Algebra',
         'difficulty_level' => 1,
     ]);
 

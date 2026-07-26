@@ -13,8 +13,8 @@ beforeEach(function () {
 
 it('lists all cities', function () {
     $user = User::factory()->create(['type' => 'student']);
-    City::create(['name' => ['en' => 'Baku', 'az' => 'Bakı']]);
-    City::create(['name' => ['en' => 'Istanbul', 'az' => 'İstanbul']]);
+    City::create(['name' => 'Baku']);
+    City::create(['name' => 'Istanbul']);
 
     $response = $this->actingAs($user)->getJson('/api/cities');
 
@@ -26,14 +26,14 @@ it('lists all cities', function () {
 
 it('searches cities by name', function () {
     $user = User::factory()->create(['type' => 'student']);
-    City::create(['name' => ['en' => 'Baku', 'az' => 'Bakı']]);
-    City::create(['name' => ['en' => 'Istanbul', 'az' => 'İstanbul']]);
+    City::create(['name' => 'Baku']);
+    City::create(['name' => 'Istanbul']);
 
     $response = $this->actingAs($user)->getJson('/api/cities?search=bak');
 
     $response->assertStatus(200);
     expect($response->json('data'))->toHaveCount(1);
-    expect($response->json('data.0.name.en'))->toBe('Baku');
+    expect($response->json('data.0.name'))->toBe('Baku');
 })->skip(fn () => DB::getDriverName() !== 'pgsql', 'filterLike requires PostgreSQL (unaccent + JSON casts)');
 
 it('returns empty array when no cities exist', function () {
@@ -50,7 +50,7 @@ it('returns empty array when no cities exist', function () {
 
 it('shows a city by id', function () {
     $user = User::factory()->create(['type' => 'student']);
-    $city = City::create(['name' => ['en' => 'Baku', 'az' => 'Bakı']]);
+    $city = City::create(['name' => 'Baku']);
 
     $response = $this->actingAs($user)->getJson("/api/cities/{$city->id}");
 
@@ -70,7 +70,7 @@ it('returns 404 when showing non-existent city', function () {
 it('allows admin to access public cities endpoint', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    City::create(['name' => ['en' => 'Baku', 'az' => 'Bakı']]);
+    City::create(['name' => 'Baku']);
 
     $response = $this->actingAs($admin)->getJson('/api/cities');
 
@@ -86,7 +86,7 @@ it('creates a city as admin', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/cities', [
-        'name' => ['en' => 'London', 'az' => 'London'],
+        'name' => 'London',
     ]);
 
     $response->assertStatus(201)
@@ -98,7 +98,7 @@ it('fails to create city without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->postJson('/api/admin/cities', [
-        'name' => ['en' => 'London'],
+        'name' => 'London',
     ]);
 
     $response->assertStatus(403);
@@ -106,7 +106,7 @@ it('fails to create city without admin role', function () {
 
 it('fails to create city without authentication', function () {
     $response = $this->postJson('/api/admin/cities', [
-        'name' => ['en' => 'London'],
+        'name' => 'London',
     ]);
 
     $response->assertStatus(401);
@@ -116,9 +116,7 @@ it('fails to create city with invalid data', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    $response = $this->actingAs($admin)->postJson('/api/admin/cities', [
-        'name' => 'not-an-array',
-    ]);
+    $response = $this->actingAs($admin)->postJson('/api/admin/cities', []);
 
     $response->assertStatus(422)
         ->assertJson(['success' => false]);
@@ -129,15 +127,15 @@ it('fails to create city with invalid data', function () {
 it('updates a city as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $city = City::create(['name' => ['en' => 'Old Name']]);
+    $city = City::create(['name' => 'Old Name']);
 
     $response = $this->actingAs($admin)->putJson("/api/admin/cities/{$city->id}", [
-        'name' => ['en' => 'New Name', 'az' => 'Yeni Ad'],
+        'name' => 'New Name',
     ]);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true, 'status_code' => 200]);
-    expect($response->json('data.name.en'))->toBe('New Name');
+    expect($response->json('data.name'))->toBe('New Name');
 });
 
 it('returns 404 when updating non-existent city', function () {
@@ -145,18 +143,18 @@ it('returns 404 when updating non-existent city', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->putJson('/api/admin/cities/99999', [
-        'name' => ['en' => 'Test'],
+        'name' => 'Test',
     ]);
 
     $response->assertStatus(404);
 });
 
 it('fails to update city without admin role', function () {
-    $city = City::create(['name' => ['en' => 'Test']]);
+    $city = City::create(['name' => 'Test']);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->putJson("/api/admin/cities/{$city->id}", [
-        'name' => ['en' => 'Hacked'],
+        'name' => 'Hacked',
     ]);
 
     $response->assertStatus(403);
@@ -167,7 +165,7 @@ it('fails to update city without admin role', function () {
 it('deletes a city as admin', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $city = City::create(['name' => ['en' => 'To Delete']]);
+    $city = City::create(['name' => 'To Delete']);
 
     $response = $this->actingAs($admin)->deleteJson("/api/admin/cities/{$city->id}");
 
@@ -185,7 +183,7 @@ it('returns 404 when deleting non-existent city', function () {
 });
 
 it('fails to delete city without admin role', function () {
-    $city = City::create(['name' => ['en' => 'Test']]);
+    $city = City::create(['name' => 'Test']);
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->deleteJson("/api/admin/cities/{$city->id}");
@@ -196,7 +194,7 @@ it('fails to delete city without admin role', function () {
 it('soft deletes city instead of hard delete', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
-    $city = City::create(['name' => ['en' => 'Soft Delete Test']]);
+    $city = City::create(['name' => 'Soft Delete Test']);
 
     $this->actingAs($admin)->deleteJson("/api/admin/cities/{$city->id}");
 

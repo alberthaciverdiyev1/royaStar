@@ -15,18 +15,18 @@ class ListQuestionsAction extends BaseListAction
 
     protected function defaultWith(): array
     {
-        return ['topic'];
+        return ['lesson'];
     }
 
     protected function applyFilters(Builder $query, array $params): void
     {
-        $this->applyExactFilters($query, ['topic_id'], $params);
+        $this->applyExactFilters($query, ['lesson_id'], $params);
 
-        if (!empty($params['topic_ids'])) {
-            $ids = is_array($params['topic_ids'])
-                ? $params['topic_ids']
-                : explode(',', $params['topic_ids']);
-            $query->whereIn('topic_id', $ids);
+        if (!empty($params['lesson_ids'])) {
+            $ids = is_array($params['lesson_ids'])
+                ? $params['lesson_ids']
+                : explode(',', $params['lesson_ids']);
+            $query->whereIn('lesson_id', $ids);
         }
 
         $this->applyExactFilters($query, ['type', 'difficulty_level'], $params);

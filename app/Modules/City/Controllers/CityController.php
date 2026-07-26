@@ -59,11 +59,7 @@ class CityController extends Controller
     }
 
     #[OA\Post(path: '/admin/cities', summary: 'Create city', requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'name', properties: [
-            new OA\Property(property: 'az', type: 'string'),
-            new OA\Property(property: 'en', type: 'string'),
-            new OA\Property(property: 'ru', type: 'string'),
-        ], type: 'object'),
+        new OA\Property(property: 'name', type: 'string'),
     ])),
         tags: ['Cities'],
         responses: [new OA\Response(response: 201, description: 'City created')]),
@@ -85,11 +81,7 @@ class CityController extends Controller
     }
 
     #[OA\Put(path: '/admin/cities/{city}', summary: 'Update city', requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'name', properties: [
-            new OA\Property(property: 'az', type: 'string'),
-            new OA\Property(property: 'en', type: 'string'),
-            new OA\Property(property: 'ru', type: 'string'),
-        ], type: 'object'),
+        new OA\Property(property: 'name', type: 'string'),
     ])),
         tags: ['Cities'],
         responses: [new OA\Response(response: 200, description: 'City updated')]),

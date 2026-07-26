@@ -15,7 +15,7 @@ class TopicFactory extends Factory
     {
         return [
             'subject_id' => Subject::factory(),
-            'name' => ['en' => fake()->word(), 'az' => fake()->word()],
+            'name' => fake()->word(),
             'difficulty_level' => fake()->randomElement(DifficultyLevel::cases())->value,
         ];
     }
