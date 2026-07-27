@@ -1,0 +1,10 @@
+{
+    "name": "Banner",
+    "alias": "banner",
+    "description": "Banner management with image, title, subtitle",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}

@@ -13,7 +13,7 @@ class StoreVideoRequest extends FormRequest
         return [
             'lesson_id' => 'nullable|exists:lessons,id',
             'name' => 'nullable|string|max:255',
-            'youtube_url' => 'required|string|url|max:255',
+            'youtube_url' => 'required|string|max:255',
             'lang' => 'nullable|string',
         ];
     }

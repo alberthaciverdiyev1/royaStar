@@ -16,6 +16,15 @@ class Video extends Model
         return $this->belongsTo(Lesson::class);
     }
 
+    public function setYoutubeUrlAttribute(?string $value): void
+    {
+        if ($value && !str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
+            $value = 'https://' . $value;
+        }
+
+        $this->attributes['youtube_url'] = $value;
+    }
+
     public function getEmbedUrlAttribute(): ?string
     {
         return $this->youtube_id

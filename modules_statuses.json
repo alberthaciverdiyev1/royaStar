@@ -15,5 +15,6 @@
     "School": true,
     "Parent": true,
     "Star": true,
-    "Exam": true
+    "Exam": true,
+    "Banner": true
 }

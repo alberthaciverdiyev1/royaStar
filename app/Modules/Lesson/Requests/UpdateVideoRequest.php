@@ -13,7 +13,7 @@ class UpdateVideoRequest extends FormRequest
         return [
             'lesson_id' => 'nullable|exists:lessons,id',
             'name' => 'nullable|string|max:255',
-            'youtube_url' => 'sometimes|string|url|max:255',
+            'youtube_url' => 'sometimes|string|max:255',
             'lang' => 'sometimes|string',
         ];
     }

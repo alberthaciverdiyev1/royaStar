@@ -14,7 +14,7 @@ class UpdateLessonRequest extends FormRequest
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'videos' => 'nullable|array',
-            'videos.*.youtube_url' => 'required|string|url|max:255',
+            'videos.*.youtube_url' => 'required|string|max:255',
             'videos.*.name' => 'nullable|string|max:255',
             'videos.*.lang' => 'nullable|string',
         ];

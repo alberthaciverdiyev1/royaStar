@@ -12,187 +12,6 @@
         }
     ],
     "paths": {
-        "/certificates": {
-            "get": {
-                "tags": [
-                    "Certificates"
-                ],
-                "summary": "List all certificates",
-                "operationId": "a7b18a735c9558ba7df94d641730f934",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search by name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of certificates"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Certificates"
-                ],
-                "summary": "Create certificate",
-                "operationId": "eed063f91e3ef68b7265bd0879992983",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "template_html"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "template_html": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Certificate created"
-                    }
-                }
-            }
-        },
-        "/certificates/{certificate}": {
-            "get": {
-                "tags": [
-                    "Certificates"
-                ],
-                "summary": "Get certificate by ID",
-                "operationId": "4c330acd1ab5a1eb88f70ad736a9f4cb",
-                "parameters": [
-                    {
-                        "name": "certificate",
-                        "in": "path",
-                        "description": "Certificate ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Certificate data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Certificates"
-                ],
-                "summary": "Update certificate",
-                "operationId": "a344acc61c7789bd25d9f0537238cdb3",
-                "responses": {
-                    "200": {
-                        "description": "Certificate updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Certificates"
-                ],
-                "summary": "Delete certificate",
-                "operationId": "695346e8fd354acb04970eab9976b5e7",
-                "responses": {
-                    "200": {
-                        "description": "Certificate deleted"
-                    }
-                }
-            }
-        },
-        "/certificates/issue": {
-            "post": {
-                "tags": [
-                    "Certificates"
-                ],
-                "summary": "Issue certificate to student",
-                "operationId": "c894f8d5d5803bd6b900a83901bacd1c",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "student_id",
-                                    "certificate_id"
-                                ],
-                                "properties": {
-                                    "student_id": {
-                                        "type": "integer"
-                                    },
-                                    "certificate_id": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Certificate issued"
-                    }
-                }
-            }
-        },
         "/cities": {
             "get": {
                 "tags": [
@@ -274,18 +93,7 @@
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "properties": {
-                                            "az": {
-                                                "type": "string"
-                                            },
-                                            "en": {
-                                                "type": "string"
-                                            },
-                                            "ru": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "type": "object"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -339,18 +147,7 @@
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "properties": {
-                                            "az": {
-                                                "type": "string"
-                                            },
-                                            "en": {
-                                                "type": "string"
-                                            },
-                                            "ru": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "type": "object"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -450,7 +247,7 @@
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "type": "object"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -502,7 +299,7 @@
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "type": "object"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -609,11 +406,11 @@
                                         "type": "string",
                                         "nullable": true
                                     },
-                                    "bunny_stream_video_ids": {
-                                        "description": "Bunny Stream video IDs of pre-uploaded videos",
+                                    "videos": {
+                                        "description": "Array of videos with YouTube URLs",
                                         "type": "array",
                                         "items": {
-                                            "type": "string"
+                                            "$ref": "#/components/schemas/VideoPayload"
                                         }
                                     }
                                 },
@@ -712,11 +509,11 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "bunny_stream_video_ids": {
-                                        "description": "Bunny Stream video IDs to replace existing videos",
+                                    "videos": {
+                                        "description": "Array of videos with YouTube URLs to replace existing ones",
                                         "type": "array",
                                         "items": {
-                                            "type": "string"
+                                            "$ref": "#/components/schemas/VideoPayload"
                                         }
                                     }
                                 },
@@ -758,14 +555,6 @@
                         "description": "Filter by lesson ID",
                         "schema": {
                             "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter by status (pending_upload, ready)",
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     {
@@ -825,6 +614,14 @@
                                     "name": {
                                         "type": "string",
                                         "nullable": true
+                                    },
+                                    "youtube_url": {
+                                        "description": "YouTube video URL",
+                                        "type": "string"
+                                    },
+                                    "lang": {
+                                        "type": "string",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -834,7 +631,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Video created with upload link"
+                        "description": "Video created"
                     }
                 }
             }
@@ -872,6 +669,29 @@
                 ],
                 "summary": "Update video",
                 "operationId": "ec42a8ab546f092484a1c73e564ee0de",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "youtube_url": {
+                                        "description": "YouTube video URL",
+                                        "type": "string"
+                                    },
+                                    "lang": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Video updated"
@@ -887,147 +707,6 @@
                 "responses": {
                     "200": {
                         "description": "Video deleted"
-                    }
-                }
-            }
-        },
-        "/families": {
-            "get": {
-                "tags": [
-                    "Families"
-                ],
-                "summary": "List all families",
-                "operationId": "aee266d16751868cf81543fdd0d9c28e",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search by name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of families"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Families"
-                ],
-                "summary": "Create family",
-                "operationId": "b7915af70530bb9d6442bb5f3d100e7c",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_id"
-                                ],
-                                "properties": {
-                                    "user_id": {
-                                        "type": "integer"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Family created"
-                    }
-                }
-            }
-        },
-        "/families/{family}": {
-            "get": {
-                "tags": [
-                    "Families"
-                ],
-                "summary": "Get family by ID",
-                "operationId": "081d0e7e899956fab1d05a93641b2c6b",
-                "parameters": [
-                    {
-                        "name": "family",
-                        "in": "path",
-                        "description": "Family ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Family data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Families"
-                ],
-                "summary": "Update family",
-                "operationId": "068c4e483ba8b72805999f79728f11cc",
-                "responses": {
-                    "200": {
-                        "description": "Family updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Families"
-                ],
-                "summary": "Delete family",
-                "operationId": "4f1dfd2c51e1d19244b099ada315c69a",
-                "responses": {
-                    "200": {
-                        "description": "Family deleted"
                     }
                 }
             }
@@ -1339,17 +1018,17 @@
                 "operationId": "c052ebc3a7aedb9c51b4a5d20e165fc9",
                 "parameters": [
                     {
-                        "name": "topic_id",
+                        "name": "lesson_id",
                         "in": "query",
-                        "description": "Filter by single topic ID",
+                        "description": "Filter by single lesson ID",
                         "schema": {
                             "type": "integer"
                         }
                     },
                     {
-                        "name": "topic_ids",
+                        "name": "lesson_ids",
                         "in": "query",
-                        "description": "Filter by multiple topic IDs (comma-separated)",
+                        "description": "Filter by multiple lesson IDs (comma-separated)",
                         "schema": {
                             "type": "string"
                         }
@@ -1430,7 +1109,7 @@
                             "schema": {
                                 "required": [
                                     "type",
-                                    "topic_id",
+                                    "lesson_id",
                                     "difficulty_level"
                                 ],
                                 "properties": {
@@ -1452,7 +1131,7 @@
                                     "difficulty_level": {
                                         "type": "string"
                                     },
-                                    "topic_id": {
+                                    "lesson_id": {
                                         "type": "integer"
                                     }
                                 },
@@ -1526,14 +1205,6 @@
                 "operationId": "a202584e6b1fd11d7aa27dfa4c245573",
                 "parameters": [
                     {
-                        "name": "topic_id",
-                        "in": "query",
-                        "description": "Filter by topic ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
                         "name": "lesson_id",
                         "in": "query",
                         "description": "Filter by lesson ID",
@@ -1606,12 +1277,13 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "type"
+                                    "type",
+                                    "lesson_id"
                                 ],
                                 "properties": {
                                     "name": {
-                                        "description": "Translated name",
-                                        "type": "object"
+                                        "description": "Quiz name",
+                                        "type": "string"
                                     },
                                     "type": {
                                         "type": "string",
@@ -1620,13 +1292,8 @@
                                             "general"
                                         ]
                                     },
-                                    "topic_id": {
-                                        "type": "integer",
-                                        "nullable": true
-                                    },
                                     "lesson_id": {
-                                        "type": "integer",
-                                        "nullable": true
+                                        "type": "integer"
                                     },
                                     "question_ids": {
                                         "description": "IDs of existing questions to attach",
@@ -1703,127 +1370,18 @@
                 }
             }
         },
-        "/schools": {
-            "get": {
-                "tags": [
-                    "Schools"
-                ],
-                "summary": "List all schools",
-                "operationId": "940d5e9a2c9cbd6345084ef16c290243",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search by name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "city_id",
-                        "in": "query",
-                        "description": "Filter by city ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of schools"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
+        "/quizzes/{quiz}/start": {
             "post": {
                 "tags": [
-                    "Schools"
+                    "Quizzes"
                 ],
-                "summary": "Create school",
-                "operationId": "053c8b7c89f5a7f49372b197d685de76",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_id",
-                                    "name"
-                                ],
-                                "properties": {
-                                    "user_id": {
-                                        "type": "integer"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "city_id": {
-                                        "type": "integer",
-                                        "nullable": true
-                                    },
-                                    "no": {
-                                        "type": "string",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "School created"
-                    }
-                }
-            }
-        },
-        "/schools/{school}": {
-            "get": {
-                "tags": [
-                    "Schools"
-                ],
-                "summary": "Get school by ID",
-                "operationId": "756e6acd2f3b46ec18aa0f1af9178e16",
+                "summary": "Start a quiz attempt (get questions)",
+                "operationId": "4d700801045811d76b1fd44a549fe543",
                 "parameters": [
                     {
-                        "name": "school",
+                        "name": "quiz",
                         "in": "path",
-                        "description": "School ID",
+                        "description": "Quiz ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1832,36 +1390,102 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "School data"
+                        "description": "Quiz questions returned"
                     }
                 },
                 "security": [
-                    {}
+                    {
+                        "bearerAuth": []
+                    }
                 ]
-            },
-            "put": {
+            }
+        },
+        "/quizzes/{quiz}/submit": {
+            "post": {
                 "tags": [
-                    "Schools"
+                    "Quizzes"
                 ],
-                "summary": "Update school",
-                "operationId": "f15d80fb5988faf8a684cb5dd4654612",
+                "summary": "Submit quiz answers and get result",
+                "operationId": "7ef47fdf020c8223077bf75d43afeb5d",
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "description": "Quiz ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "answers": {
+                                        "description": "Array of answers",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer"
+                                                },
+                                                "answer": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "School updated"
+                        "description": "Quiz submitted with results"
                     }
-                }
-            },
-            "delete": {
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/quizzes/{quiz}/result": {
+            "get": {
                 "tags": [
-                    "Schools"
+                    "Quizzes"
                 ],
-                "summary": "Delete school",
-                "operationId": "332efb8caac01f1a6691458ad89c75bf",
+                "summary": "Get latest quiz result",
+                "operationId": "38894f0dda9ba0cd1cb32dbb33422297",
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "description": "Quiz ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "School deleted"
+                        "description": "Quiz result"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/settings": {
@@ -2123,51 +1747,6 @@
                 }
             }
         },
-        "/students/activities": {
-            "get": {
-                "tags": [
-                    "Students"
-                ],
-                "summary": "Get authenticated student activities",
-                "operationId": "1a1cb159895bdc08f023dcb502543db4",
-                "parameters": [
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Filter by activity type (lesson_completed, quiz_completed)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of activities"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/subjects": {
             "get": {
                 "tags": [
@@ -2331,359 +1910,6 @@
                 "responses": {
                     "200": {
                         "description": "Subject deleted"
-                    }
-                }
-            }
-        },
-        "/teacher-tasks": {
-            "get": {
-                "tags": [
-                    "Teacher Tasks"
-                ],
-                "summary": "List all teacher tasks",
-                "operationId": "67f1642cfdcc86980607e4df12553da5",
-                "parameters": [
-                    {
-                        "name": "teacher_id",
-                        "in": "query",
-                        "description": "Filter by teacher ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "topic_id",
-                        "in": "query",
-                        "description": "Filter by topic ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "grade_id",
-                        "in": "query",
-                        "description": "Filter by grade ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Filter by task type",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of teacher tasks"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Teacher Tasks"
-                ],
-                "summary": "Create teacher task",
-                "operationId": "c7d58aa83ec61728ae0994b8ca264963",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "teacher_id",
-                                    "topic_id",
-                                    "quiz_id",
-                                    "grade_id",
-                                    "type"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "teacher_id": {
-                                        "type": "integer"
-                                    },
-                                    "topic_id": {
-                                        "type": "integer"
-                                    },
-                                    "quiz_id": {
-                                        "type": "integer"
-                                    },
-                                    "grade_id": {
-                                        "type": "integer"
-                                    },
-                                    "type": {
-                                        "type": "string"
-                                    },
-                                    "start_date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "nullable": true
-                                    },
-                                    "end_date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Teacher task created"
-                    }
-                }
-            }
-        },
-        "/teacher-tasks/{teacher_task}": {
-            "get": {
-                "tags": [
-                    "Teacher Tasks"
-                ],
-                "summary": "Get teacher task by ID",
-                "operationId": "ff449e11ba4b814e20ba6e380b6d728c",
-                "parameters": [
-                    {
-                        "name": "teacher_task",
-                        "in": "path",
-                        "description": "Teacher Task ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Teacher task data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Teacher Tasks"
-                ],
-                "summary": "Update teacher task",
-                "operationId": "0291faaa7ac533976bf43242ddae28f6",
-                "responses": {
-                    "200": {
-                        "description": "Teacher task updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Teacher Tasks"
-                ],
-                "summary": "Delete teacher task",
-                "operationId": "a86def0c40f7dc0d379e091567524ea5",
-                "responses": {
-                    "200": {
-                        "description": "Teacher task deleted"
-                    }
-                }
-            }
-        },
-        "/teachers": {
-            "get": {
-                "tags": [
-                    "Teachers"
-                ],
-                "summary": "List all teachers",
-                "operationId": "968514d1bd9e4de757cf75b3a895c452",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search by name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "city_id",
-                        "in": "query",
-                        "description": "Filter by city ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of teachers"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Teachers"
-                ],
-                "summary": "Create teacher",
-                "operationId": "b0b3d4e66f2e9381600d5fa02add6b2d",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "user_id"
-                                ],
-                                "properties": {
-                                    "user_id": {
-                                        "type": "integer"
-                                    },
-                                    "city_id": {
-                                        "type": "integer",
-                                        "nullable": true
-                                    },
-                                    "birth_date": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Teacher created"
-                    }
-                }
-            }
-        },
-        "/teachers/{teacher}": {
-            "get": {
-                "tags": [
-                    "Teachers"
-                ],
-                "summary": "Get teacher by ID",
-                "operationId": "80a4357f66a50b72788157f7f5ddeedf",
-                "parameters": [
-                    {
-                        "name": "teacher",
-                        "in": "path",
-                        "description": "Teacher ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Teacher data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Teachers"
-                ],
-                "summary": "Update teacher",
-                "operationId": "f1d7223ac1ac2518cbbd42ade2b75c2c",
-                "responses": {
-                    "200": {
-                        "description": "Teacher updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Teachers"
-                ],
-                "summary": "Delete teacher",
-                "operationId": "280ec40ede31b3fab62674c7a8d137c7",
-                "responses": {
-                    "200": {
-                        "description": "Teacher deleted"
                     }
                 }
             }
@@ -2913,173 +2139,6 @@
                 "responses": {
                     "200": {
                         "description": "Topic deleted"
-                    }
-                }
-            }
-        },
-        "/translates": {
-            "get": {
-                "tags": [
-                    "Translates"
-                ],
-                "summary": "List all translates",
-                "operationId": "d44a410ac5e8d0c3def3a853b3b6dcf5",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search by key or label",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. key, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of translates"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Translates"
-                ],
-                "summary": "Create translate",
-                "operationId": "4cae15674e36a765bf824798035213cb",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "key": {
-                                        "type": "string"
-                                    },
-                                    "label": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "value": {
-                                        "type": "object"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Translate created"
-                    }
-                }
-            }
-        },
-        "/translates/{translate}": {
-            "get": {
-                "tags": [
-                    "Translates"
-                ],
-                "summary": "Get translate by ID",
-                "operationId": "4468dc7dc0a43f29333b25a9bb986a6f",
-                "parameters": [
-                    {
-                        "name": "translate",
-                        "in": "path",
-                        "description": "Translate ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Translate data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Translates"
-                ],
-                "summary": "Update translate",
-                "operationId": "82b4c86eba46d19f9e24188138f3013e",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "key": {
-                                        "type": "string"
-                                    },
-                                    "label": {
-                                        "type": "string",
-                                        "nullable": true
-                                    },
-                                    "value": {
-                                        "type": "object"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Translate updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Translates"
-                ],
-                "summary": "Delete translate",
-                "operationId": "ef6473eb5acb9f51f410e1866a3377cc",
-                "responses": {
-                    "200": {
-                        "description": "Translate deleted"
                     }
                 }
             }
@@ -3539,10 +2598,6 @@
     ],
     "tags": [
         {
-            "name": "Certificates",
-            "description": "Certificates"
-        },
-        {
             "name": "Cities",
             "description": "Cities"
         },
@@ -3557,10 +2612,6 @@
         {
             "name": "Videos",
             "description": "Videos"
-        },
-        {
-            "name": "Families",
-            "description": "Families"
         },
         {
             "name": "Plans",
@@ -3579,10 +2630,6 @@
             "description": "Quizzes"
         },
         {
-            "name": "Schools",
-            "description": "Schools"
-        },
-        {
             "name": "Settings",
             "description": "Settings"
         },
@@ -3595,20 +2642,8 @@
             "description": "Subjects"
         },
         {
-            "name": "Teacher Tasks",
-            "description": "Teacher Tasks"
-        },
-        {
-            "name": "Teachers",
-            "description": "Teachers"
-        },
-        {
             "name": "Topics",
             "description": "Topics"
-        },
-        {
-            "name": "Translates",
-            "description": "Translates"
         },
         {
             "name": "Auth",
