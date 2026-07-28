@@ -1,161 +1,197 @@
-@extends('layouts.app', ['hideHeader' => true, 'hideNavbar' => true])
-@section('title', $lesson['name'] ?? 'Lesson')
+@extends('layouts.app')
+@section('title', $lesson->name . ' - Lesson')
 
 @section('content')
-<section class="max-w-content mx-auto px-4 py-8 md:py-12">
-    <!-- Header -->
-    <header class="mb-8">
-        <a href="{{ route('topics') }}" class="inline-flex items-center gap-2 text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface-variant))] hover:text-[rgb(var(--primary))] transition-all mb-6 no-underline">
-            <span class="material-symbols-outlined !text-sm">arrow_back</span>
-            Back to Topics
-        </a>
-        <div class="flex flex-wrap items-center gap-3 mb-4">
-            <span class="text-3xs font-black uppercase tracking-widest inline-flex items-center gap-2 px-4 py-1.5 rounded-full border bg-[rgb(var(--primary))/0.05] text-[rgb(var(--primary))] border-[rgb(var(--primary))/0.1]">
-                {{ $lesson['topic_name'] ?? 'Grammar' }}
+<section class="lesson-cover">
+    <div class="lesson-cover__deco">
+        <span class="material-symbols-outlined !text-8xl md:!text-[200px] opacity-[0.05]">auto_awesome</span>
+    </div>
+    <div class="lesson-cover__deco lesson-cover__deco--right">
+        <span class="material-symbols-outlined !text-[120px] md:!text-[240px] opacity-[0.03]">rocket_launch</span>
+    </div>
+
+    <a href="{{ route('topics.detail', $lesson->topic) }}" class="lesson-cover__back">
+        <span class="material-symbols-outlined !text-lg">arrow_back</span>
+        <span>Back</span>
+    </a>
+
+    <div class="lesson-cover__content">
+        <div class="lesson-cover__breadcrumb">
+            <span>{{ $lesson->topic?->name ?? 'Lesson' }}</span>
+            <span class="material-symbols-outlined !text-sm">chevron_right</span>
+            <span class="text-white/40">{{ $lesson->name }}</span>
+        </div>
+        <h1 class="lesson-cover__title">{{ $lesson->name }}</h1>
+        @if($lesson->description)
+        <p class="lesson-cover__desc">{{ $lesson->description }}</p>
+        @endif
+        <div class="lesson-cover__meta">
+            <span class="lesson-cover__meta-item">
+                <span class="material-symbols-outlined !text-base">play_circle</span>
+                {{ $lesson->videos->count() }} {{ Str::plural('Video', $lesson->videos->count()) }}
             </span>
-            <div class="flex items-center gap-0.5">
-                @for($s = 0; $s < ($lesson['star'] ?? 3); $s++)
-                <span class="material-symbols-outlined !text-lg text-[rgb(var(--tertiary))]" style="font-variation-settings:'FILL' 1">star</span>
-                @endfor
+            @if($lesson->quiz)
+            <span class="lesson-cover__meta-item">
+                <span class="material-symbols-outlined !text-base">quiz</span>
+                {{ $lesson->quiz->questions->count() }} Questions
+            </span>
+            @endif
+        </div>
+    </div>
+</section>
+
+<div class="lesson-body">
+    {{-- Videos --}}
+    @if($lesson->videos->isNotEmpty())
+    <section class="lesson-section">
+        <div class="lesson-section__header">
+            <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">video_library</span>
+            <div>
+                <h2 class="lesson-section__title">Lesson Videos</h2>
+                <p class="lesson-section__desc">Watch and learn at your own pace</p>
             </div>
         </div>
-        <h1 class="text-3xl md:text-4xl font-black text-[rgb(var(--on-surface))] uppercase tracking-tight">{{ $lesson['name'] }}</h1>
-        @if(!empty($lesson['description']))
-        <p class="text-sm font-bold text-[rgb(var(--on-surface-variant))] mt-3 max-w-2xl leading-relaxed">{{ $lesson['description'] }}</p>
-        @endif
-    </header>
-
-    <!-- Videos -->
-    @if(count($videos ?? []) > 0)
-    <div class="mb-10">
-        <h2 class="text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))] mb-6 flex items-center gap-2">
-            <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">video_library</span>
-            Videos
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach($videos as $video)
-            <div class="bg-[rgb(var(--surface-container-lowest))] rounded-3xl border border-[rgb(var(--surface-container-high))] overflow-hidden shadow-lg shadow-black/5">
-                <div class="aspect-video">
-                    @if(!empty($video['youtube_url']))
-                    <iframe src="{{ str_replace('watch?v=', 'embed/', $video['youtube_url']) }}" class="w-full h-full" allowfullscreen loading="lazy"></iframe>
-                    @elseif(!empty($video['video_url']))
-                    <video controls class="w-full aspect-video bg-black">
-                        <source src="{{ $video['video_url'] }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+        <div class="lesson-video-grid">
+            @foreach($lesson->videos as $video)
+            <div class="lesson-video-card">
+                <div class="lesson-video-card__player">
+                    @if($video->youtube_url)
+                    <iframe src="{{ $video->embed_url }}" class="lesson-video-card__iframe" allowfullscreen loading="lazy"></iframe>
                     @endif
                 </div>
+                @if($video->name)
+                <div class="lesson-video-card__footer">
+                    <span class="material-symbols-outlined !text-base text-[rgb(var(--primary))]">play_circle</span>
+                    <span class="lesson-video-card__title">{{ $video->name }}</span>
+                </div>
+                @endif
             </div>
             @endforeach
         </div>
-    </div>
+    </section>
     @endif
 
-    <!-- Quizzes -->
-    @if(count($quizzes ?? []) > 0)
-    <div class="mb-10">
-        <h2 class="text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))] mb-6 flex items-center gap-2">
+    {{-- Quiz --}}
+    @if($lesson->quiz)
+    <section class="lesson-section">
+        <div class="lesson-section__header">
             <span class="material-symbols-outlined !text-2xl text-[rgb(var(--secondary))]">quiz</span>
-            Quizzes
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach($quizzes as $quiz)
-            <a href="{{ route('quiz', ['id' => $quiz['id']]) }}" class="block bg-[rgb(var(--surface-container-lowest))] rounded-3xl border border-[rgb(var(--surface-container-high))] p-6 hover:shadow-xl hover:border-[rgb(var(--primary))/0.3] transition-all no-underline group">
-                <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-[rgb(var(--secondary))/0.1] flex items-center justify-center">
-                        <span class="material-symbols-outlined !text-2xl text-[rgb(var(--secondary))]">quiz</span>
-                    </div>
-                    <div class="flex items-center gap-0.5">
-                        @for($s = 0; $s < ($quiz['star'] ?? 0); $s++)
-                        <span class="material-symbols-outlined !text-sm text-[rgb(var(--tertiary))]" style="font-variation-settings:'FILL' 1">star</span>
-                        @endfor
-                    </div>
+            <div>
+                <h2 class="lesson-section__title">Knowledge Check</h2>
+                <p class="lesson-section__desc">Test what you've learned in this lesson</p>
+            </div>
+        </div>
+        <a href="{{ route('quiz', $lesson->quiz) }}" class="lesson-quiz-card">
+            <div class="lesson-quiz-card__icon">
+                <span class="material-symbols-outlined !text-3xl">quiz</span>
+            </div>
+            <div class="lesson-quiz-card__body">
+                <h3 class="lesson-quiz-card__title">{{ $lesson->quiz->name }}</h3>
+                <div class="lesson-quiz-card__stats">
+                    <span class="lesson-quiz-card__stat">
+                        <span class="material-symbols-outlined !text-sm">help</span>
+                        {{ $lesson->quiz->questions->count() }} questions
+                    </span>
+                    <span class="lesson-quiz-card__stat">
+                        <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
+                        Earn stars
+                    </span>
                 </div>
-                <h3 class="font-black text-sm uppercase text-[rgb(var(--on-surface))] group-hover:text-[rgb(var(--primary))] transition-colors">{{ $quiz['name'] }}</h3>
-                <p class="text-3xs font-bold text-[rgb(var(--on-surface-variant))] mt-2 flex items-center gap-1">
-                    <span class="material-symbols-outlined !text-sm">help</span>
-                    {{ $quiz['questions_count'] ?? 0 }} questions
-                </p>
-            </a>
-            @endforeach
-        </div>
-    </div>
+            </div>
+            <div class="lesson-quiz-card__action">
+                <span class="material-symbols-outlined !text-2xl">arrow_forward</span>
+            </div>
+        </a>
+    </section>
     @endif
 
-    @if(count($videos ?? []) == 0 && count($quizzes ?? []) == 0)
-    <div class="text-center py-20">
-        <span class="material-symbols-outlined !text-6xl text-[rgb(var(--on-surface))/0.1] mb-4">menu_book</span>
-        <p class="text-sm font-bold text-[rgb(var(--on-surface))/0.3] uppercase tracking-widest">No content available yet</p>
-    </div>
+    {{-- Empty state --}}
+    @if($lesson->videos->isEmpty() && !$lesson->quiz)
+    <section class="lesson-section">
+        <div class="text-center py-20">
+            <span class="material-symbols-outlined !text-7xl text-[rgb(var(--on-surface))/0.06] mb-6">menu_book</span>
+            <p class="text-[rgb(var(--on-surface))/0.25] font-black uppercase tracking-widest text-sm">No content available yet</p>
+        </div>
+    </section>
     @endif
 
-    <!-- Rating -->
-    <div class="rounded-3xl md:rounded-4xl p-6 md:p-10 bg-[rgb(var(--surface-container-lowest))] border border-[rgb(var(--surface-container-high))] shadow-xl shadow-[rgb(var(--primary))/0.05]">
-        <div class="text-center space-y-2 mb-8">
-            <h4 class="text-xl font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">Rate this Lesson</h4>
-            <p class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">How was your learning journey today?</p>
+    {{-- Rating --}}
+    <section class="lesson-section">
+        <div class="lesson-section__header">
+            <span class="material-symbols-outlined !text-2xl text-[rgb(var(--tertiary))]">feedback</span>
+            <div>
+                <h2 class="lesson-section__title">Rate This Lesson</h2>
+                <p class="lesson-section__desc">How was your learning experience today?</p>
+            </div>
         </div>
-        <form method="POST" action="{{ route('lesson.rate', ['id' => $lesson['id'] ?? 0]) }}" class="space-y-6">
+
+        <form method="POST" action="{{ route('lesson.rate', $lesson) }}" class="lesson-rate-card">
             @csrf
             <input name="rating" type="hidden" id="ratingInput" />
-            <div class="flex justify-center gap-2 md:gap-4">
+
+            <div class="lesson-rate-card__stars">
                 @for($i = 1; $i <= 5; $i++)
-                <button type="button" class="rating-star transition-all hover:scale-125 active:scale-75 text-[rgb(var(--on-surface))/0.2] min-w-touch min-h-touch flex items-center justify-center" data-index="{{ $i }}">
-                    <span class="material-symbols-outlined !text-[44px]">star</span>
+                <button type="button" class="lesson-star" data-index="{{ $i }}">
+                    <span class="material-symbols-outlined !text-5xl md:!text-6xl">star</span>
                 </button>
                 @endfor
             </div>
-            <div>
-                <label class="text-xs font-black uppercase tracking-widest px-2 text-[rgb(var(--primary))] block mb-3">Any thoughts for Teacher Roya?</label>
-                <textarea name="review" rows="4" class="w-full rounded-2xl p-5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.3] transition-all border border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.5]" placeholder="Share your feedback..."></textarea>
+
+            <div class="lesson-rate-card__field">
+                <label class="lesson-rate-card__label">Share your thoughts</label>
+                <textarea name="review" rows="4" class="lesson-rate-card__textarea" placeholder="What did you think of this lesson? Your feedback helps Teacher Roya improve..."></textarea>
             </div>
-            <button type="submit" class="w-full py-4 bg-[rgb(var(--secondary))] text-white rounded-full font-black text-sm active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-[rgb(var(--secondary))/0.2] hover:bg-[rgb(var(--secondary))/0.9]">
-                Submit Review
+
+            <button type="submit" class="lesson-rate-card__submit">
+                <span>Submit Feedback</span>
                 <span class="material-symbols-outlined !text-xl">rocket_launch</span>
             </button>
         </form>
-    </div>
-</section>
+    </section>
+</div>
 @endsection
 
 @push('scripts')
 <script>
-    (function() {
-        var stars = document.querySelectorAll('.rating-star');
-        var input = document.getElementById('ratingInput');
+(function() {
+    var stars = document.querySelectorAll('.lesson-star');
+    var input = document.getElementById('ratingInput');
 
-        stars.forEach(function(star, idx) {
-            star.addEventListener('click', function() {
-                stars.forEach(function(s, i) {
-                    var icon = s.querySelector('.material-symbols-outlined');
-                    if (i <= idx) {
-                        icon.style.fontVariationSettings = "'FILL' 1";
-                        s.classList.remove('text-\\[rgb\\(var\\(--on-surface\\)\\)\\]/20');
-                        s.classList.add('text-\\[rgb\\(var\\(--tertiary\\)\\)\\]');
-                    } else {
-                        icon.style.fontVariationSettings = "'FILL' 0";
-                        s.classList.remove('text-\\[rgb\\(var\\(--tertiary\\)\\)\\]');
-                        s.classList.add('text-\\[rgb\\(var\\(--on-surface\\)\\)\\]/20');
-                    }
-                });
-                if (input) input.value = idx + 1;
-            });
+    function resetStars(selected) {
+        stars.forEach(function(s, i) {
+            var icon = s.querySelector('.material-symbols-outlined');
+            if (i < selected) {
+                icon.style.fontVariationSettings = "'FILL' 1";
+                s.classList.add('lesson-star--active');
+                s.classList.remove('lesson-star--inactive');
+            } else {
+                icon.style.fontVariationSettings = "'FILL' 0";
+                s.classList.add('lesson-star--inactive');
+                s.classList.remove('lesson-star--active');
+            }
+        });
+    }
 
-            star.addEventListener('mouseenter', function() {
-                stars.forEach(function(s, i) {
-                    var icon = s.querySelector('.material-symbols-outlined');
-                    if (i <= idx) icon.style.fontVariationSettings = "'FILL' 1";
-                });
-            });
-
-            star.addEventListener('mouseleave', function() {
-                var selected = parseInt(input?.value || 0);
-                stars.forEach(function(s, i) {
-                    var icon = s.querySelector('.material-symbols-outlined');
-                    if (i >= selected) icon.style.fontVariationSettings = "'FILL' 0";
-                });
+    stars.forEach(function(star, idx) {
+        star.addEventListener('click', function() {
+            var val = idx + 1;
+            if (input) input.value = val;
+            resetStars(val);
+        });
+        star.addEventListener('mouseenter', function() {
+            stars.forEach(function(s, i) {
+                var icon = s.querySelector('.material-symbols-outlined');
+                icon.style.fontVariationSettings = i <= idx ? "'FILL' 1" : "'FILL' 0";
             });
         });
-    })();
+        star.addEventListener('mouseleave', function() {
+            var selected = parseInt(input?.value || 0);
+            stars.forEach(function(s, i) {
+                var icon = s.querySelector('.material-symbols-outlined');
+                if (i >= selected) icon.style.fontVariationSettings = "'FILL' 0";
+            });
+        });
+    });
+})();
 </script>
 @endpush

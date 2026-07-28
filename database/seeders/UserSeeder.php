@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'admin',
+            'is_approved' => true,
         ]);
         $admin->assignRole('super-admin');
 
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
             'email' => 'school@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'school',
+            'is_approved' => true,
         ]);
         $schoolAdmin->assignRole('school');
 
@@ -36,6 +38,7 @@ class UserSeeder extends Seeder
             'email' => 'elvin@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'teacher',
+            'is_approved' => true,
         ]);
         $teacher1->assignRole('teacher');
 
@@ -46,6 +49,7 @@ class UserSeeder extends Seeder
             'email' => 'leyla@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'teacher',
+            'is_approved' => true,
         ]);
         $teacher2->assignRole('teacher');
 
@@ -56,6 +60,7 @@ class UserSeeder extends Seeder
             'email' => 'said@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'student',
+            'is_approved' => true,
         ]);
         $student1->assignRole('student');
 
@@ -66,6 +71,7 @@ class UserSeeder extends Seeder
             'email' => 'aysu@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'student',
+            'is_approved' => true,
         ]);
         $student2->assignRole('student');
 
@@ -76,6 +82,7 @@ class UserSeeder extends Seeder
             'email' => 'tural@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'parent',
+            'is_approved' => true,
         ]);
         $parent->assignRole('parent');
 
@@ -86,6 +93,7 @@ class UserSeeder extends Seeder
             'email' => 'editor@royastar.com',
             'password' => bcrypt('password'),
             'type' => 'admin',
+            'is_approved' => true,
         ]);
         $editor->assignRole('admin');
     }

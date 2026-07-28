@@ -29,6 +29,26 @@
                 <label class="signup-label">Phone Number</label>
                 <input name="phone" type="tel" value="{{ old('phone') }}" class="signup-input" placeholder="+994" />
             </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label class="signup-label">City</label>
+                    <select name="city_id" class="signup-input">
+                        <option value="">Select City</option>
+                        @foreach($cities as $city)
+                        <option value="{{ $city->id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name[app()->getLocale()] ?? $city->name['az'] ?? '' }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="signup-label">Grade</label>
+                    <select name="grade_id" class="signup-input">
+                        <option value="">Select Grade</option>
+                        @foreach($grades as $grade)
+                        <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>{{ $grade->name[app()->getLocale()] ?? $grade->name['az'] ?? '' }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             <div class="space-y-1">
                 <label class="signup-label">Email Address</label>
                 <input name="email" type="email" required value="{{ old('email') }}" class="signup-input" placeholder="your@email.com" />

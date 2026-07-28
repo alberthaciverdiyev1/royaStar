@@ -23,7 +23,7 @@ class User extends Authenticatable
     protected string $guard_name = 'api';
 
     protected $fillable = [
-        'name', 'surname', 'phone', 'avatar', 'type', 'email', 'password',
+        'name', 'surname', 'phone', 'avatar', 'type', 'email', 'password', 'is_approved',
     ];
 
     protected $hidden = [
@@ -35,6 +35,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_approved' => 'boolean',
         ];
     }
 

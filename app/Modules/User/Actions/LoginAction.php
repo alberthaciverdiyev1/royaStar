@@ -23,6 +23,10 @@ class LoginAction
             throw ValidationException::withMessages(['login' => [__('auth.invalid_credentials')]]);
         }
 
+        if (!$user->is_approved) {
+            throw ValidationException::withMessages(['login' => [__('auth.account_pending')]]);
+        }
+
         if ($user->hasRole('student')) {
             $this->starService->awardDailyLogin($user->id);
         }

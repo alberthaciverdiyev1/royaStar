@@ -17,7 +17,7 @@ class Student extends Model
 
     protected $fillable = [
         'user_id', 'grade_id', 'city_id', 'school_name', 'birth_date',
-        'created_by_id', 'is_active', 'level',
+        'created_by_id', 'is_active',
     ];
 
     protected function casts(): array

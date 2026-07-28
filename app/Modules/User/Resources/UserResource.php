@@ -17,6 +17,7 @@ class UserResource extends BaseResource
             'email' => $this->email,
             'avatar' => $this->avatar,
             'type' => $this->type,
+            'is_approved' => $this->is_approved,
             'created_at' => $this->created_at,
         ];
     }

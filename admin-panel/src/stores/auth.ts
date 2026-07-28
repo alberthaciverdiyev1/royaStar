@@ -7,9 +7,16 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('token'))
   const loading = ref(false)
 
-  const isAuthenticated = computed(() => !!user.value)
+  // Both user AND token must exist to be considered authenticated
+  const isAuthenticated = computed(() => !!user.value && !!token.value)
 
   async function initialize() {
+    // If user exists but token doesn't, clear stale user
+    if (user.value && !token.value) {
+      user.value = null
+      localStorage.removeItem('user')
+    }
+
     if (token.value && !user.value) {
       loading.value = true
       try {
@@ -21,6 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         token.value = null
+        user.value = null
       } finally {
         loading.value = false
       }

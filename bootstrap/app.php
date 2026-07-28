@@ -49,7 +49,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 401 — unauthenticated
         $exceptions->render(function (AuthenticationException $e, Request $request) {
-            return apiResponse(statusCode: 401, message: __('crud.unauthenticated'));
+            if ($request->is('api/*')) {
+                return apiResponse(statusCode: 401, message: __('crud.unauthenticated'));
+            }
         });
 
         // 403 — unauthorized

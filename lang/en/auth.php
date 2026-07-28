@@ -9,4 +9,7 @@ return [
     'school_registration_pending' => 'School registration request submitted. Waiting for admin approval.',
     'registered' => 'Registered successfully.',
     'logged_in' => 'Logged in successfully.',
+    'registration_pending' => 'Registration submitted. Your account is pending admin approval.',
+    'account_pending' => 'Your account is pending approval. Please wait for an administrator to approve your account.',
+    'account_approved' => 'User approved successfully.',
 ];

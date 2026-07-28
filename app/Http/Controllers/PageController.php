@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Modules\User\Models\User;
+use App\Modules\Student\Models\Student;
+use App\Modules\Grade\Models\Grade;
+use App\Modules\City\Models\City;
+use App\Modules\Topic\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -36,11 +40,19 @@ class PageController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->boolean('remember'))) {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
+
+        if (!$user->is_approved) {
+            return redirect()->route('pending');
+        }
+
+        Auth::login($user);
 
         $request->session()->regenerate();
 
@@ -57,6 +69,8 @@ class PageController extends Controller
             'isIndex' => true,
             'hideHeader' => true,
             'hideNavbar' => true,
+            'cities' => City::all(),
+            'grades' => Grade::all(),
         ]);
     }
 
@@ -67,9 +81,11 @@ class PageController extends Controller
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'city_id' => 'nullable|exists:cities,id',
+            'grade_id' => 'nullable|exists:grades,id',
         ]);
 
-        $user = DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
@@ -80,14 +96,28 @@ class PageController extends Controller
 
             $user->assignRole('student');
 
-            return $user;
+            Student::create([
+                'user_id' => $user->id,
+                'city_id' => $request->city_id,
+                'grade_id' => $request->grade_id,
+            ]);
         });
 
-        Auth::login($user);
+        return redirect()->route('pending')
+            ->with('success', __('auth.registration_pending'));
+    }
 
-        $request->session()->regenerate();
+    public function pending()
+    {
+        if (Auth::check()) {
+            return redirect()->route('topics');
+        }
 
-        return redirect()->route('welcome');
+        return view('auth.pending', [
+            'isIndex' => true,
+            'hideHeader' => true,
+            'hideNavbar' => true,
+        ]);
     }
 
     public function index()
@@ -95,38 +125,39 @@ class PageController extends Controller
         return view('index', [
             'isIndex' => true,
             'hideNavbar' => true,
-            'initials' => '',
         ]);
     }
 
     public function topics()
     {
-        return view('pages.topics');
+        $search = request('search');
+        $topics = Topic::with('subject')
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
+                ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$search}%")))
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('pages.topics', compact('topics', 'search'));
     }
 
-    public function subtopics()
+    public function topicDetail(Topic $topic)
     {
-        return view('pages.subtopics');
+        $topic->load('subject');
+
+        $search = request('search');
+        $lessons = $topic->lessons()
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('pages.subtopics', compact('topic', 'lessons', 'search'));
     }
 
     public function lesson($id)
     {
-        return view('pages.lesson', [
-            'lesson' => [
-                'id' => $id,
-                'name' => 'Countable & Uncountable Nouns',
-                'topic_name' => 'Nouns & Objects',
-                'description' => 'Learn how to distinguish between countable and uncountable nouns in English grammar.',
-                'star' => 3,
-            ],
-            'videos' => [
-                ['youtube_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'title' => 'Lesson Video'],
-            ],
-            'quizzes' => [
-                ['id' => 1, 'name' => 'Countable Nouns Quiz', 'star' => 0, 'questions_count' => 10],
-                ['id' => 2, 'name' => 'Uncountable Nouns Quiz', 'star' => 0, 'questions_count' => 8],
-            ],
-        ]);
+        $lesson = \App\Modules\Lesson\Models\Lesson::with(['topic', 'videos', 'quiz.questions'])->findOrFail($id);
+
+        return view('pages.lesson', compact('lesson'));
     }
 
     public function lessonRate(Request $request, $id)
@@ -206,6 +237,7 @@ class PageController extends Controller
     public function profile()
     {
         $user = Auth::user();
+        $student = $user?->student;
 
         return view('pages.profile', [
             'profile' => [
@@ -213,7 +245,10 @@ class PageController extends Controller
                 'email' => $user?->email ?? 'student@example.com',
                 'phone' => $user?->phone ?? '+994 XX XXX XX XX',
             ],
+            'student' => $student,
             'totalStars' => 42,
+            'cities' => City::all(),
+            'grades' => Grade::all(),
         ]);
     }
 
@@ -223,11 +258,20 @@ class PageController extends Controller
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . Auth::id(),
             'phone' => 'nullable|string|max:20',
+            'city_id' => 'nullable|exists:cities,id',
+            'grade_id' => 'nullable|exists:grades,id',
+            'school_name' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
         ]);
 
         $user = Auth::user();
         if ($user) {
             $user->update($request->only(['name', 'email', 'phone']));
+
+            $student = $user->student;
+            if ($student) {
+                $student->update($request->only(['city_id', 'grade_id', 'school_name', 'birth_date']));
+            }
         }
 
         return redirect()->route('profile')

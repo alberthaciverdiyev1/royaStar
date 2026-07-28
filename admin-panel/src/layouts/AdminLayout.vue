@@ -29,6 +29,7 @@ const navItems: NavItem[] = [
   { to: '/exams', label: 'İmtahanlar', icon: 'exam' },
   { to: '/stars', label: 'Ulduzlar', icon: 'star' },
   { to: '/payments', label: 'Ödənişlər', icon: 'payment' },
+  { to: '/users/pending', label: 'Təsdiq gözləyənlər', icon: 'pending-users' },
 ]
 
 function isActive(item: NavItem): boolean {

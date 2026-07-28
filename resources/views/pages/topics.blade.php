@@ -25,19 +25,47 @@
     </div>
 </section>
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-4">
+    <form method="GET" action="{{ route('topics') }}" class="search-bar">
+        <span class="material-symbols-outlined !text-lg">search</span>
+        <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search topics..." class="search-bar__input" data-auto-search />
+        @if($search)
+        <a href="{{ route('topics') }}" class="search-bar__clear material-symbols-outlined !text-lg">close</a>
+        @endif
+    </form>
+
     <div class="modules-grid">
-        <x-card variant="red" href="{{ route('subtopics') }}" badgeText="Topic 01" title="Nouns & Objects" description="Mastering the building blocks of every sentence in the universe." progress="100" iconName="star" />
-
-        <x-card variant="white" href="#" badgeText="Topic 02" title="Action Verbs" description="Giving life and motion to your stories through powerful verbs." progress="20" iconName="star" />
-
-        <x-card variant="gray" badgeText="Topic 03" title="Sentence Building" description="Unlock this module by completing the previous journey." iconName="lock" />
+        @forelse($topics as $i => $topic)
+        <x-card
+            href="{{ route('topics.detail', $topic) }}"
+            badgeText="Topic {{ str_pad($topics->firstItem() + $i, 2, '0', STR_PAD_LEFT) }}"
+            title="{{ $topic->name }}"
+            description="{{ $topic->subject?->name ?? '' }}"
+            progress="0"
+            iconName="{{ ['star', 'bolt', 'rocket_launch', 'auto_awesome', 'psychology', 'menu_book'][$i % 6] }}"
+        />
+        @empty
+        <div class="col-span-full text-center py-16">
+            <span class="material-symbols-outlined !text-6xl text-[rgb(var(--on-surface))/0.1] mb-4">rocket_launch</span>
+            <p class="text-[rgb(var(--on-surface))/0.3] font-black uppercase tracking-widest text-xs">
+                {{ $search ? 'No topics match your search' : 'No topics available yet' }}
+            </p>
+        </div>
+        @endforelse
     </div>
 </div>
 
-<div class="pagination-container">
-    <div class="dot dot-active"></div>
-    <div class="dot dot-inactive"></div>
-    <div class="dot dot-inactive"></div>
-</div>
+{{ $topics->appends(['search' => $search])->links('vendor.pagination.custom') }}
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('[data-auto-search]').forEach(function(input) {
+    var timer;
+    input.addEventListener('input', function() {
+        clearTimeout(timer);
+        timer = setTimeout(function() { input.closest('form').submit(); }, 350);
+    });
+});
+</script>
+@endpush

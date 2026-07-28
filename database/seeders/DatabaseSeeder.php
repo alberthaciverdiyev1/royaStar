@@ -12,12 +12,10 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             CitySeeder::class,
             GradeSeeder::class,
-            SubjectSeeder::class,
-            TopicSeeder::class,
             UserSeeder::class,
             SettingSeeder::class,
-            DemoDataSeeder::class,
             StarSeeder::class,
+            EnglishDemoSeeder::class,
         ]);
     }
 }

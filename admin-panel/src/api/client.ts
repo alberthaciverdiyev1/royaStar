@@ -18,9 +18,14 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
+      const hadToken = !!localStorage.getItem('token');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Only reload when a session token existed (expired/mid-use),
+      // not on login-failure (wrong creds).
+      if (hadToken) {
+        window.location.reload();
+      }
     }
     return Promise.reject(err);
   },

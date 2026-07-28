@@ -9,4 +9,7 @@ return [
     'school_registration_pending' => 'Məktəb qeydiyyatı göndərildi. Admin təsdiqi gözlənilir.',
     'registered' => 'Uğurla qeydiyyatdan keçdiniz.',
     'logged_in' => 'Uğurla daxil oldunuz.',
+    'registration_pending' => 'Qeydiyyat göndərildi. Hesabınız admin təsdiqi gözləyir.',
+    'account_pending' => 'Hesabınız təsdiq gözləyir. Xahiş edirik adminin hesabınızı təsdiqləməsini gözləyin.',
+    'account_approved' => 'İstifadəçi təsdiqləndi.',
 ];

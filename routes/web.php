@@ -5,18 +5,19 @@ use Illuminate\Support\Facades\Route;
 
 // Landing
 Route::get('/', [PageController::class, 'index'])->name('home');
-Route::get('/welcome', [PageController::class, 'welcome'])->name('welcome');
+Route::redirect('/welcome', '/')->name('welcome');
 
 // Auth
 Route::get('/login', [PageController::class, 'login'])->name('login');
 Route::post('/login', [PageController::class, 'loginPost'])->name('login.post');
 Route::get('/signup', [PageController::class, 'signup'])->name('signup');
 Route::post('/signup', [PageController::class, 'signupPost'])->name('signup.post');
+Route::get('/pending', [PageController::class, 'pending'])->name('pending');
 Route::post('/logout', [PageController::class, 'logout'])->name('logout');
 
 // Topics
 Route::get('/topics', [PageController::class, 'topics'])->name('topics');
-Route::get('/subtopics', [PageController::class, 'subtopics'])->name('subtopics');
+Route::get('/topics/{topic}', [PageController::class, 'topicDetail'])->name('topics.detail');
 
 // Lesson
 Route::get('/lesson/{id}', [PageController::class, 'lesson'])->name('lesson');

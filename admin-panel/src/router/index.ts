@@ -32,6 +32,7 @@ const routes = [
       { path: 'exams', name: 'Exams', component: () => import('../pages/exams/ExamList.vue') },
       { path: 'exams/:id', name: 'ExamDetail', component: () => import('../pages/exams/ExamDetail.vue') },
       { path: 'stars', name: 'Stars', component: () => import('../pages/stars/StarList.vue') },
+      { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/PendingUsers.vue') },
     ],
   },
 ]
