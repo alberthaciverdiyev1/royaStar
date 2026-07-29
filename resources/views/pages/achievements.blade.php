@@ -392,8 +392,16 @@
                     @php $rank2 = $leaderboard->get(1); @endphp
                     @if($rank2)
                     <div class="podium-card rank-2 order-1">
-                        <div class="w-12 h-12 rounded-full bg-slate-300 text-slate-800 font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center">
-                            {{ strtoupper(substr($rank2->name, 0, 1)) }}
+                        <div class="w-12 h-12 rounded-full bg-slate-300 text-slate-800 font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center overflow-hidden">
+                            @if(!empty($rank2->avatar))
+                                @if(str_contains($rank2->avatar, '/') || str_contains($rank2->avatar, 'http'))
+                                    <img src="{{ $rank2->avatar }}" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+                                @else
+                                    <span class="text-2xl select-none">{{ $rank2->avatar }}</span>
+                                @endif
+                            @else
+                                {{ strtoupper(substr($rank2->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div class="inline-flex items-center gap-1 bg-slate-200 text-slate-800 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
                             🥈 2nd Place
@@ -414,8 +422,16 @@
                         <div class="absolute -top-5 left-1/2 -translate-x-1/2 text-amber-500">
                             <span class="material-symbols-outlined !text-3xl" style="font-variation-settings:'FILL' 1">military_tech</span>
                         </div>
-                        <div class="w-14 h-14 rounded-full bg-amber-400 text-amber-950 font-black text-xl border-4 border-amber-300 shadow-lg mx-auto mb-2 flex items-center justify-center">
-                            {{ strtoupper(substr($rank1->name, 0, 1)) }}
+                        <div class="w-14 h-14 rounded-full bg-amber-400 text-amber-950 font-black text-xl border-4 border-amber-300 shadow-lg mx-auto mb-2 flex items-center justify-center overflow-hidden">
+                            @if(!empty($rank1->avatar))
+                                @if(str_contains($rank1->avatar, '/') || str_contains($rank1->avatar, 'http'))
+                                    <img src="{{ $rank1->avatar }}" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+                                @else
+                                    <span class="text-3xl select-none">{{ $rank1->avatar }}</span>
+                                @endif
+                            @else
+                                {{ strtoupper(substr($rank1->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div class="inline-flex items-center gap-1 bg-amber-400/30 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
                             👑 Champion
@@ -433,8 +449,16 @@
                     @php $rank3 = $leaderboard->get(2); @endphp
                     @if($rank3)
                     <div class="podium-card rank-3 order-3">
-                        <div class="w-12 h-12 rounded-full bg-amber-700 text-white font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center">
-                            {{ strtoupper(substr($rank3->name, 0, 1)) }}
+                        <div class="w-12 h-12 rounded-full bg-amber-700 text-white font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center overflow-hidden">
+                            @if(!empty($rank3->avatar))
+                                @if(str_contains($rank3->avatar, '/') || str_contains($rank3->avatar, 'http'))
+                                    <img src="{{ $rank3->avatar }}" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+                                @else
+                                    <span class="text-2xl select-none">{{ $rank3->avatar }}</span>
+                                @endif
+                            @else
+                                {{ strtoupper(substr($rank3->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div class="inline-flex items-center gap-1 bg-amber-700/20 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
                             🥉 3rd Place
@@ -469,8 +493,16 @@
                                     @endif
                                 </div>
 
-                                <div class="w-9 h-9 rounded-full bg-[rgb(var(--primary-fixed))] text-white font-bold text-xs flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
-                                    {{ strtoupper(substr($u->name, 0, 1)) }}
+                                <div class="w-9 h-9 rounded-full bg-[rgb(var(--primary-fixed))] text-white font-bold text-xs flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm overflow-hidden">
+                                    @if(!empty($u->avatar))
+                                        @if(str_contains($u->avatar, '/') || str_contains($u->avatar, 'http'))
+                                            <img src="{{ $u->avatar }}" alt="Avatar" class="w-full h-full object-cover rounded-full" />
+                                        @else
+                                            <span class="text-lg select-none">{{ $u->avatar }}</span>
+                                        @endif
+                                    @else
+                                        {{ strtoupper(substr($u->name, 0, 1)) }}
+                                    @endif
                                 </div>
 
                                 <div>

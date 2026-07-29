@@ -103,8 +103,10 @@ function handleLogout() {
       <!-- User info Footer -->
       <div class="border-t border-slate-100 px-4 py-4">
         <div class="flex items-center gap-3">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-sm font-semibold text-white shadow-sm">
-            {{ (auth.user?.name?.charAt(0) || 'A').toUpperCase() }}
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-sm font-semibold text-white shadow-sm overflow-hidden border border-indigo-200">
+            <img v-if="auth.user?.avatar && (auth.user.avatar.includes('/') || auth.user.avatar.includes('http'))" :src="auth.user.avatar" class="w-full h-full object-cover" />
+            <span v-else-if="auth.user?.avatar" class="text-base select-none">{{ auth.user.avatar }}</span>
+            <span v-else>{{ (auth.user?.name?.charAt(0) || 'A').toUpperCase() }}</span>
           </div>
           <div class="flex-1 min-w-0">
             <p class="truncate text-sm font-semibold text-slate-900">{{ auth.user?.name || 'Admin' }}</p>

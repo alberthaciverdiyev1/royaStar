@@ -250,8 +250,10 @@ onMounted(fetchUsers)
           >
             <td class="px-5 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700 shadow-xs border border-indigo-200">
-                  {{ (user.name?.charAt(0) || '?').toUpperCase() }}
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700 shadow-xs border border-indigo-200 overflow-hidden">
+                  <img v-if="user.avatar && (user.avatar.includes('/') || user.avatar.includes('http'))" :src="user.avatar" class="w-full h-full object-cover" />
+                  <span v-else-if="user.avatar" class="text-xl select-none">{{ user.avatar }}</span>
+                  <span v-else>{{ (user.name?.charAt(0) || '?').toUpperCase() }}</span>
                 </div>
                 <div>
                   <span class="font-bold text-slate-900 block">{{ user.name }} {{ user.surname || '' }}</span>
@@ -362,8 +364,10 @@ onMounted(fetchUsers)
         <div v-else-if="selectedUser" class="space-y-6 p-6">
           <!-- Profile Card -->
           <div class="flex items-center gap-4 rounded-xl bg-indigo-50/60 p-4 border border-indigo-100">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-xl font-black text-white shadow-md">
-              {{ (selectedUser.name?.charAt(0) || '?').toUpperCase() }}
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xl font-black text-white shadow-md overflow-hidden border-2 border-indigo-200">
+              <img v-if="selectedUser.avatar && (selectedUser.avatar.includes('/') || selectedUser.avatar.includes('http'))" :src="selectedUser.avatar" class="w-full h-full object-cover" />
+              <span v-else-if="selectedUser.avatar" class="text-3xl select-none">{{ selectedUser.avatar }}</span>
+              <span v-else>{{ (selectedUser.name?.charAt(0) || '?').toUpperCase() }}</span>
             </div>
             <div>
               <h4 class="text-lg font-bold text-slate-900">{{ selectedUser.name }} {{ selectedUser.surname || '' }}</h4>
