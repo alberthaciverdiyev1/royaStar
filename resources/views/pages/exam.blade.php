@@ -21,49 +21,42 @@
     </div>
 </section>
 
-<div class="exam-grid">
-    <div class="exam-card-colored">
-        <div class="exam-card-badge exam-badge-grade9">Grade 9</div>
-        <h3 class="exam-card-title">Mock Exam 01</h3>
-        <p class="exam-card-desc">Full grammar and vocabulary assessment for Grade 9 students.</p>
-        <div class="exam-card-progress">
-            <div class="w-full h-2 rounded-full bg-white/20 overflow-hidden p-0.5">
-                <div class="h-full rounded-full bg-white" style="width: 0%"></div>
-            </div>
-        </div>
-        <a href="{{ route('grade9') }}" class="exam-card-btn">
-            <span class="material-symbols-outlined !text-lg">arrow_forward</span>
-        </a>
-    </div>
-
-    <div class="exam-card-white">
-        <div class="exam-card-badge exam-badge-grade11">Grade 11</div>
-        <h3 class="exam-card-title">Mock Exam 01</h3>
-        <p class="exam-card-desc">Comprehensive exam covering advanced grammar and writing skills.</p>
-        <div class="exam-card-progress">
-            <div class="w-full h-2 rounded-full bg-[rgb(var(--surface-container-high))] overflow-hidden p-0.5">
-                <div class="h-full rounded-full bg-[rgb(var(--primary))]" style="width: 0%"></div>
-            </div>
-        </div>
-        <a href="#" class="exam-card-btn-ghost">
-            <span class="material-symbols-outlined !text-lg">arrow_forward</span>
-        </a>
-    </div>
-
-    <div class="exam-card-white">
-        <div class="exam-card-badge exam-badge-general">General Grammar</div>
-        <h3 class="exam-card-title">Grammar Challenge</h3>
-        <p class="exam-card-desc">Mixed-level grammar questions to sharpen your skills.</p>
-        <div class="exam-card-progress">
-            <div class="w-full h-2 rounded-full bg-[rgb(var(--surface-container-high))] overflow-hidden p-0.5">
-                <div class="h-full rounded-full bg-[rgb(var(--primary))]" style="width: 0%"></div>
-            </div>
-        </div>
-        <a href="{{ route('final-exam') }}" class="exam-card-btn-ghost">
-            <span class="material-symbols-outlined !text-lg">arrow_forward</span>
-        </a>
-    </div>
+@if($exams->isEmpty())
+<div class="text-center py-20">
+    <span class="material-symbols-outlined !text-7xl text-[rgb(var(--on-surface))/0.06] mb-6">quiz</span>
+    <p class="text-[rgb(var(--on-surface))/0.25] font-black uppercase tracking-widest text-sm">No exams available yet</p>
 </div>
+@else
+<div class="exam-grid">
+    @foreach($exams as $index => $exam)
+    @php
+        $score = $examScores[$exam->id] ?? null;
+        $gradeName = $exam->grade ? ($exam->grade->name[app()->getLocale()] ?? $exam->grade->name['az'] ?? 'General') : 'General';
+        $isFirst = $index === 0;
+    @endphp
+    <div class="{{ $isFirst ? 'exam-card-colored' : 'exam-card-white' }}">
+        <div class="exam-card-badge {{ $isFirst ? 'exam-badge-grade9' : 'exam-badge-general' }}">{{ $gradeName }}</div>
+        <h3 class="exam-card-title">{{ $exam->name }}</h3>
+        @if($exam->description)
+        <p class="exam-card-desc">{{ $exam->description }}</p>
+        @else
+        <p class="exam-card-desc">{{ $exam->questions_count }} questions · {{ $exam->duration_minutes ?? 30 }} min</p>
+        @endif
+        <div class="exam-card-progress">
+            <div class="w-full h-2 rounded-full {{ $isFirst ? 'bg-white/20' : 'bg-[rgb(var(--surface-container-high))]' }} overflow-hidden p-0.5">
+                <div class="h-full rounded-full {{ $isFirst ? 'bg-white' : 'bg-[rgb(var(--primary))]' }}" style="width: {{ $score ?? 0 }}%"></div>
+            </div>
+            @if($score !== null)
+            <span class="text-3xs font-black uppercase tracking-widest mt-1 {{ $isFirst ? 'text-white/60' : 'text-[rgb(var(--on-surface-variant))]' }}">Score: {{ $score }}%</span>
+            @endif
+        </div>
+        <a href="{{ route('exam.detail', $exam) }}" class="{{ $isFirst ? 'exam-card-btn' : 'exam-card-btn-ghost' }}">
+            <span class="material-symbols-outlined !text-lg">arrow_forward</span>
+        </a>
+    </div>
+    @endforeach
+</div>
+@endif
 
 <div class="reward-card">
     <div class="reward-gradient"></div>

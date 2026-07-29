@@ -21,13 +21,22 @@
 /storage/*.key
 /storage/pail
 /vendor
+# AI Assistants
 /.claude/
 /CLAUDE.md
+.claudeignore
+.aiignore
+.cursorignore
+.geminiignore
+.gemini/
+.agents/
+AGENTS.md
+
+# IDE / Other
 _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
-.claudeignore
 /.githooks/
 /scripts
 ./scripts

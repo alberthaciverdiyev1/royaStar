@@ -159,6 +159,37 @@
         </form>
     </div>
 
+    <!-- ═══ Recent Achievements ═══ -->
+    @if(isset($starHistory) && $starHistory->count() > 0)
+    <div class="profile-section md:col-span-2">
+        <div class="profile-section__header">
+            <span class="material-symbols-outlined !text-2xl text-[rgb(var(--tertiary))]" style="font-variation-settings:'FILL' 1">star</span>
+            <div>
+                <h3 class="profile-section__title">Recent Achievements</h3>
+                <p class="profile-section__desc">Your latest star rewards</p>
+            </div>
+        </div>
+        <div class="grid gap-3">
+            @foreach($starHistory as $entry)
+            <div class="flex items-center gap-4 p-4 rounded-2xl bg-[rgb(var(--surface))] border border-[rgb(var(--surface-container-high))]">
+                <div class="w-10 h-10 rounded-full bg-[rgb(var(--tertiary))/0.1] flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined !text-xl text-[rgb(var(--tertiary))]" style="font-variation-settings:'FILL' 1">star</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-black text-xs uppercase tracking-wide text-[rgb(var(--on-surface))] truncate">
+                        {{ str_replace('_', ' ', ucfirst($entry['type'])) }}
+                    </h4>
+                    <p class="text-3xs font-bold text-[rgb(var(--on-surface-variant))] mt-0.5">
+                        {{ $entry['created_at']->diffForHumans() }}
+                    </p>
+                </div>
+                <span class="text-sm font-black text-[rgb(var(--tertiary))]">+{{ $entry['point'] }}</span>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <!-- ═══ Logout ═══ -->
     <div class="text-center pt-4 pb-10 md:col-span-2">
         <form method="POST" action="{{ route('logout') }}">

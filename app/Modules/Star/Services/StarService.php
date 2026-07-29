@@ -54,6 +54,16 @@ class StarService
         $this->award($userId, 'quiz_perfect', 'quiz', $quizId);
     }
 
+    public function awardExamPassed(int $userId, int $examId): void
+    {
+        $this->award($userId, 'exam_passed', 'exam', $examId);
+    }
+
+    public function awardExamExcellent(int $userId, int $examId): void
+    {
+        $this->award($userId, 'exam_excellent', 'exam', $examId);
+    }
+
     private function checkLoginStreak(int $userId): void
     {
         $star = Star::where('type', 'daily_login')->first();

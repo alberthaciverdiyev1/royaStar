@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Exam Result - ' . $exam->name)
+@section('title', 'Quiz Result - ' . $quiz->name)
 
 @section('content')
 <section class="max-w-content mx-auto px-4 py-8 md:py-12">
@@ -16,7 +16,7 @@
         <h2 class="result-title">
             @if($result['score'] >= 90) Excellent! @elseif($result['score'] >= 75) Great Job! @elseif($result['score'] >= 60) Good Effort! @else Keep Trying! @endif
         </h2>
-        <p class="result-subtitle">{{ $exam->name }}</p>
+        <p class="result-subtitle">{{ $quiz->name }}</p>
         <div class="result-score">
             <span class="result-score-value">{{ $result['score'] }}</span>
             <span class="result-score-label">/ 100</span>
@@ -102,13 +102,13 @@
 
     {{-- Actions --}}
     <div class="flex gap-4 mt-10 max-w-md mx-auto">
-        <a href="{{ route('exam.start', $exam) }}" class="flex-1 py-4 bg-[rgb(var(--primary))] text-white rounded-full font-black text-sm active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-[rgb(var(--primary))/0.2]">
+        <a href="{{ route('quiz', $quiz->id) }}" class="flex-1 py-4 bg-[rgb(var(--primary))] text-white rounded-full font-black text-sm active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-[rgb(var(--primary))/0.2]">
             <span class="material-symbols-outlined !text-xl">replay</span>
-            Retake
+            Try Again
         </a>
-        <a href="{{ route('exam') }}" class="flex-1 py-4 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] rounded-full font-black text-sm active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest">
-            <span class="material-symbols-outlined !text-xl">quiz</span>
-            All Exams
+        <a href="{{ route('topics') }}" class="flex-1 py-4 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] rounded-full font-black text-sm active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest">
+            <span class="material-symbols-outlined !text-xl">home</span>
+            Topics
         </a>
     </div>
 </section>
