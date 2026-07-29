@@ -92,6 +92,12 @@
                         <span>Exam</span>
                     </div>
                 </a>
+                <a href="{{ route('achievements') }}" class="no-underline">
+                    <div class="{{ $currentPath === 'achievements' ? $desktopActive : $desktopInactive }}">
+                        <span class="material-symbols-outlined !text-lg">military_tech</span>
+                        <span>Achievements</span>
+                    </div>
+                </a>
             </nav>
 
             <div class="flex justify-end flex-shrink-0 items-center gap-2">
@@ -150,6 +156,12 @@
             <div class="{{ $currentPath === 'exam' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-lg">quiz</span>
                 <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Exam</span>
+            </div>
+        </a>
+        <a href="{{ route('achievements') }}" class="no-underline">
+            <div class="{{ $currentPath === 'achievements' ? $mobileActive : $mobileInactive }}">
+                <span class="material-symbols-outlined !text-lg">military_tech</span>
+                <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Badges</span>
             </div>
         </a>
         <a href="{{ route('profile') }}" class="no-underline">

@@ -37,6 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/exam/{exam}/submit', [PageController::class, 'examSubmit'])->name('exam.submit');
     Route::get('/exam/{exam}/result', [PageController::class, 'examResult'])->name('exam.result');
 
+    // Achievements
+    Route::get('/achievements', [PageController::class, 'achievements'])->name('achievements');
+
     // Profile
     Route::get('/profile', [PageController::class, 'profile'])->name('profile');
     Route::put('/profile', [PageController::class, 'profileUpdate'])->name('profile.update');

@@ -12,6 +12,8 @@ use App\Modules\Quiz\Models\StudentQuiz;
 use App\Modules\Exam\Models\Exam;
 use App\Modules\Exam\Models\StudentExam;
 use App\Modules\Lesson\Models\LessonReview;
+use App\Modules\Star\Models\Star;
+use App\Modules\Star\Models\UserStar;
 use App\Modules\Star\Services\StarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -710,8 +712,81 @@ class PageController extends Controller
     }
 
     // ═══════════════════════════════════════════
-    // PROFILE — Dynamic
+    // ACHIEVEMENTS & PROFILE — Dynamic
     // ═══════════════════════════════════════════
+
+    public function achievements(Request $request)
+    {
+        $user = Auth::user();
+        $student = $user?->student;
+        $selectedMonth = $request->input('month', now()->format('Y-m'));
+
+        // Generate past 6 months list + All Time option
+        $availableMonths = [
+            'all' => 'All Time (All Stars)',
+        ];
+        for ($i = 0; $i < 6; $i++) {
+            $d = now()->subMonths($i);
+            $key = $d->format('Y-m');
+            $label = $d->format('F Y') . ($i === 0 ? ' (Current Month)' : '');
+            $availableMonths[$key] = $label;
+        }
+
+        // Total stars (filtered by month if specified)
+        $totalStars = $user ? $this->starService->getUserTotalStars($user->id, $selectedMonth === 'all' ? null : $selectedMonth) : 0;
+        $allTimeStars = $user ? $this->starService->getUserTotalStars($user->id, null) : 0;
+
+        // User stars query
+        $userStarsQuery = $user ? UserStar::where('user_id', $user->id)->with('star') : null;
+        if ($userStarsQuery && $selectedMonth !== 'all') {
+            $s = \Carbon\Carbon::parse($selectedMonth . '-01')->startOfMonth();
+            $e = \Carbon\Carbon::parse($selectedMonth . '-01')->endOfMonth();
+            $userStarsQuery->whereBetween('created_at', [$s, $e]);
+        }
+        $earnedUserStars = $userStarsQuery ? $userStarsQuery->latest()->get() : collect();
+        $earnedStarIds = $user ? UserStar::where('user_id', $user->id)->pluck('star_id')->unique()->toArray() : [];
+
+        $allStars = Star::all();
+
+        $quizCount = $student ? StudentQuiz::where('student_id', $student->id)->select('quiz_id')->distinct()->count() : 0;
+        $examCount = $student ? StudentExam::where('student_id', $student->id)->select('exam_id')->distinct()->count() : 0;
+        $correctAnswersCount = $student ? StudentQuiz::where('student_id', $student->id)->where('is_correct', true)->count() : 0;
+
+        // Leaderboard query filtered by selected month
+        $leaderboardQuery = User::select(
+                'users.id',
+                'users.name',
+                'users.email',
+                DB::raw('COALESCE(SUM(stars.point), 0) as total_stars')
+            )
+            ->leftJoin('user_stars', 'users.id', '=', 'user_stars.user_id')
+            ->leftJoin('stars', 'user_stars.star_id', '=', 'stars.id');
+
+        if ($selectedMonth !== 'all') {
+            $s = \Carbon\Carbon::parse($selectedMonth . '-01')->startOfMonth();
+            $e = \Carbon\Carbon::parse($selectedMonth . '-01')->endOfMonth();
+            $leaderboardQuery->whereBetween('user_stars.created_at', [$s, $e]);
+        }
+
+        $leaderboard = $leaderboardQuery->groupBy('users.id', 'users.name', 'users.email')
+            ->orderByDesc('total_stars')
+            ->limit(50)
+            ->get();
+
+        return view('pages.achievements', [
+            'totalStars' => $totalStars,
+            'allTimeStars' => $allTimeStars,
+            'allStars' => $allStars,
+            'earnedUserStars' => $earnedUserStars,
+            'earnedStarIds' => $earnedStarIds,
+            'quizCount' => $quizCount,
+            'examCount' => $examCount,
+            'correctAnswersCount' => $correctAnswersCount,
+            'leaderboard' => $leaderboard,
+            'availableMonths' => $availableMonths,
+            'selectedMonth' => $selectedMonth,
+        ]);
+    }
 
     public function profile()
     {
