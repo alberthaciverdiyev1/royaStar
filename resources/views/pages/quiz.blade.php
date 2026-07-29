@@ -3,7 +3,7 @@
 
 @push('styles')
 <style>
-/* Compact quiz wrapper that fits in one screen */
+/* Compact quiz wrapper */
 .quiz-wrapper {
     max-width: 52rem;
     margin: 0 auto;
@@ -166,6 +166,12 @@
                         <span class="material-symbols-outlined !text-xs">quiz</span>
                         Practice Quiz
                     </span>
+                    @if($quiz->lesson)
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-black uppercase tracking-wider text-white/90">
+                        <span class="material-symbols-outlined !text-xs">menu_book</span>
+                        {{ $quiz->lesson->name ?? 'Lesson' }}
+                    </span>
+                    @endif
                 </div>
                 <h2 class="text-lg sm:text-xl md:text-2xl font-black italic uppercase tracking-tight text-white leading-tight">
                     {{ $quiz->name }}
@@ -314,7 +320,7 @@
     window.selectAnswer = function(btn, questionId, chosenAnswer, rightAnswer) {
         var container = btn.closest('.quiz-question');
         var feedbackEl = document.getElementById('feedback_' + questionId);
-        
+
         // Prevent re-answering if already locked
         var allBtns = container.querySelectorAll('.quiz-option-btn');
         var alreadyAnswered = false;

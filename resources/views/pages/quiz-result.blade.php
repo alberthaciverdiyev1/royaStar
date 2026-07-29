@@ -71,6 +71,50 @@
 @endpush
 
 @section('content')
+@php
+    $scorePercent = $result['score'] ?? 0;
+    $totalCount = $result['total'] ?? 0;
+    $correctCount = $result['correct'] ?? 0;
+    $wrongCount = $result['wrong'] ?? 0;
+    $skippedCount = $result['skipped'] ?? 0;
+    $starsEarned = ($scorePercent === 100 ? 20 : 0) + 10; // quiz_perfect + quiz_completed
+    $questionResults = [];
+    foreach ($result['answers'] ?? [] as $ans) {
+        $qText = $ans['question_text'] ?? '';
+        $qTextStr = is_array($qText) ? collect($qText)->map(fn($b) => $b['content'] ?? '')->join(' ') : $qText;
+        $variants = $ans['variants'] ?? [];
+
+        $userLetter = $ans['answer'] ?? '';
+        $correctLetter = $ans['correct_answer'] ?? '';
+
+        // Get the actual text of user's and correct answer
+        $userAnswerText = '';
+        $correctAnswerText = '';
+        if ($ans['type'] === 'regular') {
+            $userAnswerText = '';
+            $correctAnswerText = '';
+            foreach (['a', 'b', 'c', 'd', 'e'] as $letter) {
+                $v = $variants[$letter] ?? [];
+                $vText = is_array($v) ? collect($v)->map(fn($b) => $b['content'] ?? '')->join(' ') : $v;
+                if ($letter === $userLetter) $userAnswerText = $vText;
+                if ($letter === $correctLetter) $correctAnswerText = $vText;
+            }
+        } else {
+            $userAnswerText = $userLetter;
+            $correctAnswerText = $correctLetter;
+        }
+
+        $questionResults[] = [
+            'is_correct' => $ans['is_correct'],
+            'user_letter' => $userLetter,
+            'correct_letter' => $correctLetter,
+            'user_answer_text' => $userAnswerText,
+            'correct_answer_text' => $correctAnswerText,
+            'question_text' => $qTextStr,
+        ];
+    }
+@endphp
+
 <div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
 
     <!-- Hero Result Header -->
@@ -137,7 +181,6 @@
             <div class="space-y-4">
                 @foreach($questionResults as $index => $res)
                 @php
-                    $q = $res['question'];
                     $isCorrect = $res['is_correct'];
                     $userLetter = $res['user_letter'];
                     $correctLetter = $res['correct_letter'];
@@ -160,7 +203,7 @@
                     </div>
 
                     <h4 class="font-bold text-sm sm:text-base text-[rgb(var(--on-surface))] mb-4 leading-relaxed">
-                        {{ $q->question_az ?? $q->question_en ?? 'Question Content' }}
+                        {{ $res['question_text'] ?: 'Question Content' }}
                     </h4>
 
                     <!-- Answer Options Comparison -->

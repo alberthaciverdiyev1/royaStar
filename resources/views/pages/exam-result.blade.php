@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Exam Result - ' . ($exam->title ?? 'Final Exam'))
+@section('title', 'Exam Result - ' . ($exam->name ?? 'Exam'))
 
 @push('styles')
 <style>
@@ -71,6 +71,51 @@
 @endpush
 
 @section('content')
+@php
+    $scorePercent = $result['score'] ?? 0;
+    $totalCount = $result['total'] ?? 0;
+    $correctCount = $result['correct'] ?? 0;
+    $wrongCount = $result['wrong'] ?? 0;
+    $skippedCount = $result['skipped'] ?? 0;
+    $passingScore = $exam->passing_score ?? 60;
+    $starsEarned = ($scorePercent >= $passingScore ? 30 : 0) + ($scorePercent >= 90 ? 50 : 0);
+    $questionResults = [];
+    foreach ($result['answers'] ?? [] as $ans) {
+        $qText = $ans['question_text'] ?? '';
+        $qTextStr = is_array($qText) ? collect($qText)->map(fn($b) => $b['content'] ?? '')->join(' ') : $qText;
+        $variants = $ans['variants'] ?? [];
+
+        $userLetter = $ans['answer'] ?? '';
+        $correctLetter = $ans['correct_answer'] ?? '';
+
+        // Get the actual text of user's and correct answer
+        $userAnswerText = '';
+        $correctAnswerText = '';
+        if ($ans['type'] === 'regular') {
+            $userAnswerText = '';
+            $correctAnswerText = '';
+            foreach (['a', 'b', 'c', 'd', 'e'] as $letter) {
+                $v = $variants[$letter] ?? [];
+                $vText = is_array($v) ? collect($v)->map(fn($b) => $b['content'] ?? '')->join(' ') : $v;
+                if ($letter === $userLetter) $userAnswerText = $vText;
+                if ($letter === $correctLetter) $correctAnswerText = $vText;
+            }
+        } else {
+            $userAnswerText = $userLetter;
+            $correctAnswerText = $correctLetter;
+        }
+
+        $questionResults[] = [
+            'is_correct' => $ans['is_correct'],
+            'user_letter' => $userLetter,
+            'correct_letter' => $correctLetter,
+            'user_answer_text' => $userAnswerText,
+            'correct_answer_text' => $correctAnswerText,
+            'question_text' => $qTextStr,
+        ];
+    }
+@endphp
+
 <div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
 
     <!-- Hero Result Header -->
@@ -83,13 +128,18 @@
             <div class="space-y-3 text-center md:text-left max-w-xl">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white">
                     <span class="material-symbols-outlined !text-xs">assignment_turned_in</span>
-                    Grade Final Exam Report
+                    @if($exam->grade)
+                    @php $gradeName = $exam->grade->name[app()->getLocale()] ?? $exam->grade->name['az'] ?? ''; @endphp
+                    {{ $gradeName }} Exam Report
+                    @else
+                    Exam Report
+                    @endif
                 </div>
                 <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white leading-tight">
-                    {{ $exam->title ?? 'Exam Completed' }}
+                    {{ $exam->name ?? 'Exam Completed' }}
                 </h1>
                 <p class="text-xs sm:text-sm font-semibold text-white/80">
-                    Comprehensive performance evaluation for Grade {{ $exam->grade?->number ?? '' }}.
+                    Comprehensive performance evaluation. Review your answers below to strengthen your knowledge.
                 </p>
             </div>
 
@@ -108,6 +158,11 @@
                 <div class="text-xs font-black uppercase tracking-widest text-white mt-2">
                     {{ $correctCount }} of {{ $totalCount }} Correct
                 </div>
+                @if($scorePercent >= $passingScore)
+                <span class="mt-1 text-[10px] font-black uppercase tracking-widest bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded-full">PASSED</span>
+                @else
+                <span class="mt-1 text-[10px] font-black uppercase tracking-widest bg-white/10 text-white/60 px-2 py-0.5 rounded-full">NOT PASSED</span>
+                @endif
             </div>
         </div>
     </section>
@@ -137,7 +192,6 @@
             <div class="space-y-4">
                 @foreach($questionResults as $index => $res)
                 @php
-                    $q = $res['question'];
                     $isCorrect = $res['is_correct'];
                     $userLetter = $res['user_letter'];
                     $correctLetter = $res['correct_letter'];
@@ -160,7 +214,7 @@
                     </div>
 
                     <h4 class="font-bold text-sm sm:text-base text-[rgb(var(--on-surface))] mb-4 leading-relaxed">
-                        {{ $q->question_az ?? $q->question_en ?? 'Question Content' }}
+                        {{ $res['question_text'] ?: 'Question Content' }}
                     </h4>
 
                     <!-- Answer Options Comparison -->
@@ -199,20 +253,20 @@
                     <span class="text-3xs font-black uppercase tracking-widest text-amber-600">Exam Bonus</span>
                     <h4 class="font-black text-2xl text-[rgb(var(--on-surface))] mt-0.5">+{{ $starsEarned }} XP Stars</h4>
                     <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.5] mt-1">
-                        Excellent effort on your final exam! Stars have been added to your profile.
+                        Excellent effort on your exam! Stars have been added to your profile.
                     </p>
                 </div>
             </div>
 
             <!-- Quick Action Buttons -->
             <div class="sidebar-widget-card space-y-3">
-                <a href="{{ route('exam', $exam->id) }}" class="w-full py-3 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md shadow-[rgb(var(--primary))/0.2]">
+                <a href="{{ route('exam.start', $exam) }}" class="w-full py-3 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md shadow-[rgb(var(--primary))/0.2]">
                     <span class="material-symbols-outlined !text-lg">refresh</span>
                     <span>Retake Exam</span>
                 </a>
 
-                <a href="{{ route('topics') }}" class="w-full py-3 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] hover:bg-[rgb(var(--surface-container-high))/0.8] rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all">
-                    <span>Back to Topics</span>
+                <a href="{{ route('exam') }}" class="w-full py-3 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] hover:bg-[rgb(var(--surface-container-high))/0.8] rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all">
+                    <span>Back to Exams</span>
                     <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                 </a>
             </div>
