@@ -103,8 +103,16 @@
             <div class="flex justify-end flex-shrink-0 items-center gap-2">
                 @auth
                 <a href="{{ route('profile') }}" class="flex items-center gap-2 group no-underline">
-                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[rgb(var(--primary-fixed))] flex items-center justify-center text-white font-bold text-2xs border-2 border-white shadow-sm group-hover:scale-105 transition-transform">
-                        {{ $initials ?? strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[rgb(var(--primary-fixed))] flex items-center justify-center text-white font-bold text-2xs border-2 border-white shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
+                        @if(!empty(auth()->user()->avatar))
+                            @if(str_contains(auth()->user()->avatar, '/') || str_contains(auth()->user()->avatar, 'http'))
+                                <img src="{{ auth()->user()->avatar }}" alt="Avatar" class="w-full h-full object-cover" />
+                            @else
+                                <span class="text-base select-none">{{ auth()->user()->avatar }}</span>
+                            @endif
+                        @else
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        @endif
                     </div>
                     <span class="text-3xs md:text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))] opacity-70 group-hover:opacity-100 transition-opacity">{{ auth()->user()->name }}</span>
                 </a>

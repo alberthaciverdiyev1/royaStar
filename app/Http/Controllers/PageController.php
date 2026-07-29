@@ -801,7 +801,9 @@ class PageController extends Controller
                 'name' => $user?->name ?? 'Star Student',
                 'email' => $user?->email ?? 'student@example.com',
                 'phone' => $user?->phone ?? '+994 XX XXX XX XX',
+                'avatar' => $user?->avatar,
             ],
+            'user' => $user,
             'student' => $student,
             'totalStars' => $totalStars,
             'starHistory' => $starHistory,
@@ -816,6 +818,8 @@ class PageController extends Controller
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . Auth::id(),
             'phone' => 'nullable|string|max:20',
+            'avatar' => 'nullable|string|max:500',
+            'avatar_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
             'city_id' => 'nullable|exists:cities,id',
             'grade_id' => 'nullable|exists:grades,id',
             'school_name' => 'nullable|string|max:255',
@@ -824,7 +828,16 @@ class PageController extends Controller
 
         $user = Auth::user();
         if ($user) {
-            $user->update($request->only(['name', 'email', 'phone']));
+            $userData = $request->only(['name', 'email', 'phone']);
+
+            if ($request->hasFile('avatar_file')) {
+                $path = $request->file('avatar_file')->store('avatars', 'public');
+                $userData['avatar'] = '/storage/' . $path;
+            } elseif ($request->filled('avatar')) {
+                $userData['avatar'] = $request->input('avatar');
+            }
+
+            $user->update($userData);
 
             $student = $user->student;
             if ($student) {
@@ -833,7 +846,7 @@ class PageController extends Controller
         }
 
         return redirect()->route('profile')
-            ->with('success', 'Profile updated successfully!');
+            ->with('success', 'Profiliniz uğurla yeniləndi!');
     }
 
     public function profilePassword(Request $request)
