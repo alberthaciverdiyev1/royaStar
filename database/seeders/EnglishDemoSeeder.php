@@ -132,7 +132,7 @@ class EnglishDemoSeeder extends Seeder
         $questions = $englishSets[$tIdx] ?? $englishSets[0];
 
         foreach ($questions as $qi => $qData) {
-            $rightAnswer = strtolower($qData['a']);
+            $rightAnswer = 'a';
 
             Question::create([
                 'question' => [

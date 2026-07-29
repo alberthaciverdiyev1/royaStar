@@ -209,6 +209,44 @@ class PageController extends Controller
     // QUIZ — Dynamic
     // ═══════════════════════════════════════════
 
+    private function resolveRightAnswerLetter($question, string $locale = 'az'): string
+    {
+        if (!$question || $question->type !== 'regular') {
+            return '';
+        }
+
+        $rawRight = trim($question->right_answer ?? '');
+        if ($rawRight === '') {
+            return '';
+        }
+
+        $normRaw = str_replace('variant_', '', strtolower($rawRight));
+        if (in_array($normRaw, ['a', 'b', 'c', 'd', 'e'], true)) {
+            return $normRaw;
+        }
+
+        foreach (['a', 'b', 'c', 'd', 'e'] as $letter) {
+            $varKey = 'variant_' . $letter;
+            $varData = $question->$varKey ?? null;
+            if (!$varData) continue;
+
+            $varText = is_array($varData)
+                ? collect($varData[$locale] ?? $varData['az'] ?? $varData)->map(function ($block) {
+                    if (is_array($block)) {
+                        return $block['content'] ?? '';
+                    }
+                    return (string) $block;
+                })->join(' ')
+                : (string) $varData;
+
+            if (mb_strtolower(trim($varText)) === mb_strtolower($rawRight)) {
+                return $letter;
+            }
+        }
+
+        return $normRaw;
+    }
+
     public function quiz($id)
     {
         $quiz = Quiz::with('questions')->findOrFail($id);
@@ -224,6 +262,7 @@ class PageController extends Controller
             ];
 
             if ($q->type === 'regular') {
+                $data['right_answer'] = $this->resolveRightAnswerLetter($q, $locale);
                 $data['variant_a'] = $q->variant_a[$locale] ?? $q->variant_a['az'] ?? [];
                 $data['variant_b'] = $q->variant_b[$locale] ?? $q->variant_b['az'] ?? [];
                 $data['variant_c'] = $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [];
@@ -271,21 +310,30 @@ class PageController extends Controller
                 $question = $questions->get($questionId);
                 if (!$question) continue;
 
-                $isCorrect = null;
+                $isCorrect = false;
                 $correctAnswer = null;
 
                 if ($answer === null || trim($answer) === '') {
                     $skippedCount++;
+                    $answer = null;
+                    if ($question->type === 'regular') {
+                        $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
+                    } else {
+                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
+                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
+                    }
                 } elseif ($question->type === 'regular') {
-                    $correctAnswer = $question->right_answer;
-                    $isCorrect = strtolower(trim($answer)) === strtolower(trim($correctAnswer));
+                    $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
+                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
+
+                    $isCorrect = ($userAnswerNorm === $correctAnswer);
                     $isCorrect ? $correctCount++ : $wrongCount++;
                 } else {
                     $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = $openAnswerBlocks[0]['content'] ?? '';
+                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
 
                     if ($question->answer_type === 'exact') {
-                        $isCorrect = mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer));
+                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
                         $isCorrect ? $correctCount++ : $wrongCount++;
                     } else {
                         $isCorrect = false;
@@ -309,6 +357,14 @@ class PageController extends Controller
                     'answer' => $answer,
                     'correct_answer' => $correctAnswer,
                     'is_correct' => $isCorrect,
+                    'question_text' => $question->question[$locale] ?? $question->question['az'] ?? [],
+                    'variants' => [
+                        'a' => $question->variant_a[$locale] ?? $question->variant_a['az'] ?? [],
+                        'b' => $question->variant_b[$locale] ?? $question->variant_b['az'] ?? [],
+                        'c' => $question->variant_c[$locale] ?? $question->variant_c['az'] ?? [],
+                        'd' => $question->variant_d[$locale] ?? $question->variant_d['az'] ?? [],
+                        'e' => $question->variant_e[$locale] ?? $question->variant_e['az'] ?? [],
+                    ]
                 ];
             }
 
@@ -362,14 +418,24 @@ class PageController extends Controller
                     'correct' => $correct,
                     'wrong' => $wrong,
                     'skipped' => $skipped,
-                    'answers' => $attempts->map(fn($a) => [
-                        'question_id' => $a->question_id,
-                        'type' => $a->type,
-                        'answer' => $a->answer,
-                        'correct_answer' => $a->correct_answer,
-                        'is_correct' => $a->is_correct,
-                        'question_text' => $a->question?->question[$locale] ?? $a->question?->question['az'] ?? [],
-                    ])->toArray(),
+                    'answers' => $attempts->map(function($a) use ($locale) {
+                        $q = $a->question;
+                        return [
+                            'question_id' => $a->question_id,
+                            'type' => $a->type,
+                            'answer' => $a->answer,
+                            'correct_answer' => $a->correct_answer,
+                            'is_correct' => $a->is_correct,
+                            'question_text' => $q?->question[$locale] ?? $q?->question['az'] ?? [],
+                            'variants' => [
+                                'a' => $q?->variant_a[$locale] ?? $q?->variant_a['az'] ?? [],
+                                'b' => $q?->variant_b[$locale] ?? $q?->variant_b['az'] ?? [],
+                                'c' => $q?->variant_c[$locale] ?? $q?->variant_c['az'] ?? [],
+                                'd' => $q?->variant_d[$locale] ?? $q?->variant_d['az'] ?? [],
+                                'e' => $q?->variant_e[$locale] ?? $q?->variant_e['az'] ?? [],
+                            ]
+                        ];
+                    })->toArray(),
                 ];
             }
         }
@@ -501,21 +567,30 @@ class PageController extends Controller
                 $question = $questions->get($questionId);
                 if (!$question) continue;
 
-                $isCorrect = null;
+                $isCorrect = false;
                 $correctAnswer = null;
 
                 if ($answer === null || trim($answer) === '') {
                     $skippedCount++;
+                    $answer = null;
+                    if ($question->type === 'regular') {
+                        $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
+                    } else {
+                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
+                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
+                    }
                 } elseif ($question->type === 'regular') {
-                    $correctAnswer = $question->right_answer;
-                    $isCorrect = strtolower(trim($answer)) === strtolower(trim($correctAnswer));
+                    $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
+                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
+
+                    $isCorrect = ($userAnswerNorm === $correctAnswer);
                     $isCorrect ? $correctCount++ : $wrongCount++;
                 } else {
                     $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = $openAnswerBlocks[0]['content'] ?? '';
+                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
 
                     if ($question->answer_type === 'exact') {
-                        $isCorrect = mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer));
+                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
                         $isCorrect ? $correctCount++ : $wrongCount++;
                     } else {
                         $isCorrect = false;
@@ -539,6 +614,14 @@ class PageController extends Controller
                     'answer' => $answer,
                     'correct_answer' => $correctAnswer,
                     'is_correct' => $isCorrect,
+                    'question_text' => $question->question[$locale] ?? $question->question['az'] ?? [],
+                    'variants' => [
+                        'a' => $question->variant_a[$locale] ?? $question->variant_a['az'] ?? [],
+                        'b' => $question->variant_b[$locale] ?? $question->variant_b['az'] ?? [],
+                        'c' => $question->variant_c[$locale] ?? $question->variant_c['az'] ?? [],
+                        'd' => $question->variant_d[$locale] ?? $question->variant_d['az'] ?? [],
+                        'e' => $question->variant_e[$locale] ?? $question->variant_e['az'] ?? [],
+                    ]
                 ];
             }
 
@@ -594,14 +677,24 @@ class PageController extends Controller
                     'correct' => $correct,
                     'wrong' => $wrong,
                     'skipped' => $skipped,
-                    'answers' => $attempts->map(fn($a) => [
-                        'question_id' => $a->question_id,
-                        'type' => $a->type,
-                        'answer' => $a->answer,
-                        'correct_answer' => $a->correct_answer,
-                        'is_correct' => $a->is_correct,
-                        'question_text' => $a->question?->question[$locale] ?? $a->question?->question['az'] ?? [],
-                    ])->toArray(),
+                    'answers' => $attempts->map(function($a) use ($locale) {
+                        $q = $a->question;
+                        return [
+                            'question_id' => $a->question_id,
+                            'type' => $a->type,
+                            'answer' => $a->answer,
+                            'correct_answer' => $a->correct_answer,
+                            'is_correct' => $a->is_correct,
+                            'question_text' => $q?->question[$locale] ?? $q?->question['az'] ?? [],
+                            'variants' => [
+                                'a' => $q?->variant_a[$locale] ?? $q?->variant_a['az'] ?? [],
+                                'b' => $q?->variant_b[$locale] ?? $q?->variant_b['az'] ?? [],
+                                'c' => $q?->variant_c[$locale] ?? $q?->variant_c['az'] ?? [],
+                                'd' => $q?->variant_d[$locale] ?? $q?->variant_d['az'] ?? [],
+                                'e' => $q?->variant_e[$locale] ?? $q?->variant_e['az'] ?? [],
+                            ]
+                        ];
+                    })->toArray(),
                 ];
             }
         }

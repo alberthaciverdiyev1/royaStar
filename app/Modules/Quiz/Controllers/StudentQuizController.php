@@ -94,22 +94,33 @@ class StudentQuizController extends Controller
                 $question = $questions->get($questionId);
                 if (!$question) continue;
 
-                $isCorrect = null;
+                $isCorrect = false;
                 $correctAnswer = null;
 
                 if ($answer === null || trim($answer) === '') {
                     $skippedCount++;
+                    $answer = null;
+                    if ($question->type === 'regular') {
+                        $rawRight = $question->right_answer ?? '';
+                        $correctAnswer = str_replace('variant_', '', strtolower(trim($rawRight)));
+                    } else {
+                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
+                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
+                    }
                 } elseif ($question->type === 'regular') {
-                    $correctAnswer = $question->right_answer;
-                    $isCorrect = strtolower(trim($answer)) === strtolower(trim($correctAnswer));
+                    $rawRight = $question->right_answer ?? '';
+                    $correctAnswer = str_replace('variant_', '', strtolower(trim($rawRight)));
+                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
+
+                    $isCorrect = ($userAnswerNorm === $correctAnswer);
                     $isCorrect ? $correctCount++ : $wrongCount++;
                 } else {
                     // Open question
                     $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = $openAnswerBlocks[0]['content'] ?? '';
+                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
 
                     if ($question->answer_type === 'exact') {
-                        $isCorrect = mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer));
+                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
                         $isCorrect ? $correctCount++ : $wrongCount++;
                     } else {
                         // similar — set is_correct = false for now, awaiting admin review
