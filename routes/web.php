@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [PageController::class, 'profile'])->name('profile');
     Route::put('/profile', [PageController::class, 'profileUpdate'])->name('profile.update');
+    Route::post('/profile/avatar', [PageController::class, 'avatarUpload'])->name('profile.avatar');
     Route::put('/profile/password', [PageController::class, 'profilePassword'])->name('profile.password');
 });
 

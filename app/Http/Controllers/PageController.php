@@ -831,8 +831,7 @@ class PageController extends Controller
             $userData = $request->only(['name', 'email', 'phone']);
 
             if ($request->hasFile('avatar_file')) {
-                $path = $request->file('avatar_file')->store('avatars', 'public');
-                $userData['avatar'] = '/storage/' . $path;
+                $userData['avatar'] = $this->compressAndStoreAvatar($request->file('avatar_file'));
             } elseif ($request->filled('avatar')) {
                 $userData['avatar'] = $request->input('avatar');
             }
@@ -846,7 +845,106 @@ class PageController extends Controller
         }
 
         return redirect()->route('profile')
-            ->with('success', 'Profiliniz uğurla yeniləndi!');
+            ->with('success', 'Profiliniz və şəkiliniz uğurla yeniləndi!');
+    }
+
+    public function avatarUpload(Request $request)
+    {
+        $request->validate([
+            'avatar_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'avatar' => 'nullable|string|max:500',
+        ]);
+
+        $user = Auth::user();
+        if ($user) {
+            if ($request->hasFile('avatar_file')) {
+                $user->avatar = $this->compressAndStoreAvatar($request->file('avatar_file'));
+            } elseif ($request->filled('avatar')) {
+                $user->avatar = $request->input('avatar');
+            }
+            $user->save();
+        }
+
+        return redirect()->route('profile')
+            ->with('success', 'Profil şəkliniz uğurla yeniləndi!');
+    }
+
+    /**
+     * Compress photo with 256x256 center-crop & WebP 75% compression (~15KB)
+     */
+    private function compressAndStoreAvatar($file): string
+    {
+        $filename = 'avatar_' . Auth::id() . '_' . time() . '.webp';
+        $storageDir = storage_path('app/public/avatars');
+        $publicDir = public_path('storage/avatars');
+
+        if (!file_exists($storageDir)) {
+            mkdir($storageDir, 0755, true);
+        }
+        if (!file_exists($publicDir)) {
+            @mkdir($publicDir, 0755, true);
+        }
+
+        $destinationPath = $storageDir . '/' . $filename;
+        $publicPath = $publicDir . '/' . $filename;
+
+        if (extension_loaded('gd')) {
+            $imageContent = file_get_contents($file->getRealPath());
+            $srcImage = @imagecreatefromstring($imageContent);
+
+            if ($srcImage !== false) {
+                $srcWidth = imagesx($srcImage);
+                $srcHeight = imagesy($srcImage);
+                $targetSize = 256;
+
+                // Center crop calculations
+                if ($srcWidth > $srcHeight) {
+                    $cropX = (int) round(($srcWidth - $srcHeight) / 2);
+                    $cropY = 0;
+                    $cropSize = $srcHeight;
+                } else {
+                    $cropX = 0;
+                    $cropY = (int) round(($srcHeight - $srcWidth) / 2);
+                    $cropSize = $srcWidth;
+                }
+
+                $dstImage = imagecreatetruecolor($targetSize, $targetSize);
+
+                // Preserve alpha transparency
+                imagealphablending($dstImage, false);
+                imagesavealpha($dstImage, true);
+
+                imagecopyresampled(
+                    $dstImage,
+                    $srcImage,
+                    0, 0,
+                    $cropX, $cropY,
+                    $targetSize, $targetSize,
+                    $cropSize, $cropSize
+                );
+
+                if (function_exists('imagewebp')) {
+                    imagewebp($dstImage, $destinationPath, 75);
+                    @imagewebp($dstImage, $publicPath, 75);
+                } else {
+                    $filename = 'avatar_' . Auth::id() . '_' . time() . '.jpg';
+                    $destinationPath = $storageDir . '/' . $filename;
+                    $publicPath = $publicDir . '/' . $filename;
+                    imagejpeg($dstImage, $destinationPath, 75);
+                    @imagejpeg($dstImage, $publicPath, 75);
+                }
+
+                imagedestroy($srcImage);
+                imagedestroy($dstImage);
+
+                return '/storage/avatars/' . $filename;
+            }
+        }
+
+        // Fallback store
+        $path = $file->store('avatars', 'public');
+        @copy(storage_path('app/public/' . $path), public_path('storage/' . $path));
+        return '/storage/' . $path;
     }
 
     public function profilePassword(Request $request)

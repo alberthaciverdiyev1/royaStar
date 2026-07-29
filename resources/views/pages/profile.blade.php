@@ -9,7 +9,7 @@
         <div class="profile-header__bg"></div>
         <div class="profile-header__content">
             <div class="profile-avatar relative group">
-                <div class="profile-avatar__circle overflow-hidden flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-xl">
+                <div class="profile-avatar__circle overflow-hidden flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-xl border-4 border-white/20">
                     @if(!empty($profile['avatar']))
                         @if(str_contains($profile['avatar'], '/') || str_contains($profile['avatar'], 'http'))
                             <img src="{{ $profile['avatar'] }}" alt="Avatar" class="w-full h-full object-cover rounded-full" />
@@ -20,7 +20,7 @@
                         <span class="profile-avatar__letter text-3xl font-black text-white">{{ strtoupper(substr($profile['name'] ?? 'S', 0, 1)) }}</span>
                     @endif
                 </div>
-                <button type="button" onclick="openAvatarModal()" class="profile-avatar__edit shadow-lg transition-transform hover:scale-110" title="Avatarı dəyiş">
+                <button type="button" onclick="openAvatarModal()" class="profile-avatar__edit shadow-lg transition-transform hover:scale-110 bg-[rgb(var(--primary))] text-white border-2 border-white" title="Fotoşəkil Yüklə / Dəyiş">
                     <span class="material-symbols-outlined !text-base">photo_camera</span>
                 </button>
             </div>
@@ -52,12 +52,10 @@
                 <p class="profile-section__desc">Profil məlumatlarınızı yeniləyin</p>
             </div>
         </div>
-        <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" id="profileForm">
+        <form method="POST" action="{{ route('profile.update') }}" id="profileForm">
             @csrf
             @method('PUT')
             
-            <input type="hidden" name="avatar" id="hiddenAvatarInput" value="{{ $profile['avatar'] ?? '' }}" />
-
             <div class="profile-form-grid">
                 <div class="profile-field">
                     <label class="profile-field__label">Ad və Soyad</label>
@@ -214,67 +212,98 @@
 
 </section>
 
-<!-- ═══ AVATAR SELECTOR MODAL ═══ -->
-<div id="avatarModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all">
-    <div class="w-full max-w-md rounded-3xl bg-[rgb(var(--surface-container-lowest))] p-6 shadow-2xl border border-[rgb(var(--surface-container-high))] space-y-6">
+<!-- ═══ THEME-MATCHED AVATAR MODAL ═══ -->
+<div id="avatarModal" class="fixed inset-0 hidden items-center justify-center bg-black/60 backdrop-blur-md p-4 transition-all" style="z-index: 99999 !important;">
+    <div class="w-full max-w-md rounded-3xl bg-[rgb(var(--surface-container-lowest))] shadow-2xl border border-[rgb(var(--surface-container-high))] overflow-hidden flex flex-col max-h-[90vh] text-[rgb(var(--on-surface))]" style="background-color: rgb(var(--surface-container-lowest)) !important;">
         
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between border-b border-[rgb(var(--surface-container-high))] pb-4">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[rgb(var(--primary))] !text-2xl">account_circle</span>
-                <h3 class="text-lg font-black text-[rgb(var(--on-surface))]">Avatar Seçin</h3>
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-[rgb(var(--surface-container-high))] bg-[rgb(var(--surface-container))] px-6 py-4 shrink-0">
+            <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[rgb(var(--primary))] !text-2xl">photo_camera</span>
+                <h3 class="text-base font-black text-[rgb(var(--on-surface))]">Profil Fotoşəkili Yüklə</h3>
             </div>
             <button type="button" onclick="closeAvatarModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-[rgb(var(--on-surface-variant))] hover:bg-[rgb(var(--surface-container-high))] transition-colors">
                 <span class="material-symbols-outlined !text-xl">close</span>
             </button>
         </div>
 
-        <!-- Option 1: Preset Emoji Avatars -->
-        <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-[rgb(var(--on-surface-variant))] mb-3">
-                🌟 Sevimli İkonlar
-            </label>
-            <div class="grid grid-cols-4 gap-3">
-                @php
-                    $presetAvatars = ['🦊', '🦁', '🚀', '👑', '🐻', '🐼', '🦄', '⚡', '🌟', '🎓', '🐯', '🦅', '🐱', '🐶', '🤖', '👾'];
-                @endphp
-                @foreach($presetAvatars as $emoji)
-                <button 
-                    type="button" 
-                    onclick="selectEmojiAvatar('{{ $emoji }}')"
-                    class="h-14 rounded-2xl bg-[rgb(var(--surface-container))] hover:bg-[rgb(var(--primary-container))] border border-[rgb(var(--surface-container-high))] flex items-center justify-center text-3xl transition-transform hover:scale-110 active:scale-95 shadow-sm"
-                >
-                    {{ $emoji }}
-                </button>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Option 2: Upload Custom Photo -->
-        <div class="pt-2 border-t border-[rgb(var(--surface-container-high))]">
-            <label class="block text-xs font-bold uppercase tracking-wider text-[rgb(var(--on-surface-variant))] mb-3">
-                📁 Şəxsi Şəkil Yükləın
-            </label>
+        <!-- Body -->
+        <div class="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
             
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+            <!-- Upload Form -->
+            <form method="POST" action="{{ route('profile.avatar') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
-                @method('PUT')
-                <div class="flex items-center gap-3">
+
+                <!-- Live Single Preview Circle -->
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <div class="w-24 h-24 rounded-full border-4 border-[rgb(var(--primary))] shadow-md bg-[rgb(var(--surface-container))] flex items-center justify-center overflow-hidden relative">
+                        @if(!empty($profile['avatar']) && (str_contains($profile['avatar'], '/') || str_contains($profile['avatar'], 'http')))
+                            <img id="modalAvatarPreview" src="{{ $profile['avatar'] }}" alt="Preview" class="w-full h-full object-cover rounded-full" />
+                            <span id="modalAvatarPlaceholder" style="display: none !important;"></span>
+                            <span id="modalAvatarPreviewText" style="display: none !important;"></span>
+                        @elseif(!empty($profile['avatar']))
+                            <img id="modalAvatarPreview" src="" alt="Preview" class="hidden w-full h-full object-cover rounded-full" style="display: none !important;" />
+                            <span id="modalAvatarPreviewText" class="text-4xl select-none">{{ $profile['avatar'] }}</span>
+                            <span id="modalAvatarPlaceholder" style="display: none !important;"></span>
+                        @else
+                            <img id="modalAvatarPreview" src="" alt="Preview" class="hidden w-full h-full object-cover rounded-full" style="display: none !important;" />
+                            <span id="modalAvatarPreviewText" style="display: none !important;"></span>
+                            <span id="modalAvatarPlaceholder" class="material-symbols-outlined !text-5xl text-[rgb(var(--on-surface-variant))/0.4]">account_circle</span>
+                        @endif
+                    </div>
+                    <span class="text-xs font-bold text-[rgb(var(--on-surface-variant))] uppercase tracking-wider">Fotoşəkil Önizləməsi</span>
+                </div>
+
+                <!-- Input -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-[rgb(var(--on-surface))]">Kompüter və ya Telefondan Şəkil Seçin</label>
                     <input 
                         type="file" 
                         name="avatar_file" 
                         id="modalAvatarFileInput" 
                         accept="image/*"
+                        onchange="previewSelectedPhoto(this)"
                         required
-                        class="block w-full text-xs text-[rgb(var(--on-surface-variant))] file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[rgb(var(--primary))/0.1] file:text-[rgb(var(--primary))] hover:file:bg-[rgb(var(--primary))/0.2] transition-all cursor-pointer"
+                        class="w-full text-xs text-[rgb(var(--on-surface-variant))] border border-[rgb(var(--surface-container-high))] rounded-xl p-2 bg-[rgb(var(--surface-container))] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[rgb(var(--primary))] file:text-white hover:file:opacity-90 cursor-pointer"
                     />
-                    <button type="submit" class="profile-btn profile-btn--secondary shrink-0 px-4 py-2.5 text-xs">
-                        Yüklə
-                    </button>
+                    <p class="text-[11px] text-[rgb(var(--on-surface-variant))/0.7] font-medium">⚡ Şəkil avtomatik olaraq 256x256 WebP formatında sıxlaşdırılacaq (~15KB).</p>
                 </div>
-            </form>
-        </div>
 
+                <button type="submit" class="profile-btn profile-btn--primary w-full py-3 text-xs font-bold shadow-md">
+                    <span class="material-symbols-outlined !text-lg">save</span>
+                    Yadda Saxla
+                </button>
+            </form>
+
+            <!-- 4x4 Grid Form -->
+            <div class="pt-4 border-t border-[rgb(var(--surface-container-high))] space-y-3">
+                <span class="block text-xs font-bold uppercase tracking-wider text-[rgb(var(--on-surface-variant))] text-center">
+                    🌟 Və ya Hazır İkon Seçin (4x4)
+                </span>
+                
+                <form method="POST" action="{{ route('profile.avatar') }}" id="emojiAvatarForm">
+                    @csrf
+                    <input type="hidden" name="avatar" id="modalEmojiInput" value="" />
+                    
+                    <div style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important;">
+                        @php
+                            $presetAvatars = ['🦊', '🦁', '🚀', '👑', '🐻', '🐼', '🦄', '⚡', '🌟', '🎓', '🐯', '🦅', '🐱', '🐶', '🤖', '👾'];
+                        @endphp
+                        @foreach($presetAvatars as $emoji)
+                        <button 
+                            type="button" 
+                            onclick="selectEmojiAvatar('{{ $emoji }}')"
+                            style="height: 44px !important; width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important;"
+                            class="rounded-xl bg-[rgb(var(--surface-container))] hover:bg-[rgb(var(--primary-container))] border border-[rgb(var(--surface-container-high))] text-xl transition-transform hover:scale-105 active:scale-95 shadow-xs"
+                        >
+                            {{ $emoji }}
+                        </button>
+                        @endforeach
+                    </div>
+                </form>
+            </div>
+
+        </div>
     </div>
 </div>
 @endsection
@@ -297,12 +326,37 @@ function closeAvatarModal() {
     }
 }
 
+function previewSelectedPhoto(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('modalAvatarPreview');
+            var placeholder = document.getElementById('modalAvatarPlaceholder');
+            var previewText = document.getElementById('modalAvatarPreviewText');
+
+            if (preview) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                preview.style.setProperty('display', 'block', 'important');
+            }
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+                placeholder.style.setProperty('display', 'none', 'important');
+            }
+            if (previewText) {
+                previewText.style.setProperty('display', 'none', 'important');
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 function selectEmojiAvatar(emoji) {
-    var hiddenInput = document.getElementById('hiddenAvatarInput');
-    var form = document.getElementById('profileForm');
-    if (hiddenInput && form) {
-        hiddenInput.value = emoji;
-        form.submit();
+    var modalInput = document.getElementById('modalEmojiInput');
+    var emojiForm = document.getElementById('emojiAvatarForm');
+    if (modalInput && emojiForm) {
+        modalInput.value = emoji;
+        emojiForm.submit();
     }
 }
 
