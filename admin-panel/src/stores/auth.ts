@@ -9,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Both user AND token must exist to be considered authenticated
   const isAuthenticated = computed(() => !!user.value && !!token.value)
+  const isAdmin = computed(() => user.value?.type === 'admin')
 
   async function initialize() {
     // If user exists but token doesn't, clear stale user
@@ -22,6 +23,9 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         const res = await authApi.me()
         const u = res.data.data?.user ?? null
+        if (u && u.type !== 'admin') {
+          throw new Error('Student access denied')
+        }
         user.value = u
         if (u) localStorage.setItem('user', JSON.stringify(u))
       } catch {
@@ -38,6 +42,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(email: string, password: string) {
     const res = await authApi.login({ email, password })
     const { user: u, token: t } = res.data.data
+
+    if (u && u.type !== 'admin') {
+      throw new Error('Yalnız Admin hesabları daxil ola bilər.')
+    }
 
     if (t) {
       localStorage.setItem('token', t)

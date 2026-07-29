@@ -32,7 +32,8 @@ const routes = [
       { path: 'exams', name: 'Exams', component: () => import('../pages/exams/ExamList.vue') },
       { path: 'exams/:id', name: 'ExamDetail', component: () => import('../pages/exams/ExamDetail.vue') },
       { path: 'stars', name: 'Stars', component: () => import('../pages/stars/StarList.vue') },
-      { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/PendingUsers.vue') },
+      { path: 'users', name: 'Users', component: () => import('../pages/users/UserList.vue') },
+      { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/UserList.vue') },
     ],
   },
 ]
@@ -45,11 +46,17 @@ const router = createRouter({
 router.beforeEach((to) => {
   const auth = useAuthStore()
 
-  if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return { name: 'Login' }
+  if (to.meta.requiresAuth) {
+    if (!auth.isAuthenticated) {
+      return { name: 'Login' }
+    }
+    if (auth.user && auth.user.type !== 'admin') {
+      auth.logout()
+      return { name: 'Login' }
+    }
   }
 
-  if (to.meta.guest && auth.isAuthenticated) {
+  if (to.meta.guest && auth.isAuthenticated && auth.user?.type === 'admin') {
     return { name: 'Dashboard' }
   }
 })
