@@ -1,61 +1,197 @@
 @extends('layouts.app')
-@section('title', 'Topics')
+@section('title', 'Topics - Learning Universe')
+
+@push('styles')
+<style>
+.universe-banner {
+    position: relative;
+    border-radius: 2.5rem;
+    padding: 3rem 2rem;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
+    color: #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(var(--primary), 0.35);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+@media (min-width: 768px) {
+    .universe-banner {
+        border-radius: 3.5rem;
+        padding: 4rem 3.5rem;
+    }
+}
+
+.search-input-wrapper {
+    background-color: rgba(var(--surface-container-lowest), 1);
+    border: 2px solid rgba(var(--surface-container-high), 1);
+    border-radius: 9999px;
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s ease;
+}
+.search-input-wrapper:focus-within {
+    border-color: rgb(var(--primary));
+    box-shadow: 0 8px 30px rgba(var(--primary), 0.15);
+}
+
+.sidebar-widget-card {
+    background-color: rgba(var(--surface-container-lowest), 1);
+    border: 2px solid rgba(var(--surface-container-high), 1);
+    border-radius: 1.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+</style>
+@endpush
 
 @section('content')
-<section class="universe-banner group hover:shadow-[rgb(var(--primary))/0.4]">
-    <div class="bg-decor-star">
-        <span class="material-symbols-outlined !text-4xl text-[rgb(var(--tertiary))]">star</span>
-    </div>
-    <div class="bg-decor-rocket">
-        <span class="material-symbols-outlined !text-6xl text-[rgb(var(--primary))]">rocket_launch</span>
-    </div>
+<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
 
-    <div class="relative z-10">
-        <h2 class="universe-title">Your Learning<br/>Universe</h2>
-        <p class="universe-text">
-            Embark on your journey through the grammar galaxies. Every star earned brings you closer to mastery!
-        </p>
-    </div>
+    <!-- Wide Universe Hero Banner -->
+    <section class="universe-banner group">
+        <div class="absolute -top-12 -right-12 text-white/10 pointer-events-none transition-transform duration-1000 group-hover:rotate-45">
+            <span class="material-symbols-outlined !text-[280px]">auto_awesome</span>
+        </div>
+        <div class="absolute -bottom-12 -left-12 text-white/10 pointer-events-none">
+            <span class="material-symbols-outlined !text-[240px]">rocket_launch</span>
+        </div>
 
-    <div class="banner-icon-magic group-hover:rotate-45 group-hover:scale-110">
-        <span class="material-symbols-outlined !text-[140px] md:!text-[180px]">auto_awesome</span>
-    </div>
-    <div class="banner-icon-rocket group-hover:translate-x-4 group-hover:-translate-y-4 transition-transform duration-1000">
-        <span class="material-symbols-outlined !text-[180px] md:!text-[220px] text-white">rocket_launch</span>
-    </div>
-</section>
-
-<div class="max-w-6xl mx-auto px-4">
-    <form method="GET" action="{{ route('topics') }}" class="search-bar">
-        <span class="material-symbols-outlined !text-lg">search</span>
-        <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search topics..." class="search-bar__input" data-auto-search />
-        @if($search)
-        <a href="{{ route('topics') }}" class="search-bar__clear material-symbols-outlined !text-lg">close</a>
-        @endif
-    </form>
-
-    <div class="modules-grid">
-        @forelse($topics as $i => $topic)
-        <x-card
-            href="{{ route('topics.detail', $topic) }}"
-            badgeText="Topic {{ str_pad($topics->firstItem() + $i, 2, '0', STR_PAD_LEFT) }}"
-            title="{{ $topic->name }}"
-            description="{{ $topic->subject?->name ?? '' }}"
-            progress="0"
-            iconName="{{ ['star', 'bolt', 'rocket_launch', 'auto_awesome', 'psychology', 'menu_book'][$i % 6] }}"
-        />
-        @empty
-        <div class="col-span-full text-center py-16">
-            <span class="material-symbols-outlined !text-6xl text-[rgb(var(--on-surface))/0.1] mb-4">rocket_launch</span>
-            <p class="text-[rgb(var(--on-surface))/0.3] font-black uppercase tracking-widest text-xs">
-                {{ $search ? 'No topics match your search' : 'No topics available yet' }}
+        <div class="relative z-10 space-y-3 max-w-2xl">
+            <div class="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white">
+                <span class="material-symbols-outlined !text-xs">auto_awesome</span>
+                Learning Galaxies
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white leading-tight">
+                Your Learning Universe 🌟
+            </h1>
+            <p class="text-xs sm:text-sm font-semibold text-white/80 leading-relaxed">
+                Embark on your journey through the grammar galaxies. Every topic mastered brings you closer to earning Star XP badges!
             </p>
         </div>
-        @endforelse
-    </div>
-</div>
+    </section>
 
-{{ $topics->appends(['search' => $search])->links('vendor.pagination.custom') }}
+    <!-- Spacious 2-Column Dashboard Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- MAIN COLUMN (8 cols) -->
+        <main class="lg:col-span-8 space-y-6">
+
+            <!-- Search & Filter Bar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <form method="GET" action="{{ route('topics') }}" class="search-input-wrapper w-full sm:max-w-md">
+                    <span class="material-symbols-outlined !text-xl text-[rgb(var(--primary))] opacity-70">search</span>
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search topics or subjects..." class="bg-transparent border-none text-xs sm:text-sm font-bold text-[rgb(var(--on-surface))] placeholder-[rgb(var(--on-surface))/0.4] focus:outline-none w-full" data-auto-search />
+                    @if($search)
+                    <a href="{{ route('topics') }}" class="material-symbols-outlined !text-lg text-[rgb(var(--on-surface))/0.5] hover:text-[rgb(var(--on-surface))] no-underline">close</a>
+                    @endif
+                </form>
+
+                <div class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5]">
+                    Showing {{ $topics->count() }} of {{ $topics->total() }} Topics
+                </div>
+            </div>
+
+            <!-- Topics Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                @forelse($topics as $i => $topic)
+                <x-card
+                    href="{{ route('topics.detail', $topic) }}"
+                    badgeText="Topic {{ str_pad($topics->firstItem() + $i, 2, '0', STR_PAD_LEFT) }}"
+                    title="{{ $topic->name }}"
+                    description="{{ $topic->subject?->name ?? 'Grammar Module' }}"
+                    progress="0"
+                    iconName="{{ ['star', 'bolt', 'rocket_launch', 'auto_awesome', 'psychology', 'menu_book'][$i % 6] }}"
+                />
+                @empty
+                <div class="col-span-full bg-[rgb(var(--surface-container-lowest))] border-2 border-dashed border-[rgb(var(--surface-container-high))] rounded-3xl p-12 text-center space-y-3">
+                    <span class="material-symbols-outlined !text-6xl text-[rgb(var(--on-surface))/0.15]">rocket_launch</span>
+                    <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">No Topics Found</h4>
+                    <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.5] max-w-sm mx-auto">
+                        {{ $search ? 'No topics match your search query.' : 'No topics available yet.' }}
+                    </p>
+                </div>
+                @endforelse
+            </div>
+
+            <!-- Pagination -->
+            @if($topics->hasPages())
+            <div class="pt-4 flex justify-center">
+                {{ $topics->appends(['search' => $search])->links('vendor.pagination.custom') }}
+            </div>
+            @endif
+        </main>
+
+        <!-- SIDEBAR COLUMN (4 cols) -->
+        <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+
+            <!-- Student Star Progress Card -->
+            <div class="sidebar-widget-card space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">stars</span>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-sm uppercase tracking-wide text-[rgb(var(--on-surface))]">Star Explorer Level</h4>
+                        <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">Complete topics to unlock new ranks</p>
+                    </div>
+                </div>
+
+                @auth
+                @php
+                    $totalStars = app(\App\Modules\Star\Services\StarService::class)->getUserTotalStars(auth()->id());
+                    $level = max(1, floor($totalStars / 50) + 1);
+                @endphp
+                <div class="bg-[rgb(var(--surface-container-high))/0.5] rounded-2xl p-3.5 flex items-center justify-between">
+                    <div>
+                        <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--primary))]">Level {{ $level }}</span>
+                        <div class="text-base font-black text-[rgb(var(--on-surface))]">{{ $totalStars }} Stars</div>
+                    </div>
+                    <a href="{{ route('achievements') }}" class="px-3.5 py-1.5 bg-[rgb(var(--primary))] text-white rounded-full text-3xs font-black uppercase tracking-widest no-underline hover:opacity-95">
+                        View Badges
+                    </a>
+                </div>
+                @else
+                <a href="{{ route('login') }}" class="w-full py-3 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline shadow-lg shadow-[rgb(var(--primary))/0.2]">
+                    <span>Log In to Save Progress</span>
+                    <span class="material-symbols-outlined !text-lg">arrow_forward</span>
+                </a>
+                @endauth
+            </div>
+
+            <!-- Quick Exam Banner -->
+            <div class="sidebar-widget-card bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-none space-y-4 shadow-xl shadow-indigo-500/20">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined !text-3xl text-amber-300">quiz</span>
+                    <div>
+                        <h4 class="font-black text-base uppercase tracking-tight">Grade Final Exams</h4>
+                        <p class="text-3xs font-semibold text-white/80">Test your full knowledge across grade levels</p>
+                    </div>
+                </div>
+                <a href="{{ route('exam') }}" class="w-full py-3 bg-white text-indigo-950 rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md">
+                    <span>Take Final Exam</span>
+                    <span class="material-symbols-outlined !text-lg">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Daily Study Tip -->
+            <div class="sidebar-widget-card space-y-2.5">
+                <div class="flex items-center gap-2 text-amber-600">
+                    <span class="material-symbols-outlined !text-xl" style="font-variation-settings:'FILL' 1">lightbulb</span>
+                    <h4 class="font-black text-xs uppercase tracking-wide">Daily Learning Tip</h4>
+                </div>
+                <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6] leading-relaxed">
+                    Study 1 topic and complete its knowledge check quiz every day to keep your 7-day streak active!
+                </p>
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
 @endsection
 
 @push('scripts')

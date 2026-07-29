@@ -3,32 +3,22 @@
 
 @push('styles')
 <style>
-.achievements-wrapper {
-    max-width: 64rem;
-    margin: 0 auto;
-    padding: 1.25rem 1rem 4rem 1rem;
-}
-@media (min-width: 640px) {
-    .achievements-wrapper {
-        padding: 2rem 1.5rem 5rem 1.5rem;
-    }
-}
-
 /* Hero Celestial Card */
 .achieve-hero-banner {
     position: relative;
-    border-radius: 2.25rem;
-    padding: 2.5rem 1.5rem;
+    border-radius: 2.5rem;
+    padding: 3rem 2rem;
     background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
                 linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
     color: #ffffff;
     box-shadow: 0 25px 50px -12px rgba(var(--primary), 0.35);
     overflow: hidden;
+    margin-bottom: 2rem;
 }
 @media (min-width: 768px) {
     .achieve-hero-banner {
-        border-radius: 3rem;
-        padding: 3.5rem 3rem;
+        border-radius: 3.5rem;
+        padding: 4rem 3.5rem;
     }
 }
 
@@ -173,26 +163,31 @@
     color: #ffffff;
     box-shadow: 0 4px 14px rgba(var(--primary), 0.25);
 }
+
+.sidebar-widget-card {
+    background-color: rgba(var(--surface-container-lowest), 1);
+    border: 2px solid rgba(var(--surface-container-high), 1);
+    border-radius: 1.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
 </style>
 @endpush
 
 @section('content')
-<div class="achievements-wrapper space-y-8">
+<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
 
     <!-- Hero Achievement Header -->
     <section class="achieve-hero-banner group">
-        <!-- Floating Celestial Orbs -->
         <div class="absolute -top-12 -right-12 text-white/10 pointer-events-none transition-transform duration-1000 group-hover:rotate-45">
-            <span class="material-symbols-outlined !text-[240px]">military_tech</span>
+            <span class="material-symbols-outlined !text-[280px]">military_tech</span>
         </div>
         <div class="absolute -bottom-10 -left-10 text-white/10 pointer-events-none">
-            <span class="material-symbols-outlined !text-[180px]">auto_awesome</span>
+            <span class="material-symbols-outlined !text-[220px]">auto_awesome</span>
         </div>
 
         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-
             <div class="flex items-center gap-5 text-center md:text-left">
-                <!-- Level Badge -->
                 @php
                     $level = max(1, floor($allTimeStars / 50) + 1);
                 @endphp
@@ -206,9 +201,9 @@
                         <span class="material-symbols-outlined !text-xs">military_tech</span>
                         Star Rewards Hub
                     </div>
-                    <h2 class="text-2xl sm:text-4xl font-black italic uppercase tracking-tight text-white leading-tight">
+                    <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white leading-tight">
                         Achievements & Rankings 🌟
-                    </h2>
+                    </h1>
                     <p class="text-xs sm:text-sm font-semibold text-white/80 max-w-md">
                         Earn Star points by completing quizzes and lessons. Monthly stars reset on the last day at 23:59!
                     </p>
@@ -223,7 +218,6 @@
                     {{ $selectedMonth === 'all' ? 'All-Time Stars' : 'Monthly Stars' }}
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -251,7 +245,7 @@
         </form>
     </section>
 
-    <!-- Main Navigation Section Tabs -->
+    <!-- Navigation Section Tabs -->
     <section class="flex items-center justify-center gap-3">
         <button type="button" id="tab-btn-achievements" class="main-nav-tab active flex items-center gap-2" onclick="switchMainTab('achievements')">
             <span class="material-symbols-outlined !text-lg">workspace_premium</span>
@@ -263,292 +257,290 @@
         </button>
     </section>
 
-    <!-- TAB 1: MY ACHIEVEMENTS & GALLERY -->
-    <div id="tab-content-achievements" class="space-y-8">
-        <!-- Quick Stats Bar -->
-        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-            <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 text-center space-y-1 shadow-sm">
-                <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">workspace_premium</span>
-                <div class="text-xl sm:text-2xl font-black text-[rgb(var(--on-surface))]">{{ $earnedUserStars->count() }}</div>
-                <div class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5]">Badges Unlocked</div>
-            </div>
-            <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 text-center space-y-1 shadow-sm">
-                <span class="material-symbols-outlined !text-2xl text-amber-500">auto_awesome</span>
-                <div class="text-xl sm:text-2xl font-black text-amber-600">{{ $totalStars }}</div>
-                <div class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5]">Period XP Points</div>
-            </div>
-            <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 text-center space-y-1 shadow-sm">
-                <span class="material-symbols-outlined !text-2xl text-emerald-600">rocket_launch</span>
-                <div class="text-xl sm:text-2xl font-black text-emerald-600">{{ $quizCount }}</div>
-                <div class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5]">Quizzes Completed</div>
-            </div>
-            <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 text-center space-y-1 shadow-sm">
-                <span class="material-symbols-outlined !text-2xl text-indigo-600">quiz</span>
-                <div class="text-xl sm:text-2xl font-black text-indigo-600">{{ $examCount }}</div>
-                <div class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5]">Exams Taken</div>
-            </div>
-        </section>
+    <!-- Spacious 2-Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-        <!-- Recent Unlocked Achievements Feed -->
-        <section class="space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">history</span>
-                    <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Recent Activity Timeline
-                    </h3>
-                </div>
-                <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">Latest Unlocks</span>
-            </div>
+        <!-- MAIN COLUMN (8 cols): Badges or Leaderboard -->
+        <main class="lg:col-span-8 space-y-8">
 
-            @if($earnedUserStars->isNotEmpty())
-            <div class="space-y-3">
-                @foreach($earnedUserStars->take(5) as $userStar)
-                @php
-                    $starObj = $userStar->star;
-                    $starName = is_array($starObj?->name) ? ($starObj?->name[app()->getLocale()] ?? $starObj?->name['az'] ?? 'Star Award') : ($starObj?->name ?? 'Star Award');
-                    $starDesc = is_array($starObj?->description) ? ($starObj?->description[app()->getLocale()] ?? $starObj?->description['az'] ?? '') : ($starObj?->description ?? '');
-                @endphp
-                <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] hover:border-[rgb(var(--primary))/0.3] rounded-2xl p-4 flex items-center justify-between gap-4 transition-all shadow-sm">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-600 flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">stars</span>
+            <!-- TAB 1: MY ACHIEVEMENTS & GALLERY -->
+            <div id="tab-content-achievements" class="space-y-8">
+                <!-- Recent Unlocked Achievements Feed -->
+                <section class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">history</span>
+                            <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
+                                Recent Activity Timeline
+                            </h3>
                         </div>
-                        <div>
-                            <h4 class="font-black text-sm text-[rgb(var(--on-surface))] uppercase tracking-wide">
-                                {{ $starName }}
+                        <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">Latest Unlocks</span>
+                    </div>
+
+                    @if($earnedUserStars->isNotEmpty())
+                    <div class="space-y-3">
+                        @foreach($earnedUserStars->take(5) as $userStar)
+                        @php
+                            $starObj = $userStar->star;
+                            $starName = is_array($starObj?->name) ? ($starObj?->name[app()->getLocale()] ?? $starObj?->name['az'] ?? 'Star Award') : ($starObj?->name ?? 'Star Award');
+                            $starDesc = is_array($starObj?->description) ? ($starObj?->description[app()->getLocale()] ?? $starObj?->description['az'] ?? '') : ($starObj?->description ?? '');
+                        @endphp
+                        <div class="sidebar-widget-card p-4 flex items-center justify-between gap-4 transition-all">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">stars</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-sm text-[rgb(var(--on-surface))] uppercase tracking-wide">
+                                        {{ $starName }}
+                                    </h4>
+                                    <p class="text-xs text-[rgb(var(--on-surface))/0.6] font-semibold">
+                                        {{ $starDesc ?: 'Awarded for exceptional learning progress!' }}
+                                    </p>
+                                    <span class="text-4xs font-bold text-[rgb(var(--on-surface))/0.4] block mt-0.5">
+                                        Unlocked {{ $userStar->created_at ? $userStar->created_at->diffForHumans() : 'Recently' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-400/20 text-amber-700 font-black text-xs">
+                                    +{{ $starObj?->point ?? 10 }} Stars
+                                </span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-dashed border-[rgb(var(--surface-container-high))] rounded-2xl p-8 text-center space-y-3">
+                        <span class="material-symbols-outlined !text-5xl text-[rgb(var(--primary))/0.3]">emoji_events</span>
+                        <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">No Achievements For Selected Period</h4>
+                        <p class="text-xs font-bold text-[rgb(var(--on-surface))/0.5] max-w-sm mx-auto">
+                            Solve quizzes and exams in this period to claim your Star Badges!
+                        </p>
+                    </div>
+                    @endif
+                </section>
+
+                <!-- All Badges Gallery -->
+                <section class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">grid_view</span>
+                            <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
+                                Badges & Trophies Gallery
+                            </h3>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <button type="button" class="achieve-tab-btn active" onclick="filterBadges('all', this)">All ({{ $allStars->count() }})</button>
+                            <button type="button" class="achieve-tab-btn" onclick="filterBadges('unlocked', this)">Unlocked ({{ count($earnedStarIds) }})</button>
+                            <button type="button" class="achieve-tab-btn" onclick="filterBadges('locked', this)">Locked ({{ $allStars->count() - count($earnedStarIds) }})</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @foreach($allStars as $star)
+                        @php
+                            $isUnlocked = in_array($star->id, $earnedStarIds);
+                            $starTitle = is_array($star->name) ? ($star->name[app()->getLocale()] ?? $star->name['az'] ?? $star->type) : ($star->name ?? $star->type);
+                            $starDetails = is_array($star->description) ? ($star->description[app()->getLocale()] ?? $star->description['az'] ?? '') : ($star->description ?? '');
+                        @endphp
+                        <div class="badge-card {{ $isUnlocked ? 'unlocked' : 'locked' }} badge-item-card" data-status="{{ $isUnlocked ? 'unlocked' : 'locked' }}">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="badge-icon-box {{ $isUnlocked ? 'bg-amber-400 text-amber-950 shadow-md shadow-amber-400/30' : 'bg-slate-200 text-slate-500' }}">
+                                    @if($star->type === 'quiz_perfect')
+                                    <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">emoji_events</span>
+                                    @elseif($star->type === 'exam_excellent')
+                                    <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">trophy</span>
+                                    @elseif($star->type === 'login_streak')
+                                    <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">local_fire_department</span>
+                                    @else
+                                    <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">workspace_premium</span>
+                                    @endif
+                                </div>
+                                <span class="text-3xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full {{ $isUnlocked ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500' }}">
+                                    {{ $isUnlocked ? 'Unlocked ✓' : 'Locked' }}
+                                </span>
+                            </div>
+
+                            <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase tracking-tight mb-1">
+                                {{ $starTitle }}
                             </h4>
-                            <p class="text-xs text-[rgb(var(--on-surface))/0.6] font-semibold">
-                                {{ $starDesc ?: 'Awarded for exceptional learning progress!' }}
+                            <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6] leading-relaxed mb-4">
+                                {{ $starDetails ?: 'Complete learning milestones to claim this badge.' }}
                             </p>
-                            <span class="text-4xs font-bold text-[rgb(var(--on-surface))/0.4] block mt-0.5">
-                                Unlocked {{ $userStar->created_at ? $userStar->created_at->diffForHumans() : 'Recently' }}
-                            </span>
+
+                            <div class="flex items-center justify-between pt-3 border-t border-[rgb(var(--surface-container-high))/0.6] text-xs font-bold">
+                                <span class="text-amber-600 flex items-center gap-1 font-black">
+                                    <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
+                                    +{{ $star->point }} Stars
+                                </span>
+                                <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">
+                                    {{ strtoupper(str_replace('_', ' ', $star->type)) }}
+                                </span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 2: GLOBAL LEADERBOARD & RANKINGS -->
+            <div id="tab-content-leaderboard" class="space-y-8 hidden">
+                <!-- Top 3 Podium Showcase -->
+                @if($leaderboard->count() >= 3)
+                <section class="grid grid-cols-3 gap-3 sm:gap-6 pt-4 items-end max-w-xl mx-auto">
+                    @php $rank2 = $leaderboard->get(1); @endphp
+                    @if($rank2)
+                    <div class="podium-card rank-2 order-1">
+                        <div class="w-12 h-12 rounded-full bg-slate-300 text-slate-800 font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center">
+                            {{ strtoupper(substr($rank2->name, 0, 1)) }}
+                        </div>
+                        <div class="inline-flex items-center gap-1 bg-slate-200 text-slate-800 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
+                            🥈 2nd Place
+                        </div>
+                        <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))] truncate px-1">
+                            {{ $rank2->name }}
+                        </h4>
+                        <div class="text-amber-600 font-black text-xs sm:text-sm flex items-center justify-center gap-1 mt-1">
+                            <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
+                            {{ $rank2->total_stars }}
                         </div>
                     </div>
-                    <div class="text-right flex-shrink-0">
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-400/20 text-amber-700 font-black text-xs">
-                            +{{ $starObj?->point ?? 10 }} Stars
-                        </span>
+                    @endif
+
+                    @php $rank1 = $leaderboard->first(); @endphp
+                    @if($rank1)
+                    <div class="podium-card rank-1 order-2">
+                        <div class="absolute -top-5 left-1/2 -translate-x-1/2 text-amber-500">
+                            <span class="material-symbols-outlined !text-3xl" style="font-variation-settings:'FILL' 1">military_tech</span>
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-amber-400 text-amber-950 font-black text-xl border-4 border-amber-300 shadow-lg mx-auto mb-2 flex items-center justify-center">
+                            {{ strtoupper(substr($rank1->name, 0, 1)) }}
+                        </div>
+                        <div class="inline-flex items-center gap-1 bg-amber-400/30 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
+                            👑 Champion
+                        </div>
+                        <h4 class="font-black text-sm sm:text-base text-[rgb(var(--on-surface))] truncate px-1">
+                            {{ $rank1->name }}
+                        </h4>
+                        <div class="text-amber-600 font-black text-sm sm:text-base flex items-center justify-center gap-1 mt-1">
+                            <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
+                            {{ $rank1->total_stars }}
+                        </div>
+                    </div>
+                    @endif
+
+                    @php $rank3 = $leaderboard->get(2); @endphp
+                    @if($rank3)
+                    <div class="podium-card rank-3 order-3">
+                        <div class="w-12 h-12 rounded-full bg-amber-700 text-white font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center">
+                            {{ strtoupper(substr($rank3->name, 0, 1)) }}
+                        </div>
+                        <div class="inline-flex items-center gap-1 bg-amber-700/20 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
+                            🥉 3rd Place
+                        </div>
+                        <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))] truncate px-1">
+                            {{ $rank3->name }}
+                        </h4>
+                        <div class="text-amber-600 font-black text-xs sm:text-sm flex items-center justify-center gap-1 mt-1">
+                            <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
+                            {{ $rank3->total_stars }}
+                        </div>
+                    </div>
+                    @endif
+                </section>
+                @endif
+
+                <!-- Rankings List -->
+                <section class="space-y-3">
+                    <div class="space-y-2">
+                        @foreach($leaderboard as $index => $u)
+                        @php
+                            $isMe = auth()->check() && auth()->id() === $u->id;
+                            $userLvl = max(1, floor($u->total_stars / 50) + 1);
+                        @endphp
+                        <div class="leaderboard-row {{ $isMe ? 'is-me' : '' }} flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-8 text-center flex-shrink-0">
+                                    @if($index === 0) 🥇
+                                    @elseif($index === 1) 🥈
+                                    @elseif($index === 2) 🥉
+                                    @else <span class="text-xs font-black text-[rgb(var(--on-surface))/0.5]">#{{ $index + 1 }}</span>
+                                    @endif
+                                </div>
+
+                                <div class="w-9 h-9 rounded-full bg-[rgb(var(--primary-fixed))] text-white font-bold text-xs flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
+                                    {{ strtoupper(substr($u->name, 0, 1)) }}
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))]">
+                                            {{ $u->name }}
+                                        </h4>
+                                        @if($isMe)
+                                        <span class="bg-[rgb(var(--secondary))] text-white text-4xs font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
+                                            YOU
+                                        </span>
+                                        @endif
+                                    </div>
+                                    <span class="text-4xs font-bold text-[rgb(var(--on-surface))/0.5] uppercase tracking-wider">
+                                        Level {{ $userLvl }} Explorer
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 bg-amber-400/15 text-amber-700 px-3 py-1 rounded-full font-black text-xs">
+                                <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
+                                <span>{{ $u->total_stars }} Stars</span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </section>
+            </div>
+
+        </main>
+
+        <!-- SIDEBAR COLUMN (4 cols): Quick Stats & Actions -->
+        <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
+
+            <!-- Quick Stats Bar -->
+            <div class="sidebar-widget-card space-y-4">
+                <h4 class="font-black text-xs uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">Quick Explorer Stats</h4>
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
+                        <div class="text-xl font-black text-[rgb(var(--primary))]">{{ $earnedUserStars->count() }}</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Badges Unlocked</div>
+                    </div>
+                    <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
+                        <div class="text-xl font-black text-amber-600">{{ $totalStars }}</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Period Stars</div>
+                    </div>
+                    <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
+                        <div class="text-xl font-black text-emerald-600">{{ $quizCount }}</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Quizzes Done</div>
+                    </div>
+                    <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
+                        <div class="text-xl font-black text-indigo-600">{{ $examCount }}</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Exams Taken</div>
                     </div>
                 </div>
-                @endforeach
             </div>
-            @else
-            <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-dashed border-[rgb(var(--surface-container-high))] rounded-2xl p-8 text-center space-y-3">
-                <span class="material-symbols-outlined !text-5xl text-[rgb(var(--primary))/0.3]">emoji_events</span>
-                <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">No Achievements For Selected Period</h4>
-                <p class="text-xs font-bold text-[rgb(var(--on-surface))/0.5] max-w-sm mx-auto">
-                    Solve quizzes and exams in this period to claim your Star Badges!
-                </p>
-                <a href="{{ route('topics') }}" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs uppercase tracking-widest no-underline active:scale-95 transition-all">
-                    Explore Topics
+
+            <!-- Start Practice Callout -->
+            <div class="sidebar-widget-card bg-gradient-to-br from-[rgb(var(--primary))] to-[rgb(var(--secondary))] text-white border-none space-y-4 shadow-xl">
+                <div class="space-y-1">
+                    <h4 class="font-black text-base uppercase tracking-tight">Earn More Stars!</h4>
+                    <p class="text-xs font-semibold text-white/80">Complete quizzes and lessons to climb up the leaderboards.</p>
+                </div>
+                <a href="{{ route('topics') }}" class="w-full py-3 bg-white text-[rgb(var(--primary))] rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md">
+                    <span>Explore Topics</span>
+                    <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                 </a>
             </div>
-            @endif
-        </section>
 
-        <!-- All Badges Gallery & Filtering -->
-        <section class="space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">grid_view</span>
-                    <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Badges & Trophies Gallery
-                    </h3>
-                </div>
-                <div class="flex items-center gap-1.5 flex-wrap">
-                    <button type="button" class="achieve-tab-btn active" onclick="filterBadges('all', this)">All ({{ $allStars->count() }})</button>
-                    <button type="button" class="achieve-tab-btn" onclick="filterBadges('unlocked', this)">Unlocked ({{ count($earnedStarIds) }})</button>
-                    <button type="button" class="achieve-tab-btn" onclick="filterBadges('locked', this)">Locked ({{ $allStars->count() - count($earnedStarIds) }})</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach($allStars as $star)
-                @php
-                    $isUnlocked = in_array($star->id, $earnedStarIds);
-                    $starTitle = is_array($star->name) ? ($star->name[app()->getLocale()] ?? $star->name['az'] ?? $star->type) : ($star->name ?? $star->type);
-                    $starDetails = is_array($star->description) ? ($star->description[app()->getLocale()] ?? $star->description['az'] ?? '') : ($star->description ?? '');
-                @endphp
-                <div class="badge-card {{ $isUnlocked ? 'unlocked' : 'locked' }} badge-item-card" data-status="{{ $isUnlocked ? 'unlocked' : 'locked' }}">
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="badge-icon-box {{ $isUnlocked ? 'bg-amber-400 text-amber-950 shadow-md shadow-amber-400/30' : 'bg-slate-200 text-slate-500' }}">
-                            @if($star->type === 'quiz_perfect')
-                            <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">emoji_events</span>
-                            @elseif($star->type === 'exam_excellent')
-                            <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">trophy</span>
-                            @elseif($star->type === 'login_streak')
-                            <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">local_fire_department</span>
-                            @else
-                            <span class="material-symbols-outlined !text-2xl" style="font-variation-settings:'FILL' 1">workspace_premium</span>
-                            @endif
-                        </div>
-                        <span class="text-3xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full {{ $isUnlocked ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500' }}">
-                            {{ $isUnlocked ? 'Unlocked ✓' : 'Locked' }}
-                        </span>
-                    </div>
-
-                    <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase tracking-tight mb-1">
-                        {{ $starTitle }}
-                    </h4>
-                    <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6] leading-relaxed mb-4">
-                        {{ $starDetails ?: 'Complete learning milestones to claim this badge.' }}
-                    </p>
-
-                    <div class="flex items-center justify-between pt-3 border-t border-[rgb(var(--surface-container-high))/0.6] text-xs font-bold">
-                        <span class="text-amber-600 flex items-center gap-1 font-black">
-                            <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
-                            +{{ $star->point }} Stars
-                        </span>
-                        <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">
-                            {{ strtoupper(str_replace('_', ' ', $star->type)) }}
-                        </span>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </section>
-    </div>
-
-    <!-- TAB 2: GLOBAL LEADERBOARD & RANKINGS -->
-    <div id="tab-content-leaderboard" class="space-y-8 hidden">
-
-        <!-- Top 3 Podium Showcase -->
-        @if($leaderboard->count() >= 3)
-        <section class="grid grid-cols-3 gap-3 sm:gap-6 pt-4 items-end max-w-2xl mx-auto">
-
-            <!-- 2nd Place (Silver) -->
-            @php $rank2 = $leaderboard->get(1); @endphp
-            @if($rank2)
-            <div class="podium-card rank-2 order-1">
-                <div class="w-12 h-12 rounded-full bg-slate-300 text-slate-800 font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center">
-                    {{ strtoupper(substr($rank2->name, 0, 1)) }}
-                </div>
-                <div class="inline-flex items-center gap-1 bg-slate-200 text-slate-800 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
-                    🥈 2nd Place
-                </div>
-                <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))] truncate px-1">
-                    {{ $rank2->name }}
-                </h4>
-                <div class="text-amber-600 font-black text-xs sm:text-sm flex items-center justify-center gap-1 mt-1">
-                    <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
-                    {{ $rank2->total_stars }}
-                </div>
-            </div>
-            @endif
-
-            <!-- 1st Place (Gold) -->
-            @php $rank1 = $leaderboard->first(); @endphp
-            @if($rank1)
-            <div class="podium-card rank-1 order-2">
-                <div class="absolute -top-5 left-1/2 -translate-x-1/2 text-amber-500">
-                    <span class="material-symbols-outlined !text-3xl" style="font-variation-settings:'FILL' 1">military_tech</span>
-                </div>
-                <div class="w-14 h-14 rounded-full bg-amber-400 text-amber-950 font-black text-xl border-4 border-amber-300 shadow-lg mx-auto mb-2 flex items-center justify-center">
-                    {{ strtoupper(substr($rank1->name, 0, 1)) }}
-                </div>
-                <div class="inline-flex items-center gap-1 bg-amber-400/30 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
-                    👑 Champion
-                </div>
-                <h4 class="font-black text-sm sm:text-base text-[rgb(var(--on-surface))] truncate px-1">
-                    {{ $rank1->name }}
-                </h4>
-                <div class="text-amber-600 font-black text-sm sm:text-base flex items-center justify-center gap-1 mt-1">
-                    <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
-                    {{ $rank1->total_stars }}
-                </div>
-            </div>
-            @endif
-
-            <!-- 3rd Place (Bronze) -->
-            @php $rank3 = $leaderboard->get(2); @endphp
-            @if($rank3)
-            <div class="podium-card rank-3 order-3">
-                <div class="w-12 h-12 rounded-full bg-amber-700 text-white font-black text-lg border-2 border-white shadow-md mx-auto mb-2 flex items-center justify-center">
-                    {{ strtoupper(substr($rank3->name, 0, 1)) }}
-                </div>
-                <div class="inline-flex items-center gap-1 bg-amber-700/20 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
-                    🥉 3rd Place
-                </div>
-                <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))] truncate px-1">
-                    {{ $rank3->name }}
-                </h4>
-                <div class="text-amber-600 font-black text-xs sm:text-sm flex items-center justify-center gap-1 mt-1">
-                    <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
-                    {{ $rank3->total_stars }}
-                </div>
-            </div>
-            @endif
-
-        </section>
-        @endif
-
-        <!-- Full Rankings Table / List -->
-        <section class="space-y-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">format_list_numbered</span>
-                    <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Student Leaderboard — {{ $availableMonths[$selectedMonth] ?? 'Selected Period' }}
-                    </h3>
-                </div>
-                <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">Top 50 Ranking</span>
-            </div>
-
-            <div class="space-y-2">
-                @foreach($leaderboard as $index => $u)
-                @php
-                    $isMe = auth()->check() && auth()->id() === $u->id;
-                    $userLvl = max(1, floor($u->total_stars / 50) + 1);
-                @endphp
-                <div class="leaderboard-row {{ $isMe ? 'is-me' : '' }} flex items-center justify-between gap-4">
-                    <div class="flex items-center gap-3.5">
-                        <!-- Rank Number Badge -->
-                        <div class="w-8 text-center flex-shrink-0">
-                            @if($index === 0)
-                            <span class="text-xl">🥇</span>
-                            @elseif($index === 1)
-                            <span class="text-xl">🥈</span>
-                            @elseif($index === 2)
-                            <span class="text-xl">🥉</span>
-                            @else
-                            <span class="text-xs sm:text-sm font-black text-[rgb(var(--on-surface))/0.5]">#{{ $index + 1 }}</span>
-                            @endif
-                        </div>
-
-                        <!-- User Avatar -->
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[rgb(var(--primary-fixed))] text-white font-bold text-xs flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
-                            {{ strtoupper(substr($u->name, 0, 1)) }}
-                        </div>
-
-                        <!-- User Info -->
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))]">
-                                    {{ $u->name }}
-                                </h4>
-                                @if($isMe)
-                                <span class="bg-[rgb(var(--secondary))] text-white text-4xs font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
-                                    YOU
-                                </span>
-                                @endif
-                            </div>
-                            <span class="text-4xs font-bold text-[rgb(var(--on-surface))/0.5] uppercase tracking-wider">
-                                Level {{ $userLvl }} Explorer
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Stars Score -->
-                    <div class="flex items-center gap-1.5 bg-amber-400/15 text-amber-700 px-3 py-1 rounded-full font-black text-xs sm:text-sm">
-                        <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
-                        <span>{{ $u->total_stars }} Stars</span>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </section>
+        </aside>
 
     </div>
 
