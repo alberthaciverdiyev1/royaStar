@@ -87,12 +87,21 @@ function StatIcon({ icon }: { icon: string }) {
 
   <!-- Welcome section -->
   <div class="mb-8">
-    <h1 class="text-2xl font-bold tracking-tight text-gray-900">
-      Xoş gəldiniz, {{ auth.user?.name || 'Admin' }}!
-    </h1>
-    <p class="mt-1 text-sm text-gray-500">
-      RoyaStars admin panelinə xoş gəlmisiniz. Aşağıdan sistem statistikalarını görə bilərsiniz.
-    </p>
+    <div class="flex items-center gap-4">
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 text-lg font-bold text-white shadow-sm border border-indigo-200 overflow-hidden">
+        <img v-if="auth.user?.avatar && (auth.user.avatar.includes('/') || auth.user.avatar.includes('http'))" :src="auth.user.avatar" class="w-full h-full object-cover" />
+        <span v-else-if="auth.user?.avatar" class="text-xl select-none">{{ auth.user.avatar }}</span>
+        <span v-else>{{ (auth.user?.name?.charAt(0) || 'A').toUpperCase() }}</span>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900">
+          Xoş gəldiniz, {{ auth.user?.name || 'Admin' }}!
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+          RoyaStars admin panelinə xoş gəlmisiniz. Aşağıdan sistem statistikalarını görə bilərsiniz.
+        </p>
+      </div>
+    </div>
   </div>
 
   <!-- Stats grid -->

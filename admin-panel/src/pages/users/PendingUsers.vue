@@ -84,8 +84,10 @@ onMounted(fetchPending)
           <tr v-for="user in users" :key="user.id" class="transition-colors hover:bg-slate-50">
             <td class="px-5 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600">
-                  {{ (user.name?.charAt(0) || '?').toUpperCase() }}
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 border border-indigo-200 overflow-hidden">
+                  <img v-if="user.avatar && (user.avatar.includes('/') || user.avatar.includes('http'))" :src="user.avatar" class="w-full h-full object-cover" />
+                  <span v-else-if="user.avatar" class="text-xl select-none">{{ user.avatar }}</span>
+                  <span v-else>{{ (user.name?.charAt(0) || '?').toUpperCase() }}</span>
                 </div>
                 <span class="font-medium text-slate-900">{{ user.name }} {{ user.surname || '' }}</span>
               </div>

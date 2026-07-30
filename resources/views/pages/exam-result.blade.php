@@ -126,6 +126,22 @@
 
         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="space-y-3 text-center md:text-left max-w-xl">
+                @auth
+                <div class="flex items-center justify-center md:justify-start gap-2.5 mb-1">
+                    <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 overflow-hidden flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                        @if(!empty(auth()->user()->avatar))
+                            @if(str_contains(auth()->user()->avatar, '/') || str_contains(auth()->user()->avatar, 'http'))
+                                <img src="{{ auth()->user()->avatar }}" alt="" class="w-full h-full object-cover" />
+                            @else
+                                <span class="text-base select-none">{{ auth()->user()->avatar }}</span>
+                            @endif
+                        @else
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        @endif
+                    </div>
+                    <span class="text-3xs font-black uppercase tracking-widest text-white/80">{{ auth()->user()->name }}</span>
+                </div>
+                @endauth
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white">
                     <span class="material-symbols-outlined !text-xs">assignment_turned_in</span>
                     @if($exam->grade)
