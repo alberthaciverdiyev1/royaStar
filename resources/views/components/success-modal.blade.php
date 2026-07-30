@@ -21,14 +21,4 @@
     </div>
 </div>
 
-@push('styles')
-<style>
-    #success-modal.show { opacity: 1; pointer-events: auto; }
-    #success-modal.show #modal-card { transform: scale(1); }
-    @@keyframes rocket-fly {
-        0% { transform: translateY(0) scale(1); opacity: 1; }
-        100% { transform: translateY(-200px) scale(0.5); opacity: 0; }
-    }
-    .fly-away { animation: rocket-fly 0.8s ease-in forwards; }
-</style>
-@endpush
+<link href="{{ asset('css/success-modal.css') }}?v={{ filemtime(public_path('css/success-modal.css')) }}" rel="stylesheet">

@@ -1,93 +1,7 @@
 @extends('layouts.app')
 @section('title', $topic->name . ' - Lessons & Learning Path')
 
-@push('styles')
-<style>
-/* Celestial Hero Banner */
-.topic-banner-hero {
-    position: relative;
-    border-radius: 2.5rem;
-    padding: 3rem 2rem;
-    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
-                linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
-    color: #ffffff;
-    box-shadow: 0 25px 50px -12px rgba(var(--primary), 0.35);
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-@media (min-width: 768px) {
-    .topic-banner-hero {
-        border-radius: 3.5rem;
-        padding: 4rem 3.5rem;
-    }
-}
-
-/* Search Bar */
-.topic-search-box {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 9999px;
-    padding: 0.6rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    transition: all 0.25s ease;
-}
-.topic-search-box:focus-within {
-    border-color: rgb(var(--primary));
-    box-shadow: 0 8px 30px rgba(var(--primary), 0.15);
-}
-
-/* Lesson Cards & Path */
-.lesson-card-item {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 1.75rem;
-    padding: 1.5rem;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-.lesson-card-item:hover {
-    transform: translateY(-4px);
-    border-color: rgba(var(--primary), 0.35);
-    box-shadow: 0 14px 35px rgba(var(--primary), 0.12);
-}
-.lesson-card-item.active-step {
-    border-color: rgb(var(--primary));
-    background: linear-gradient(135deg, rgba(var(--primary), 0.04) 0%, rgba(var(--surface-container-lowest), 1) 100%);
-}
-
-.lesson-step-badge {
-    width: 3.25rem;
-    height: 3.25rem;
-    border-radius: 1.25rem;
-    background: rgba(var(--primary), 0.1);
-    color: rgb(var(--primary));
-    font-weight: 900;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-}
-.lesson-card-item:hover .lesson-step-badge {
-    background: rgb(var(--primary));
-    color: #ffffff;
-    transform: scale(1.1) rotate(-6deg);
-}
-
-.sidebar-widget-card {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 1.75rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-</style>
-@endpush
+<link href="{{ asset('css/subtopics.css') }}?v={{ filemtime(public_path('css/subtopics.css')) }}" rel="stylesheet">
 
 @section('content')
 <div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
@@ -267,14 +181,4 @@
 </div>
 @endsection
 
-@push('scripts')
-<script>
-document.querySelectorAll('[data-auto-search]').forEach(function(input) {
-    var timer;
-    input.addEventListener('input', function() {
-        clearTimeout(timer);
-        timer = setTimeout(function() { input.closest('form').submit(); }, 350);
-    });
-});
-</script>
-@endpush
+<script src="{{ asset('js/subtopics.js') }}?v={{ filemtime(public_path('js/subtopics.js')) }}"></script>

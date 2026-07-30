@@ -1,51 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Topics - Learning Universe')
 
-@push('styles')
-<style>
-.universe-banner {
-    position: relative;
-    border-radius: 2.5rem;
-    padding: 3rem 2rem;
-    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
-                linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
-    color: #ffffff;
-    box-shadow: 0 25px 50px -12px rgba(var(--primary), 0.35);
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-@media (min-width: 768px) {
-    .universe-banner {
-        border-radius: 3.5rem;
-        padding: 4rem 3.5rem;
-    }
-}
-
-.search-input-wrapper {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 9999px;
-    padding: 0.6rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-    transition: all 0.25s ease;
-}
-.search-input-wrapper:focus-within {
-    border-color: rgb(var(--primary));
-    box-shadow: 0 8px 30px rgba(var(--primary), 0.15);
-}
-
-.sidebar-widget-card {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 1.75rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-</style>
-@endpush
+<link href="{{ asset('css/topics.css') }}?v={{ filemtime(public_path('css/topics.css')) }}" rel="stylesheet">
 
 @section('content')
 <div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
@@ -194,14 +150,4 @@
 </div>
 @endsection
 
-@push('scripts')
-<script>
-document.querySelectorAll('[data-auto-search]').forEach(function(input) {
-    var timer;
-    input.addEventListener('input', function() {
-        clearTimeout(timer);
-        timer = setTimeout(function() { input.closest('form').submit(); }, 350);
-    });
-});
-</script>
-@endpush
+<script src="{{ asset('js/topics.js') }}?v={{ filemtime(public_path('js/topics.js')) }}"></script>

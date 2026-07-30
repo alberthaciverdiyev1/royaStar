@@ -1,36 +1,7 @@
 @extends('layouts.app')
 @section('title', $exam->name . ' - Exam Detail')
 
-@push('styles')
-<style>
-.exam-detail-wrapper {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: 0.75rem 1rem 2rem 1rem;
-}
-@media (min-width: 640px) {
-    .exam-detail-wrapper {
-        padding: 1rem 1.5rem 3rem 1.5rem;
-    }
-}
-
-/* Detail card — matches quiz question card style */
-.detail-card {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-    transition: all 0.25s ease;
-}
-@media (min-width: 640px) {
-    .detail-card {
-        padding: 2rem;
-        border-radius: 1.75rem;
-    }
-}
-</style>
-@endpush
+<link href="{{ asset('css/exam-detail.css') }}?v={{ filemtime(public_path('css/exam-detail.css')) }}" rel="stylesheet">
 
 @section('content')
 <div class="exam-detail-wrapper space-y-4 sm:space-y-6">

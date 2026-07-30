@@ -1,74 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Quiz Result - ' . ($quiz->name ?? 'Quiz'))
 
-@push('styles')
-<style>
-/* Hero Result Banner */
-.result-hero-card {
-    position: relative;
-    border-radius: 2.5rem;
-    padding: 3rem 2rem;
-    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
-                linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
-    color: #ffffff;
-    box-shadow: 0 25px 50px -12px rgba(var(--primary), 0.35);
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-@media (min-width: 768px) {
-    .result-hero-card {
-        border-radius: 3.5rem;
-        padding: 4rem 3.5rem;
-    }
-}
-
-/* Question Breakdown Cards */
-.question-review-card {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 1.75rem;
-    padding: 1.5rem;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-.question-review-card.correct {
-    border-color: rgba(16, 185, 129, 0.35);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, rgba(var(--surface-container-lowest), 1) 100%);
-}
-.question-review-card.wrong {
-    border-color: rgba(239, 68, 68, 0.35);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, rgba(var(--surface-container-lowest), 1) 100%);
-}
-
-.filter-tab-btn {
-    padding: 0.5rem 1.25rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    background: rgba(var(--surface-container-lowest), 1);
-    color: rgba(var(--on-surface), 0.6);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.filter-tab-btn.active {
-    background: rgb(var(--primary));
-    border-color: rgb(var(--primary));
-    color: #ffffff;
-    box-shadow: 0 4px 14px rgba(var(--primary), 0.25);
-}
-
-.sidebar-widget-card {
-    background-color: rgba(var(--surface-container-lowest), 1);
-    border: 2px solid rgba(var(--surface-container-high), 1);
-    border-radius: 1.75rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-}
-</style>
-@endpush
+<link href="{{ asset('css/quiz-result.css') }}?v={{ filemtime(public_path('css/quiz-result.css')) }}" rel="stylesheet">
 
 @section('content')
 @php
@@ -285,22 +218,4 @@
 </div>
 @endsection
 
-@push('scripts')
-<script>
-function filterQuestions(type, btn) {
-    document.querySelectorAll('.filter-tab-btn').forEach(function(b) {
-        b.classList.remove('active');
-    });
-    btn.classList.add('active');
-
-    document.querySelectorAll('.q-item-card').forEach(function(card) {
-        var status = card.getAttribute('data-status');
-        if (type === 'all' || status === type) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-</script>
-@endpush
+<script src="{{ asset('js/quiz-result.js') }}?v={{ filemtime(public_path('js/quiz-result.js')) }}"></script>
