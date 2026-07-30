@@ -12,6 +12,186 @@
         }
     ],
     "paths": {
+        "/banners": {
+            "get": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "List all banners",
+                "operationId": "446d031f96eb2a686a4a201a9740edff",
+                "parameters": [
+                    {
+                        "name": "all",
+                        "in": "query",
+                        "description": "Set to true to get all banners without pagination",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by title or subtitle",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort column (e.g. title, created_at)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "order_type",
+                        "in": "query",
+                        "description": "Sort direction (asc or desc)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default 20)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of banners"
+                    }
+                },
+                "security": [
+                    {}
+                ]
+            }
+        },
+        "/admin/banners": {
+            "post": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Create banner",
+                "operationId": "f1bc120f905ff2faf9b629e78f3de9f7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "subtitle": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Banner created"
+                    }
+                }
+            }
+        },
+        "/banners/{banner}": {
+            "get": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Get banner by ID",
+                "operationId": "3a4061fcfda134e1bb34ab36e2d3ee59",
+                "parameters": [
+                    {
+                        "name": "banner",
+                        "in": "path",
+                        "description": "Banner ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Banner data"
+                    }
+                }
+            }
+        },
+        "/admin/banners/{banner}": {
+            "put": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Update banner",
+                "operationId": "1938cffdc6bca56d20097d2ebcbecd63",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "subtitle": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Banner updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Delete banner",
+                "operationId": "df9eb314074f6b984f0026da9c99476f",
+                "responses": {
+                    "200": {
+                        "description": "Banner deleted"
+                    }
+                }
+            }
+        },
         "/cities": {
             "get": {
                 "tags": [
@@ -172,6 +352,124 @@
                         "description": "City deleted"
                     }
                 }
+            }
+        },
+        "/exams/{exam}/start": {
+            "post": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Start an exam attempt (get questions)",
+                "operationId": "1f4aec0e704c47d2be250673d0595534",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam questions returned"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/exams/{exam}/submit": {
+            "post": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Submit exam answers and get result",
+                "operationId": "51dcbce4a33e79e8eb677bf5afa7d538",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "answers": {
+                                        "description": "Array of answers",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer"
+                                                },
+                                                "answer": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exam submitted with results"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/exams/{exam}/result": {
+            "get": {
+                "tags": [
+                    "Exams"
+                ],
+                "summary": "Get latest exam result",
+                "operationId": "d92e14d2cd35190984df5f19ff186199",
+                "parameters": [
+                    {
+                        "name": "exam",
+                        "in": "path",
+                        "description": "Exam ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exam result"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/grades": {
@@ -1747,190 +2045,14 @@
                 }
             }
         },
-        "/subjects": {
-            "get": {
-                "tags": [
-                    "Subjects"
-                ],
-                "summary": "List all subjects",
-                "operationId": "01864eab025655bc2bfda152550929b1",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "description": "Search by name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "grade_ids",
-                        "in": "query",
-                        "description": "Comma-separated grade IDs (e.g. ?grade_ids=5,6)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "created_at_min",
-                        "in": "query",
-                        "description": "Start date (Y-m-d)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "created_at_max",
-                        "in": "query",
-                        "description": "End date (Y-m-d)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of subjects"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Subjects"
-                ],
-                "summary": "Create subject",
-                "operationId": "b6d13bb7a2ece5093fbbcfea58e1cbb7",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Subject created"
-                    }
-                }
-            }
-        },
-        "/subjects/{subject}": {
-            "get": {
-                "tags": [
-                    "Subjects"
-                ],
-                "summary": "Get subject by ID",
-                "operationId": "c58a4fcdbc179cef4a64baa8cb604351",
-                "parameters": [
-                    {
-                        "name": "subject",
-                        "in": "path",
-                        "description": "Subject ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Subject data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Subjects"
-                ],
-                "summary": "Update subject",
-                "operationId": "c93e6aa705c238f5a82fd9214a7f4cf0",
-                "responses": {
-                    "200": {
-                        "description": "Subject updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Subjects"
-                ],
-                "summary": "Delete subject",
-                "operationId": "87f7116bf470db0b60a0823203ebb7d4",
-                "responses": {
-                    "200": {
-                        "description": "Subject deleted"
-                    }
-                }
-            }
-        },
-        "/subjects/{subject}/topics": {
+        "/topics": {
             "get": {
                 "tags": [
                     "Topics"
                 ],
-                "summary": "List topics in subject",
-                "operationId": "3b3cab9cad6edd54a2aaf60ef5cb9ee8",
+                "summary": "List topics",
+                "operationId": "cb8ec444f3141771272e731abf9f1159",
                 "parameters": [
-                    {
-                        "name": "subject",
-                        "in": "path",
-                        "description": "Subject ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
                     {
                         "name": "search",
                         "in": "query",
@@ -2013,13 +2135,13 @@
                 }
             }
         },
-        "/admin/subjects/{subject}/topics": {
+        "/admin/topics": {
             "post": {
                 "tags": [
                     "Topics"
                 ],
-                "summary": "Create topic in subject",
-                "operationId": "7bc24543723974645bfe4acdcb519685",
+                "summary": "Create topic",
+                "operationId": "613679df0ca4bda3552866fc4fd67f62",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2057,23 +2179,14 @@
                 }
             }
         },
-        "/subjects/{subject}/topics/{topic}": {
+        "/topics/{topic}": {
             "get": {
                 "tags": [
                     "Topics"
                 ],
-                "summary": "Get topic by ID within subject",
-                "operationId": "31521fc504d10d5f66bd7a970d9dd846",
+                "summary": "Get topic by ID",
+                "operationId": "bb023b10e17f81b90a0d8acee91a59ec",
                 "parameters": [
-                    {
-                        "name": "subject",
-                        "in": "path",
-                        "description": "Subject ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
                     {
                         "name": "topic",
                         "in": "path",
@@ -2091,13 +2204,13 @@
                 }
             }
         },
-        "/admin/subjects/{subject}/topics/{topic}": {
+        "/admin/topics/{topic}": {
             "put": {
                 "tags": [
                     "Topics"
                 ],
                 "summary": "Update topic",
-                "operationId": "064e0f2a2245b2d879232b4814b02565",
+                "operationId": "cfa9a71fe0b1cf86eb56aee81398da53",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2135,7 +2248,7 @@
                     "Topics"
                 ],
                 "summary": "Delete topic",
-                "operationId": "4443c36c87e752cdb7dd0b0582055539",
+                "operationId": "e849b2d1ddd4506313c127b3a35f9f2b",
                 "responses": {
                     "200": {
                         "description": "Topic deleted"
@@ -2598,8 +2711,16 @@
     ],
     "tags": [
         {
+            "name": "Banners",
+            "description": "Banners"
+        },
+        {
             "name": "Cities",
             "description": "Cities"
+        },
+        {
+            "name": "Exams",
+            "description": "Exams"
         },
         {
             "name": "Grades",
@@ -2636,10 +2757,6 @@
         {
             "name": "Students",
             "description": "Students"
-        },
-        {
-            "name": "Subjects",
-            "description": "Subjects"
         },
         {
             "name": "Topics",

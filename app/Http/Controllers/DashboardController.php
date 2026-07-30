@@ -11,9 +11,6 @@ use App\Modules\Lesson\Models\LessonReview;
 use App\Modules\Question\Models\Question;
 use App\Modules\Quiz\Models\Quiz;
 use App\Modules\Quiz\Models\StudentQuiz;
-use App\Modules\Star\Models\Star;
-use App\Modules\Star\Models\UserPoint;
-use App\Modules\Star\Models\UserStar;
 use App\Modules\Student\Models\Student;
 use App\Modules\Topic\Models\Topic;
 use App\Modules\User\Models\User;
@@ -42,9 +39,10 @@ class DashboardController extends Controller
         $totalReviews = LessonReview::count();
         $averageRating = round(LessonReview::avg('rating') ?? 0, 1);
 
-        // Gamification
-        $totalXp = UserPoint::join('xps', 'user_points.xp_id', '=', 'xps.id')
-            ->sum('xps.point');
+        // Gamification (via user_stars + stars tables)
+        $totalXp = DB::table('user_stars')
+            ->join('stars', 'user_stars.star_id', '=', 'stars.id')
+            ->sum('stars.point');
 
         // Growth
         $newUsersToday = User::whereDate('created_at', today())->count();

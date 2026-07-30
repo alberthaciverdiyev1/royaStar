@@ -136,7 +136,6 @@ class PageController extends Controller
     {
         return view('index', [
             'isIndex' => true,
-            'hideNavbar' => true,
         ]);
     }
 

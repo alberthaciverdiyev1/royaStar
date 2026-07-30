@@ -1,4 +1,4 @@
-@extends('layouts.app', ['hideNavbar' => true, 'isIndex' => true, 'noMainPadding' => true])
+@extends('layouts.app', ['isIndex' => true, 'noMainPadding' => true])
 @section('title', 'Teacher Roya\'s Stars — Learn English the Fun Way')
 
 @push('styles')

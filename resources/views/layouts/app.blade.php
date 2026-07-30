@@ -117,21 +117,12 @@
                     <span class="text-3xs md:text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))] opacity-70 group-hover:opacity-100 transition-opacity">{{ auth()->user()->name }}</span>
                 </a>
                 @else
-                @if ($isIndex ?? false)
                 <a href="{{ route('login') }}" class="text-[rgb(var(--on-surface))] opacity-50 hover:opacity-100 font-bold text-xs uppercase tracking-widest no-underline px-3 py-2 transition-all">
                     Log In
                 </a>
                 <a href="{{ route('signup') }}" class="bg-[rgb(var(--secondary))] text-white px-5 py-2 rounded-full font-bold text-xs shadow-lg shadow-[rgb(var(--secondary))/0.1] active:scale-95 transition-all uppercase tracking-widest no-underline inline-block">
                     Sign Up
                 </a>
-                @else
-                <a href="{{ route('profile') }}" class="flex flex-col items-center gap-0.5 group no-underline">
-                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[rgb(var(--primary-fixed))] flex items-center justify-center text-white font-bold text-2xs border-2 border-white shadow-sm group-hover:scale-105 transition-transform">
-                        {{ $initials ?? 'ST' }}
-                    </div>
-                    <span class="text-4xs font-black uppercase tracking-widest text-[rgb(var(--primary))] opacity-60">Profile</span>
-                </a>
-                @endif
                 @endauth
             </div>
         </div>
@@ -150,32 +141,32 @@
     <nav class="mobile-nav lg:hidden fixed bottom-0 left-0 w-full z-50 bg-[rgb(var(--surface-container-lowest))/0.95] backdrop-blur-xl rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] px-2 pb-5 pt-2 flex justify-around items-center border-t border-[rgb(var(--surface-container-high))]">
         <a href="{{ route('home') }}" class="no-underline">
             <div class="{{ $currentPath === '/' ? $mobileActive : $mobileInactive }}">
-                <span class="material-symbols-outlined !text-lg">home</span>
-                <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Home</span>
+                <span class="material-symbols-outlined !text-2xl">home</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Home</span>
             </div>
         </a>
         <a href="{{ route('topics') }}" class="no-underline">
             <div class="{{ $currentPath === 'topics' ? $mobileActive : $mobileInactive }}">
-                <span class="material-symbols-outlined !text-lg">rocket_launch</span>
-                <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Topics</span>
+                <span class="material-symbols-outlined !text-2xl">rocket_launch</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Topics</span>
             </div>
         </a>
         <a href="{{ route('exam') }}" class="no-underline">
             <div class="{{ $currentPath === 'exam' ? $mobileActive : $mobileInactive }}">
-                <span class="material-symbols-outlined !text-lg">quiz</span>
-                <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Exam</span>
+                <span class="material-symbols-outlined !text-2xl">quiz</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Exam</span>
             </div>
         </a>
         <a href="{{ route('achievements') }}" class="no-underline">
             <div class="{{ $currentPath === 'achievements' ? $mobileActive : $mobileInactive }}">
-                <span class="material-symbols-outlined !text-lg">military_tech</span>
-                <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Badges</span>
+                <span class="material-symbols-outlined !text-2xl">military_tech</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Badges</span>
             </div>
         </a>
         <a href="{{ route('profile') }}" class="no-underline">
             <div class="{{ $currentPath === 'profile' ? $mobileActive : $mobileInactive }}">
-                <span class="material-symbols-outlined !text-lg">person</span>
-                <span class="text-4xs font-bold uppercase tracking-widest mt-0.5">Profile</span>
+                <span class="material-symbols-outlined !text-2xl">person</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Profile</span>
             </div>
         </a>
     </nav>
