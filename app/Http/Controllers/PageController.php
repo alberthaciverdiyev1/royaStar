@@ -293,7 +293,21 @@ class PageController extends Controller
 
         abort_unless($student, 403, 'Only students can submit quizzes');
 
-        $result = DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user) {
+        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
+        $alreadyAwardedCompleted = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'quiz_completed')->pluck('id'))
+            ->where('reference_type', 'quiz')
+            ->where('reference_id', $quiz->id)
+            ->exists();
+        $alreadyAwardedPerfect = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'quiz_perfect')->pluck('id'))
+            ->where('reference_type', 'quiz')
+            ->where('reference_id', $quiz->id)
+            ->exists();
+
+        $result = DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user, $alreadyAwardedCompleted, $alreadyAwardedPerfect) {
             // Delete old attempts atomically with new insert
             StudentQuiz::where('student_id', $student->id)
                 ->where('quiz_id', $quiz->id)
@@ -371,9 +385,11 @@ class PageController extends Controller
 
             $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
 
-            // Award stars
-            $this->starService->awardQuizCompleted($user->id, $quiz->id);
-            if ($score === 100) {
+            // Award stars only on first completion
+            if (!$alreadyAwardedCompleted) {
+                $this->starService->awardQuizCompleted($user->id, $quiz->id);
+            }
+            if ($score === 100 && !$alreadyAwardedPerfect) {
                 $this->starService->awardQuizPerfect($user->id, $quiz->id);
             }
 
@@ -551,7 +567,21 @@ class PageController extends Controller
 
         abort_unless($student, 403, 'Only students can submit exams');
 
-        $result = DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user) {
+        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
+        $alreadyAwardedPassed = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'exam_passed')->pluck('id'))
+            ->where('reference_type', 'exam')
+            ->where('reference_id', $exam->id)
+            ->exists();
+        $alreadyAwardedExcellent = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'exam_excellent')->pluck('id'))
+            ->where('reference_type', 'exam')
+            ->where('reference_id', $exam->id)
+            ->exists();
+
+        $result = DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user, $alreadyAwardedPassed, $alreadyAwardedExcellent) {
             // Delete old attempts atomically with new insert
             StudentExam::where('student_id', $student->id)
                 ->where('exam_id', $exam->id)
@@ -629,12 +659,12 @@ class PageController extends Controller
 
             $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
 
-            // Award stars
+            // Award stars only on first completion
             $passingScore = $exam->passing_score ?? 60;
-            if ($score >= $passingScore) {
+            if ($score >= $passingScore && !$alreadyAwardedPassed) {
                 $this->starService->awardExamPassed($user->id, $exam->id);
             }
-            if ($score >= 90) {
+            if ($score >= 90 && !$alreadyAwardedExcellent) {
                 $this->starService->awardExamExcellent($user->id, $exam->id);
             }
 

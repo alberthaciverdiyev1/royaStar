@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\Exam\Models\Exam;
 use App\Modules\Exam\Models\StudentExam;
 use App\Modules\Exam\Requests\SubmitExamRequest;
+use App\Modules\Star\Models\Star;
+use App\Modules\Star\Models\UserStar;
 use App\Modules\Star\Services\StarService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -83,8 +85,23 @@ class StudentExamController extends Controller
         $questions = $exam->questions->keyBy('id');
         $answers = $request->input('answers', []);
         $locale = app()->getLocale();
+        $user = auth()->user();
 
-        return DB::transaction(function () use ($student, $exam, $questions, $answers, $locale) {
+        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
+        $alreadyAwardedPassed = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'exam_passed')->pluck('id'))
+            ->where('reference_type', 'exam')
+            ->where('reference_id', $exam->id)
+            ->exists();
+        $alreadyAwardedExcellent = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'exam_excellent')->pluck('id'))
+            ->where('reference_type', 'exam')
+            ->where('reference_id', $exam->id)
+            ->exists();
+
+        return DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user, $alreadyAwardedPassed, $alreadyAwardedExcellent) {
             // Delete old attempts atomically with new insert
             StudentExam::where('student_id', $student->id)
                 ->where('exam_id', $exam->id)
@@ -160,14 +177,12 @@ class StudentExamController extends Controller
 
             $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
 
-            $user = auth()->user();
-            if ($user) {
-                if ($score >= $exam->passing_score) {
-                    $this->starService->awardExamPassed($user->id, $exam->id);
-                }
-                if ($score >= 90) {
-                    $this->starService->awardExamExcellent($user->id, $exam->id);
-                }
+            // Award stars only on first completion
+            if ($score >= $exam->passing_score && !$alreadyAwardedPassed) {
+                $this->starService->awardExamPassed($user->id, $exam->id);
+            }
+            if ($score >= 90 && !$alreadyAwardedExcellent) {
+                $this->starService->awardExamExcellent($user->id, $exam->id);
             }
 
             return apiResponse(data: [

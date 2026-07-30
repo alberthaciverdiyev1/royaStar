@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\Quiz\Models\Quiz;
 use App\Modules\Quiz\Models\StudentQuiz;
 use App\Modules\Quiz\Requests\SubmitQuizRequest;
+use App\Modules\Star\Models\Star;
+use App\Modules\Star\Models\UserStar;
 use App\Modules\Star\Services\StarService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -78,8 +80,23 @@ class StudentQuizController extends Controller
         $questions = $quiz->questions->keyBy('id');
         $answers = $request->input('answers', []);
         $locale = app()->getLocale();
+        $user = auth()->user();
 
-        return DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale) {
+        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
+        $alreadyAwardedCompleted = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'quiz_completed')->pluck('id'))
+            ->where('reference_type', 'quiz')
+            ->where('reference_id', $quiz->id)
+            ->exists();
+        $alreadyAwardedPerfect = UserStar::withTrashed()
+            ->where('user_id', $user->id)
+            ->whereIn('star_id', Star::where('type', 'quiz_perfect')->pluck('id'))
+            ->where('reference_type', 'quiz')
+            ->where('reference_id', $quiz->id)
+            ->exists();
+
+        return DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user, $alreadyAwardedCompleted, $alreadyAwardedPerfect) {
             // Delete old attempts atomically with new insert
             StudentQuiz::where('student_id', $student->id)
                 ->where('quiz_id', $quiz->id)
@@ -155,12 +172,12 @@ class StudentQuizController extends Controller
 
             $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
 
-            $user = auth()->user();
-            if ($user) {
+            // Award stars only on first completion
+            if (!$alreadyAwardedCompleted) {
                 $this->starService->awardQuizCompleted($user->id, $quiz->id);
-                if ($score === 100) {
-                    $this->starService->awardQuizPerfect($user->id, $quiz->id);
-                }
+            }
+            if ($score === 100 && !$alreadyAwardedPerfect) {
+                $this->starService->awardQuizPerfect($user->id, $quiz->id);
             }
 
             return apiResponse(data: [
