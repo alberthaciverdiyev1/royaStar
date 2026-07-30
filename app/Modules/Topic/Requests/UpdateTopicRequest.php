@@ -14,7 +14,6 @@ class UpdateTopicRequest extends FormRequest
         $levels = implode(',', array_map(fn($case) => $case->value, DifficultyLevel::cases()));
 
         return [
-            'subject_id' => 'sometimes|exists:subjects,id',
             'name' => 'sometimes|string|max:255',
             'difficulty_level' => "sometimes|integer|in:{$levels}",
             'grade_ids' => 'nullable|array',

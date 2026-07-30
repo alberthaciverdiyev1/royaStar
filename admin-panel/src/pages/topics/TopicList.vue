@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { subjectsApi, type Subject } from '../../api/subjects'
 import { topicsApi, type Topic } from '../../api/topics'
 import { gradesApi, type Grade } from '../../api/grades'
 import Table from '../../components/Table.vue'
@@ -14,8 +13,6 @@ import { showToast } from '../../stores/toast'
 import type { PaginationMeta } from '../../api/types'
 import { h } from 'vue'
 
-const subjects = ref<Subject[]>([])
-const selectedSubjectId = ref<number | null>(null)
 const topics = ref<Topic[]>([])
 const grades = ref<Grade[]>([])
 const meta = ref<PaginationMeta | null>(null)
@@ -44,28 +41,20 @@ const DIFFICULTY_OPTIONS = [
   { value: 5, label: 'Ekspert' },
 ]
 
-// Load subjects and grades on mount
+// Load grades on mount
 onMounted(async () => {
   try {
-    const [subRes, gradeRes] = await Promise.all([
-      subjectsApi.list({ per_page: 100 }),
-      gradesApi.all(),
-    ])
-    subjects.value = subRes.data
+    const gradeRes = await gradesApi.all()
     grades.value = gradeRes.data
-    if (subRes.data.length > 0) {
-      selectedSubjectId.value = subRes.data[0].id
-    }
   } catch {
     showToast({ type: 'error', text: 'Məlumatlar yüklənərkən xəta baş verdi' })
   }
 })
 
 async function fetchTopics() {
-  if (!selectedSubjectId.value) return
   loading.value = true
   try {
-    const res = await topicsApi.list(selectedSubjectId.value, {
+    const res = await topicsApi.list({
       search: search.value || undefined,
       page: page.value,
       per_page: 15,
@@ -79,9 +68,11 @@ async function fetchTopics() {
   }
 }
 
-watch(selectedSubjectId, () => { page.value = 1 })
 watch(search, () => { page.value = 1 })
-watch([page, search, selectedSubjectId], fetchTopics)
+watch([page, search], fetchTopics)
+
+// Initial fetch
+fetchTopics()
 
 function openCreate() {
   editingTopic.value = null
@@ -115,7 +106,6 @@ async function handleSave() {
     formError.value = 'Ad tələb olunur'
     return
   }
-  if (!selectedSubjectId.value) return
 
   saving.value = true
   formError.value = ''
@@ -127,10 +117,10 @@ async function handleSave() {
     }
 
     if (editingTopic.value) {
-      await topicsApi.update(selectedSubjectId.value, editingTopic.value.id, payload)
+      await topicsApi.update(editingTopic.value.id, payload)
       showToast({ type: 'success', text: 'Mövzu yeniləndi' })
     } else {
-      await topicsApi.create(selectedSubjectId.value, payload)
+      await topicsApi.create(payload)
       showToast({ type: 'success', text: 'Mövzu yaradıldı' })
     }
     modalOpen.value = false
@@ -143,10 +133,10 @@ async function handleSave() {
 }
 
 async function handleDelete() {
-  if (!deleteTarget.value || !selectedSubjectId.value) return
+  if (!deleteTarget.value) return
   deleting.value = true
   try {
-    await topicsApi.delete(selectedSubjectId.value, deleteTarget.value.id)
+    await topicsApi.delete(deleteTarget.value.id)
     showToast({ type: 'success', text: 'Mövzu silindi' })
     deleteTarget.value = null
     fetchTopics()
@@ -200,7 +190,6 @@ const columns: Column[] = [
       <p class="mt-1 text-sm text-gray-500">Fənlər üzrə mövzuları idarə edin</p>
     </div>
     <button
-      v-if="selectedSubjectId"
       @click="openCreate"
       class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
     >
@@ -211,34 +200,20 @@ const columns: Column[] = [
     </button>
   </div>
 
-  <!-- Subject selector -->
-  <div class="mb-5">
-    <label class="block text-sm font-medium text-gray-700 mb-1.5">Fən seçin</label>
-    <select
-      v-model="selectedSubjectId"
-      class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
-    >
-      <option :value="null">Fən seçin...</option>
-      <option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-    </select>
+  <div class="mb-5 max-w-xs">
+    <SearchInput v-model="search" placeholder="Mövzu axtar..." />
   </div>
 
-  <template v-if="selectedSubjectId">
-    <div class="mb-5 max-w-xs">
-      <SearchInput v-model="search" placeholder="Mövzu axtar..." />
-    </div>
+  <Table
+    :columns="columns"
+    :data="topics"
+    :loading="loading"
+    empty-message="Heç bir mövzu əlavə edilməyib"
+    :on-edit="openEdit"
+    :on-delete="(t: any) => deleteTarget = t"
+  />
 
-    <Table
-      :columns="columns"
-      :data="topics"
-      :loading="loading"
-      empty-message="Bu fəndə heç bir mövzu əlavə edilməyib"
-      :on-edit="openEdit"
-      :on-delete="(t: any) => deleteTarget = t"
-    />
-
-    <Pagination v-if="meta" :meta="meta" @page-change="(p: number) => page = p" />
-  </template>
+  <Pagination v-if="meta" :meta="meta" @page-change="(p: number) => page = p" />
 
   <!-- Create/Edit Modal -->
   <Modal

@@ -1,7 +1,6 @@
 <?php
 
 use App\Modules\Question\Models\Question;
-use App\Modules\Subject\Models\Subject;
 use App\Modules\Topic\Enums\DifficultyLevel;
 use App\Modules\Topic\Models\Topic;
 use App\Modules\Lesson\Models\Lesson;
@@ -13,9 +12,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Role::create(['name' => 'admin', 'guard_name' => 'api']);
-    $this->subject = Subject::create(['name' => 'Math']);
     $this->topic = Topic::create([
-        'subject_id' => $this->subject->id,
         'name' => 'Algebra',
         'difficulty_level' => DifficultyLevel::Beginner->value,
     ]);
@@ -109,7 +106,6 @@ it('returns empty list when no questions exist', function () {
 
 it('filters questions by lesson_id', function () {
     $topic2 = Topic::create([
-        'subject_id' => $this->subject->id,
         'name' => 'Geometry',
         'difficulty_level' => DifficultyLevel::Beginner->value,
     ]);

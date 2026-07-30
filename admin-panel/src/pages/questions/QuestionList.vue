@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
-import { subjectsApi, type Subject } from '../../api/subjects'
 import { topicsApi, type Topic } from '../../api/topics'
 import { lessonsApi, type Lesson } from '../../api/lessons'
 import {
@@ -21,8 +20,6 @@ import { showToast } from '../../stores/toast'
 import type { PaginationMeta } from '../../api/types'
 import { h } from 'vue'
 
-const subjects = ref<Subject[]>([])
-const selectedSubjectId = ref<number | null>(null)
 const topics = ref<Topic[]>([])
 const selectedTopicId = ref<number | null>(null)
 const lessons = ref<Lesson[]>([])
@@ -151,24 +148,7 @@ function onVariantTypeChange(type: ContentBlock['type']) {
 
 onMounted(async () => {
   try {
-    const res = await subjectsApi.list({ per_page: 100 })
-    subjects.value = res.data
-    if (subjects.value.length > 0) {
-      selectedSubjectId.value = subjects.value[0].id
-    }
-  } catch {
-    showToast({ type: 'error', text: 'Fənlər yüklənərkən xəta baş verdi' })
-  }
-})
-
-watch(selectedSubjectId, async () => {
-  selectedTopicId.value = null
-  topics.value = []
-  selectedLessonId.value = null
-  lessons.value = []
-  if (!selectedSubjectId.value) return
-  try {
-    const res = await topicsApi.list(selectedSubjectId.value, { per_page: 100 })
+    const res = await topicsApi.list({ per_page: 100 })
     topics.value = res.data
     if (topics.value.length > 0) {
       selectedTopicId.value = topics.value[0].id
@@ -444,24 +424,13 @@ const availableVariants = computed(() => {
     </button>
   </div>
 
-  <!-- Subject + Topic + Lesson selectors -->
+  <!-- Topic + Lesson selectors -->
   <div class="mb-5 flex flex-wrap items-end gap-3">
-    <div class="w-full max-w-xs">
-      <label class="block text-sm font-medium text-gray-700 mb-1.5">Fən seçin</label>
-      <select
-        v-model="selectedSubjectId"
-        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
-      >
-        <option :value="null">Fən seçin...</option>
-        <option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-      </select>
-    </div>
     <div class="w-full max-w-xs">
       <label class="block text-sm font-medium text-gray-700 mb-1.5">Mövzu seçin</label>
       <select
         v-model="selectedTopicId"
-        :disabled="!selectedSubjectId"
-        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
       >
         <option :value="null">Mövzu seçin...</option>
         <option v-for="t in topics" :key="t.id" :value="t.id">{{ t.name }}</option>

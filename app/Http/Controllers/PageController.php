@@ -143,9 +143,7 @@ class PageController extends Controller
     public function topics()
     {
         $search = request('search');
-        $topics = Topic::with('subject')
-            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
-                ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$search}%")))
+        $topics = Topic::when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
             ->paginate(20)
             ->withQueryString();
 
@@ -154,8 +152,6 @@ class PageController extends Controller
 
     public function topicDetail(Topic $topic)
     {
-        $topic->load('subject');
-
         $search = request('search');
         $lessons = $topic->lessons()
             ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
@@ -198,13 +194,28 @@ class PageController extends Controller
 
         $user = Auth::user();
 
-        LessonReview::updateOrCreate(
-            ['user_id' => $user->id, 'lesson_id' => $id],
-            ['rating' => $request->rating, 'review' => $request->review],
-        );
+        $exists = LessonReview::where('user_id', $user->id)
+            ->where('lesson_id', $id)
+            ->exists();
 
-        return redirect()->route('lesson', $id)
-            ->with('success', 'Thank you for your feedback!');
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Siz artıq bu dərsə rəy vermisiniz.',
+            ], 409);
+        }
+
+        LessonReview::create([
+            'user_id' => $user->id,
+            'lesson_id' => $id,
+            'rating' => $request->rating,
+            'review' => $request->review,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thank you for your feedback!',
+        ]);
     }
 
     // ═══════════════════════════════════════════

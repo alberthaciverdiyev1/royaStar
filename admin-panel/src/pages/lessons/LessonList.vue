@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { subjectsApi, type Subject } from '../../api/subjects'
 import { topicsApi, type Topic } from '../../api/topics'
 import { lessonsApi, type Lesson, type Video } from '../../api/lessons'
 import Table from '../../components/Table.vue'
@@ -14,8 +13,6 @@ import { showToast } from '../../stores/toast'
 import type { PaginationMeta } from '../../api/types'
 import { h } from 'vue'
 
-const subjects = ref<Subject[]>([])
-const selectedSubjectId = ref<number | null>(null)
 const topics = ref<Topic[]>([])
 const selectedTopicId = ref<number | null>(null)
 const lessons = ref<Lesson[]>([])
@@ -39,13 +36,13 @@ const deleting = ref(false)
 
 onMounted(async () => {
   try {
-    const res = await subjectsApi.list({ per_page: 100 })
-    subjects.value = res.data
-    if (subjects.value.length > 0) {
-      selectedSubjectId.value = subjects.value[0].id
+    const res = await topicsApi.list({ per_page: 100 })
+    topics.value = res.data
+    if (topics.value.length > 0) {
+      selectedTopicId.value = topics.value[0].id
     }
   } catch {
-    showToast({ type: 'error', text: 'Fənlər yüklənərkən xəta baş verdi' })
+    showToast({ type: 'error', text: 'Mövzular yüklənərkən xəta baş verdi' })
   }
 })
 
@@ -72,20 +69,6 @@ async function fetchLessons() {
   }
 }
 
-watch(selectedSubjectId, async () => {
-  selectedTopicId.value = null
-  topics.value = []
-  if (!selectedSubjectId.value) return
-  try {
-    const res = await topicsApi.list(selectedSubjectId.value, { per_page: 100 })
-    topics.value = res.data
-    if (topics.value.length > 0) {
-      selectedTopicId.value = topics.value[0].id
-    }
-  } catch {
-    showToast({ type: 'error', text: 'Mövzular yüklənərkən xəta baş verdi' })
-  }
-})
 watch(selectedTopicId, () => { page.value = 1 })
 watch(search, () => { page.value = 1 })
 watch([page, search, selectedTopicId], fetchLessons)
@@ -227,29 +210,16 @@ const columns: Column[] = [
     </button>
   </div>
 
-  <!-- Subject + Topic selectors -->
-  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end">
-    <div class="w-full max-w-xs">
-      <label class="block text-sm font-medium text-gray-700 mb-1.5">Fən seçin</label>
-      <select
-        v-model="selectedSubjectId"
-        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
-      >
-        <option :value="null">Fən seçin...</option>
-        <option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-      </select>
-    </div>
-    <div class="w-full max-w-xs">
-      <label class="block text-sm font-medium text-gray-700 mb-1.5">Mövzu seçin</label>
-      <select
-        v-model="selectedTopicId"
-        :disabled="!selectedSubjectId"
-        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <option :value="null">Mövzu seçin...</option>
-        <option v-for="t in topics" :key="t.id" :value="t.id">{{ t.name }}</option>
-      </select>
-    </div>
+  <!-- Topic selector -->
+  <div class="mb-5 max-w-xs">
+    <label class="block text-sm font-medium text-gray-700 mb-1.5">Mövzu seçin</label>
+    <select
+      v-model="selectedTopicId"
+      class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
+    >
+      <option :value="null">Mövzu seçin...</option>
+      <option v-for="t in topics" :key="t.id" :value="t.id">{{ t.name }}</option>
+    </select>
   </div>
 
   <template v-if="selectedTopicId">

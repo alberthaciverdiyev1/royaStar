@@ -83,7 +83,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <form method="GET" action="{{ route('topics') }}" class="search-input-wrapper w-full sm:max-w-md">
                     <span class="material-symbols-outlined !text-xl text-[rgb(var(--primary))] opacity-70">search</span>
-                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search topics or subjects..." class="bg-transparent border-none text-xs sm:text-sm font-bold text-[rgb(var(--on-surface))] placeholder-[rgb(var(--on-surface))/0.4] focus:outline-none w-full" data-auto-search />
+                    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Search topics..." class="bg-transparent border-none text-xs sm:text-sm font-bold text-[rgb(var(--on-surface))] placeholder-[rgb(var(--on-surface))/0.4] focus:outline-none w-full" data-auto-search />
                     @if($search)
                     <a href="{{ route('topics') }}" class="material-symbols-outlined !text-lg text-[rgb(var(--on-surface))/0.5] hover:text-[rgb(var(--on-surface))] no-underline">close</a>
                     @endif
@@ -101,7 +101,7 @@
                     href="{{ route('topics.detail', $topic) }}"
                     badgeText="Topic {{ str_pad($topics->firstItem() + $i, 2, '0', STR_PAD_LEFT) }}"
                     title="{{ $topic->name }}"
-                    description="{{ $topic->subject?->name ?? 'Grammar Module' }}"
+                    description="Grammar Module"
                     progress="0"
                     iconName="{{ ['star', 'bolt', 'rocket_launch', 'auto_awesome', 'psychology', 'menu_book'][$i % 6] }}"
                 />

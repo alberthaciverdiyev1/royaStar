@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Lesson\Controllers\LessonController;
+use App\Modules\Lesson\Controllers\LessonReviewController;
 use App\Modules\Lesson\Controllers\VideoController;
 
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,10 @@ Route::controller(LessonController::class)->group(function () {
         Route::put('topics/{topic}/lessons/{lesson}', 'update');
         Route::delete('topics/{topic}/lessons/{lesson}', 'delete');
     });
+});
+
+Route::prefix('admin')->middleware('admin')->controller(LessonReviewController::class)->group(function () {
+    Route::get('lesson-reviews', 'index');
 });
 
 Route::controller(VideoController::class)->group(function () {

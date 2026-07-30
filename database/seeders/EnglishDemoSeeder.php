@@ -6,7 +6,6 @@ use App\Modules\Lesson\Models\Lesson;
 use App\Modules\Lesson\Models\Video;
 use App\Modules\Question\Models\Question;
 use App\Modules\Quiz\Models\Quiz;
-use App\Modules\Subject\Models\Subject;
 use App\Modules\Topic\Enums\DifficultyLevel;
 use App\Modules\Topic\Models\Topic;
 use App\Modules\Grade\Models\Grade;
@@ -16,8 +15,6 @@ class EnglishDemoSeeder extends Seeder
 {
     public function run(): void
     {
-        $subject = Subject::create(['name' => 'İngilis dili']);
-
         $topicData = [
             ['name' => 'Qrammatika', 'difficulty_level' => DifficultyLevel::Elementary, 'grades' => [2, 3, 4, 5]],
             ['name' => 'Lüğət ehtiyatı', 'difficulty_level' => DifficultyLevel::Beginner, 'grades' => [1, 2, 3, 4]],
@@ -33,7 +30,7 @@ class EnglishDemoSeeder extends Seeder
             $gradeNums = $td['grades'] ?? [];
             unset($td['grades']);
 
-            $topic = Topic::create(array_merge($td, ['subject_id' => $subject->id]));
+            $topic = Topic::create($td);
 
             if (!empty($gradeNums)) {
                 $gradeIds = $allGrades->filter(fn($g) => in_array((int) preg_replace('/\D/', '', $g->name), $gradeNums))->pluck('id');

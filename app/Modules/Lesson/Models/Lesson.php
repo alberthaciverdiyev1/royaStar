@@ -23,4 +23,5 @@ class Lesson extends Model
     public function questions() { return $this->hasMany(Question::class); }
     public function studentLessons() { return $this->hasMany(StudentLesson::class); }
     public function view() { return $this->hasOne(LessonView::class); }
+    public function reviews() { return $this->hasMany(LessonReview::class); }
 }

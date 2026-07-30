@@ -106,7 +106,7 @@
             <div class="flex items-center gap-2 text-3xs font-black uppercase tracking-widest text-white/80">
                 <a href="{{ route('topics') }}" class="text-white hover:underline no-underline">Topics</a>
                 <span>/</span>
-                <span class="text-amber-300 font-extrabold">{{ $topic->subject?->name ?? 'Subject' }}</span>
+                <span class="font-extrabold text-amber-300">English</span>
             </div>
 
             <!-- Title & Details -->
@@ -232,7 +232,7 @@
                     </div>
                     <div>
                         <h4 class="font-black text-sm uppercase tracking-wide text-[rgb(var(--on-surface))]">Topic Overview</h4>
-                        <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">{{ $topic->subject?->name ?? 'Grammar Module' }}</p>
+                        <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">English</p>
                     </div>
                 </div>
 

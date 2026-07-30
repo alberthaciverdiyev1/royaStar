@@ -3,7 +3,6 @@
 namespace App\Modules\Topic\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\Subject\Models\Subject;
 use App\Modules\Topic\Actions\DeleteTopicAction;
 use App\Modules\Topic\Actions\ListTopicsAction;
 use App\Modules\Topic\Actions\ShowTopicAction;
@@ -27,9 +26,8 @@ class TopicController extends Controller
         private readonly DeleteTopicAction $deleteTopicAction,
     ) {}
 
-    #[OA\Get(path: '/subjects/{subject}/topics', summary: 'List topics in subject', tags: ['Topics'],
+    #[OA\Get(path: '/topics', summary: 'List topics', tags: ['Topics'],
         parameters: [
-            new OA\PathParameter(name: 'subject', description: 'Subject ID', schema: new OA\Schema(type: 'integer')),
             new OA\QueryParameter(name: 'search', description: 'Search by name', schema: new OA\Schema(type: 'string')),
             new OA\QueryParameter(name: 'difficulty_level', description: 'Filter by difficulty level (1-5)', schema: new OA\Schema(type: 'integer')),
             new OA\QueryParameter(name: 'grade_ids', description: 'Comma-separated grade IDs (e.g. ?grade_ids=5,6)', schema: new OA\Schema(type: 'string')),
@@ -42,17 +40,14 @@ class TopicController extends Controller
         ],
         responses: [new OA\Response(response: 200, description: 'List of topics')]),
     ]
-    public function index(Subject $subject, Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $paginator = $this->listTopicsAction->execute(array_merge(
-            $request->all(),
-            ['subject_id' => $subject->id]
-        ));
+        $paginator = $this->listTopicsAction->execute($request->all());
 
         return apiPaginated($paginator, transform: fn($topic) => new TopicResource($topic));
     }
 
-    #[OA\Post(path: '/admin/subjects/{subject}/topics', summary: 'Create topic in subject',
+    #[OA\Post(path: '/admin/topics', summary: 'Create topic',
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(required: ['name', 'difficulty_level'], properties: [
             new OA\Property(property: 'name', type: 'string'),
             new OA\Property(property: 'difficulty_level', type: 'integer', description: '1=Beginner, 2=Elementary, 3=Intermediate, 4=Advanced, 5=Expert'),
@@ -61,32 +56,27 @@ class TopicController extends Controller
         tags: ['Topics'],
         responses: [new OA\Response(response: 201, description: 'Topic created')]),
     ]
-    public function store(Subject $subject, StoreTopicRequest $request): JsonResponse
+    public function store(StoreTopicRequest $request): JsonResponse
     {
         return apiResponse(
             data: new TopicResource(
-                $this->storeTopicAction->execute(
-                    array_merge($request->validated(), ['subject_id' => $subject->id])
-                )),
+                $this->storeTopicAction->execute($request->validated())),
             statusCode: 201
         );
     }
 
-    #[OA\Get(path: '/subjects/{subject}/topics/{topic}', summary: 'Get topic by ID within subject', tags: ['Topics'],
+    #[OA\Get(path: '/topics/{topic}', summary: 'Get topic by ID', tags: ['Topics'],
         parameters: [
-            new OA\PathParameter(name: 'subject', description: 'Subject ID', schema: new OA\Schema(type: 'integer')),
             new OA\PathParameter(name: 'topic', description: 'Topic ID', schema: new OA\Schema(type: 'integer')),
         ],
         responses: [new OA\Response(response: 200, description: 'Topic data')]),
     ]
-    public function show(Subject $subject, Topic $topic): JsonResponse
+    public function show(Topic $topic): JsonResponse
     {
-        abort_if($topic->subject_id !== $subject->id, 404, 'Topic not found in this subject');
-
         return apiResponse(data: new TopicResource($this->showTopicAction->execute($topic->id)));
     }
 
-    #[OA\Put(path: '/admin/subjects/{subject}/topics/{topic}', summary: 'Update topic',
+    #[OA\Put(path: '/admin/topics/{topic}', summary: 'Update topic',
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
             new OA\Property(property: 'name', type: 'string'),
             new OA\Property(property: 'difficulty_level', type: 'integer', description: '1=Beginner, 2=Elementary, 3=Intermediate, 4=Advanced, 5=Expert'),
@@ -95,20 +85,17 @@ class TopicController extends Controller
         tags: ['Topics'],
         responses: [new OA\Response(response: 200, description: 'Topic updated')]),
     ]
-    public function update(Subject $subject, int $topic, UpdateTopicRequest $request): JsonResponse
+    public function update(Topic $topic, UpdateTopicRequest $request): JsonResponse
     {
-        $model = Topic::where('id', $topic)->where('subject_id', $subject->id)->firstOrFail();
-
-        return apiResponse(data: new TopicResource($this->updateTopicAction->execute($model->id, $request->validated())), message: 'crud.updated');
+        return apiResponse(data: new TopicResource($this->updateTopicAction->execute($topic->id, $request->validated())), message: 'crud.updated');
     }
 
-    #[OA\Delete(path: '/admin/subjects/{subject}/topics/{topic}', summary: 'Delete topic', tags: ['Topics'],
+    #[OA\Delete(path: '/admin/topics/{topic}', summary: 'Delete topic', tags: ['Topics'],
         responses: [new OA\Response(response: 200, description: 'Topic deleted')]),
     ]
-    public function delete(Subject $subject, int $topic): JsonResponse
+    public function delete(Topic $topic): JsonResponse
     {
-        $model = Topic::where('id', $topic)->where('subject_id', $subject->id)->firstOrFail();
-        $this->deleteTopicAction->execute($model->id);
+        $this->deleteTopicAction->execute($topic->id);
 
         return apiResponse();
     }

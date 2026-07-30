@@ -14,6 +14,6 @@ class ShowTopicAction extends BaseShowAction
 
     protected function defaultWith(): array
     {
-        return ['subject', 'lessons', 'grades'];
+        return ['lessons', 'grades'];
     }
 }

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
             $table->json('name')->comment('Topic name');
             $table->integer('difficulty_level')->comment('Topic difficulty');
             $table->timestamps();

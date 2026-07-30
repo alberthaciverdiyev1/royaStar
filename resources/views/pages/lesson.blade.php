@@ -214,9 +214,27 @@
                     </h3>
                 </div>
 
-                <form method="POST" action="{{ route('lesson.rate', $lesson->id) }}" class="sidebar-widget-card space-y-6">
+                @if($existingReview)
+                <!-- Already rated — read-only display -->
+                <div class="sidebar-widget-card space-y-4 text-center">
+                    <span class="material-symbols-outlined !text-4xl text-emerald-500" style="font-variation-settings:'FILL' 1">check_circle</span>
+                    <p class="text-sm font-bold text-[rgb(var(--on-surface))/0.7]">Siz artıq bu dərsə rəy vermisiniz</p>
+                    <div class="flex justify-center items-center gap-2">
+                        @for($i = 1; $i <= 5; $i++)
+                        <span class="lesson-star-btn active" style="cursor: default; color: {{ ($existingReview->rating ?? 0) >= $i ? 'rgb(var(--tertiary))' : 'rgba(var(--on-surface), 0.15)' }}">
+                            <span class="material-symbols-outlined !text-4xl sm:!text-5xl" style="{{ ($existingReview->rating ?? 0) >= $i ? 'font-variation-settings:\'FILL\' 1;' : '' }}">star</span>
+                        </span>
+                        @endfor
+                    </div>
+                    @if($existingReview->review)
+                    <p class="text-sm italic text-[rgb(var(--on-surface))/0.6] max-w-md mx-auto">"{{ $existingReview->review }}"</p>
+                    @endif
+                </div>
+                @else
+                <!-- Rating form — JS submit -->
+                <form id="rateForm" class="sidebar-widget-card space-y-6">
                     @csrf
-                    <input name="rating" type="hidden" id="ratingInput" value="{{ $existingReview?->rating ?? '' }}" />
+                    <input name="rating" type="hidden" id="ratingInput" value="" />
 
                     <div class="text-center space-y-2">
                         <p class="text-xs font-bold text-[rgb(var(--on-surface))/0.6] uppercase tracking-widest">
@@ -224,8 +242,8 @@
                         </p>
                         <div class="flex justify-center items-center gap-2">
                             @for($i = 1; $i <= 5; $i++)
-                            <button type="button" class="lesson-star-btn {{ ($existingReview?->rating ?? 0) >= $i ? 'active' : '' }}" data-index="{{ $i }}">
-                                <span class="material-symbols-outlined !text-4xl sm:!text-5xl" style="{{ ($existingReview?->rating ?? 0) >= $i ? 'font-variation-settings:\'FILL\' 1;' : '' }}">star</span>
+                            <button type="button" class="lesson-star-btn" data-index="{{ $i }}">
+                                <span class="material-symbols-outlined !text-4xl sm:!text-5xl">star</span>
                             </button>
                             @endfor
                         </div>
@@ -233,14 +251,25 @@
 
                     <div class="space-y-2">
                         <label class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">Your Feedback (Optional)</label>
-                        <textarea name="review" rows="3" class="w-full bg-[rgb(var(--surface-container-high))] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))] text-[rgb(var(--on-surface))] text-xs sm:text-sm font-semibold rounded-2xl p-4 focus:outline-none transition-all placeholder-[rgb(var(--on-surface))/0.4]" placeholder="Share your thoughts about this lesson...">{{ $existingReview?->review ?? '' }}</textarea>
+                        <textarea name="review" id="reviewInput" rows="3" class="w-full bg-[rgb(var(--surface-container-high))] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))] text-[rgb(var(--on-surface))] text-xs sm:text-sm font-semibold rounded-2xl p-4 focus:outline-none transition-all placeholder-[rgb(var(--on-surface))/0.4]" placeholder="Share your thoughts about this lesson..."></textarea>
                     </div>
 
-                    <button type="submit" class="w-full py-3.5 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs sm:text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-[rgb(var(--primary))/0.2]">
+                    <button id="rateSubmitBtn" type="submit" class="w-full py-3.5 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs sm:text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-[rgb(var(--primary))/0.2]">
                         <span>Submit Feedback</span>
                         <span class="material-symbols-outlined !text-lg">rocket_launch</span>
                     </button>
                 </form>
+                @endif
+
+                <!-- Rocket animation container -->
+                <div id="rocketContainer" aria-hidden="true" class="fixed inset-0 pointer-events-none z-[999]" style="display: none;">
+                    <div id="rocket" class="absolute" style="filter: drop-shadow(0 0 60px rgba(220,38,38,0.8));">🚀</div>
+                    <div id="spark1" class="absolute w-3 h-3 rounded-full bg-amber-400"></div>
+                    <div id="spark2" class="absolute w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                    <div id="spark3" class="absolute w-3.5 h-3.5 rounded-full bg-amber-300"></div>
+                    <div id="spark4" class="absolute w-2 h-2 rounded-full bg-red-400"></div>
+                    <div id="spark5" class="absolute w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                </div>
             </section>
 
         </main>
@@ -320,47 +349,215 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Rating star handler
+    // ── Rating star handler ──
     var stars = document.querySelectorAll('.lesson-star-btn');
     var input = document.getElementById('ratingInput');
+    if (stars.length && input) {
+        function resetStars(selected) {
+            stars.forEach(function(s, i) {
+                var icon = s.querySelector('.material-symbols-outlined');
+                if (i < selected) {
+                    icon.style.fontVariationSettings = "'FILL' 1";
+                    s.classList.add('active');
+                } else {
+                    icon.style.fontVariationSettings = "'FILL' 0";
+                    s.classList.remove('active');
+                }
+            });
+        }
 
-    function resetStars(selected) {
-        stars.forEach(function(s, i) {
-            var icon = s.querySelector('.material-symbols-outlined');
-            if (i < selected) {
-                icon.style.fontVariationSettings = "'FILL' 1";
-                s.classList.add('active');
-            } else {
-                icon.style.fontVariationSettings = "'FILL' 0";
-                s.classList.remove('active');
-            }
+        stars.forEach(function(star, idx) {
+            star.addEventListener('click', function() {
+                var val = idx + 1;
+                input.value = val;
+                resetStars(val);
+            });
+            star.addEventListener('mouseenter', function() {
+                stars.forEach(function(s, i) {
+                    var icon = s.querySelector('.material-symbols-outlined');
+                    icon.style.fontVariationSettings = i <= idx ? "'FILL' 1" : "'FILL' 0";
+                });
+            });
+            star.addEventListener('mouseleave', function() {
+                var selected = parseInt(input?.value || 0);
+                stars.forEach(function(s, i) {
+                    var icon = s.querySelector('.material-symbols-outlined');
+                    if (i >= selected) {
+                        icon.style.fontVariationSettings = "'FILL' 0";
+                    } else {
+                        icon.style.fontVariationSettings = "'FILL' 1";
+                    }
+                });
+            });
         });
     }
 
-    stars.forEach(function(star, idx) {
-        star.addEventListener('click', function() {
-            var val = idx + 1;
-            if (input) input.value = val;
-            resetStars(val);
-        });
-        star.addEventListener('mouseenter', function() {
-            stars.forEach(function(s, i) {
-                var icon = s.querySelector('.material-symbols-outlined');
-                icon.style.fontVariationSettings = i <= idx ? "'FILL' 1" : "'FILL' 0";
-            });
-        });
-        star.addEventListener('mouseleave', function() {
-            var selected = parseInt(input?.value || 0);
-            stars.forEach(function(s, i) {
-                var icon = s.querySelector('.material-symbols-outlined');
-                if (i >= selected) {
-                    icon.style.fontVariationSettings = "'FILL' 0";
-                } else {
-                    icon.style.fontVariationSettings = "'FILL' 1";
+    // ── JS form submit + rocket animation ──
+    var form = document.getElementById('rateForm');
+    if (form) {
+        var submitBtn = document.getElementById('rateSubmitBtn');
+        var reviewInput = document.getElementById('reviewInput');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var rating = input.value;
+            if (!rating) {
+                var p = form.querySelector('.lesson-star-btn');
+                if (p) {
+                    p.style.animation = 'shake 0.4s ease';
+                    setTimeout(function() { p.style.animation = ''; }, 500);
                 }
+                return;
+            }
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined !text-lg animate-spin">progress_activity</span>';
+
+            // Get CSRF token
+            var csrfToken = form.querySelector('input[name="_token"]').value;
+
+            fetch('{{ route('lesson.rate', $lesson->id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: parseInt(rating),
+                    review: reviewInput ? reviewInput.value : '',
+                }),
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    launchRocket();
+                    // Replace form with success message
+                    var card = form;
+                    card.innerHTML =
+                        '<div class="text-center space-y-3 py-4">' +
+                            '<span class="material-symbols-outlined !text-5xl text-emerald-500" style="font-variation-settings:\'FILL\' 1">check_circle</span>' +
+                            '<p class="text-lg font-black text-[rgb(var(--on-surface))]">Thank You!</p>' +
+                            '<p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6]">Your feedback has been saved successfully.</p>' +
+                            '<div class="flex justify-center items-center gap-1 pt-2">' +
+                                Array.from({length: parseInt(rating)}, function() {
+                                    return '<span class="material-symbols-outlined !text-3xl text-[rgb(var(--tertiary))]" style="font-variation-settings:\'FILL\' 1">star</span>';
+                                }).join('') +
+                            '</div>' +
+                        '</div>';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Submit Feedback</span><span class="material-symbols-outlined !text-lg">rocket_launch</span>';
+                    alert(data.message || 'Something went wrong.');
+                }
+            })
+            .catch(function() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Submit Feedback</span><span class="material-symbols-outlined !text-lg">rocket_launch</span>';
+                alert('Something went wrong. Please try again.');
             });
         });
-    });
+    }
+
+    // ── Rocket animation: huge red emoji from button, slow fly upward ──
+    function launchRocket() {
+        var container = document.getElementById('rocketContainer');
+        var rocket = document.getElementById('rocket');
+        var sparks = [
+            document.getElementById('spark1'),
+            document.getElementById('spark2'),
+            document.getElementById('spark3'),
+            document.getElementById('spark4'),
+            document.getElementById('spark5'),
+        ];
+
+        var btnRect = submitBtn.getBoundingClientRect();
+        var startX = btnRect.left + btnRect.width / 2;
+        var startY = btnRect.top;
+
+        var ROCKET_SIZE = 120;
+        var DURATION = 4000;
+
+        container.style.display = 'block';
+
+        // Place rocket at button position
+        rocket.style.transition = 'none';
+        rocket.style.left = (startX - ROCKET_SIZE / 2) + 'px';
+        rocket.style.top = startY + 'px';
+        rocket.style.fontSize = ROCKET_SIZE + 'px';
+        rocket.style.lineHeight = '1';
+        rocket.style.opacity = '1';
+        rocket.style.transform = 'scale(1)';
+
+        // Place sparks at button position
+        sparks.forEach(function(s, i) {
+            s.style.transition = 'none';
+            s.style.position = 'absolute';
+            var spread = (i - 2) * 20;
+            s.style.left = (startX + spread) + 'px';
+            s.style.top = (startY + ROCKET_SIZE / 2 + 10) + 'px';
+            s.style.opacity = '1';
+        });
+
+        // Slow rocket fly upward
+        requestAnimationFrame(function() {
+            rocket.style.transition = 'all ' + DURATION + 'ms cubic-bezier(0.15, 0.85, 0.35, 1)';
+            rocket.style.top = '-200px';
+            rocket.style.opacity = '0';
+            rocket.style.transform = 'scale(1.2)';
+
+            sparks.forEach(function(s, i) {
+                s.style.transition = 'all ' + DURATION + 'ms cubic-bezier(0.15, 0.85, 0.35, 1)';
+                s.style.top = '-250px';
+                s.style.opacity = '0';
+                s.style.left = (startX + (i - 2) * 20 + (Math.random() - 0.5) * 80) + 'px';
+            });
+        });
+
+        // Slow trail particles — bigger, slower, more of them
+        var trailInterval = setInterval(function() {
+            for (var t = 0; t < 2; t++) {
+                (function() {
+                    var trail = document.createElement('div');
+                    trail.className = 'absolute rounded-full';
+                    var size = 6 + Math.random() * 10;
+                    trail.style.width = size + 'px';
+                    trail.style.height = size + 'px';
+                    trail.style.background = ['#f59e0b', '#ef4444', '#f97316', '#dc2626'][Math.floor(Math.random() * 4)];
+                    trail.style.left = (startX + (Math.random() - 0.5) * 40) + 'px';
+                    trail.style.top = (startY + ROCKET_SIZE / 2 + Math.random() * 20) + 'px';
+                    trail.style.opacity = '0.9';
+                    trail.style.transition = 'all 1.8s ease-out';
+                    trail.style.position = 'absolute';
+                    trail.style.borderRadius = '50%';
+                    container.appendChild(trail);
+                    requestAnimationFrame(function() {
+                        trail.style.top = (parseInt(trail.style.top) - 60 - Math.random() * 80) + 'px';
+                        trail.style.opacity = '0';
+                        trail.style.transform = 'translateX(' + (Math.random() - 0.5) * 50 + 'px)';
+                    });
+                    setTimeout(function() { trail.remove(); }, 2000);
+                })();
+            }
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(trailInterval);
+            container.style.display = 'none';
+        }, DURATION + 500);
+    }
 });
 </script>
+
+<style>
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+</style>
 @endpush

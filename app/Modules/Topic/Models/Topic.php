@@ -6,7 +6,6 @@ use App\Traits\SerializesDates;
 
 use App\Modules\Topic\Enums\DifficultyLevel;
 use App\Modules\Grade\Models\Grade;
-use App\Modules\Subject\Models\Subject;
 use App\Modules\Lesson\Models\Lesson;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +15,7 @@ class Topic extends Model
 {
     use HasFactory, SoftDeletes, SerializesDates;
 
-    protected $fillable = ['subject_id', 'name', 'difficulty_level'];
+    protected $fillable = ['name', 'difficulty_level'];
 
     protected function casts(): array
     {
@@ -25,7 +24,6 @@ class Topic extends Model
         ];
     }
 
-    public function subject() { return $this->belongsTo(Subject::class); }
     public function lessons() { return $this->hasMany(Lesson::class); }
     public function grades() { return $this->belongsToMany(Grade::class, 'grade_topics')->withTimestamps(); }
 }

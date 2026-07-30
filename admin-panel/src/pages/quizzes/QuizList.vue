@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { subjectsApi, type Subject } from '../../api/subjects'
 import { topicsApi, type Topic } from '../../api/topics'
 import { lessonsApi, type Lesson } from '../../api/lessons'
 import { questionsApi, type Question } from '../../api/questions'
@@ -18,8 +17,6 @@ import type { PaginationMeta } from '../../api/types'
 import { h } from 'vue'
 
 // Filter state
-const subjects = ref<Subject[]>([])
-const filterSubjectId = ref<number | null>(null)
 const filterTopics = ref<Topic[]>([])
 const filterTopicId = ref<number | null>(null)
 const filterLessons = ref<Lesson[]>([])
@@ -45,9 +42,7 @@ const selectedQuestionIds = ref<number[]>([])
 const saving = ref(false)
 const formError = ref('')
 
-// Modal subject → topic → lesson cascading selects
-const modalSubjects = ref<Subject[]>([])
-const modalSubjectId = ref<number | null>(null)
+// Modal topic → lesson cascading selects
 const modalTopics = ref<Topic[]>([])
 const modalTopicId = ref<number | null>(null)
 const modalLessons = ref<Lesson[]>([])
@@ -62,32 +57,16 @@ const deleting = ref(false)
 // --- Init ---
 onMounted(async () => {
   try {
-    const [subRes, modalSubRes] = await Promise.all([
-      subjectsApi.list({ per_page: 100 }),
-      subjectsApi.list({ per_page: 100 }),
-    ])
-    subjects.value = subRes.data
-    modalSubjects.value = modalSubRes.data
+    const res = await topicsApi.list({ per_page: 100 })
+    filterTopics.value = res.data
+    modalTopics.value = res.data
     fetchQuizzes()
   } catch {
-    showToast({ type: 'error', text: 'Fənlər yüklənərkən xəta baş verdi' })
+    showToast({ type: 'error', text: 'Mövzular yüklənərkən xəta baş verdi' })
   }
 })
 
 // --- Filter cascading ---
-watch(filterSubjectId, async () => {
-  filterTopicId.value = null
-  filterTopics.value = []
-  filterLessonId.value = null
-  filterLessons.value = []
-  page.value = 1
-  if (!filterSubjectId.value) return
-  try {
-    const res = await topicsApi.list(filterSubjectId.value, { per_page: 100 })
-    filterTopics.value = res.data
-  } catch { /* ignore */ }
-})
-
 watch(filterTopicId, async () => {
   filterLessonId.value = null
   filterLessons.value = []
@@ -105,18 +84,6 @@ watch(filterType, () => { page.value = 1 })
 watch([page, search, filterLessonId, filterType], fetchQuizzes)
 
 // --- Modal cascading ---
-watch(modalSubjectId, async () => {
-  modalTopicId.value = null
-  modalTopics.value = []
-  modalLessonId.value = null
-  modalLessons.value = []
-  if (!modalSubjectId.value) return
-  try {
-    const res = await topicsApi.list(modalSubjectId.value, { per_page: 100 })
-    modalTopics.value = res.data
-  } catch { /* ignore */ }
-})
-
 watch(modalTopicId, async () => {
   modalLessonId.value = null
   modalLessons.value = []
@@ -176,10 +143,8 @@ function openCreate() {
   editingQuiz.value = null
   modalName.value = ''
   modalType.value = 'topic_based'
-  modalSubjectId.value = null
   modalTopicId.value = null
   modalLessonId.value = null
-  modalTopics.value = []
   modalLessons.value = []
   selectedQuestionIds.value = []
   availableQuestions.value = []
@@ -192,9 +157,7 @@ async function openEdit(quiz: Quiz) {
   modalName.value = quiz.name
   modalType.value = quiz.type
   modalLessonId.value = quiz.lesson_id
-  modalSubjectId.value = null
   modalTopicId.value = null
-  modalTopics.value = []
   modalLessons.value = []
 
   // Load full quiz data to get questions
@@ -339,24 +302,13 @@ const columns: Column[] = [
     </button>
   </div>
 
-  <!-- Filter selectors (optional) -->
+  <!-- Filter selectors -->
   <div class="mb-5 flex flex-wrap items-end gap-3">
-    <div class="w-full max-w-xs">
-      <label class="block text-sm font-medium text-gray-700 mb-1.5">Fən (filtr)</label>
-      <select
-        v-model="filterSubjectId"
-        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
-      >
-        <option :value="null">Bütün fənlər</option>
-        <option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-      </select>
-    </div>
     <div class="w-full max-w-xs">
       <label class="block text-sm font-medium text-gray-700 mb-1.5">Mövzu (filtr)</label>
       <select
         v-model="filterTopicId"
-        :disabled="!filterSubjectId"
-        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
       >
         <option :value="null">Bütün mövzular</option>
         <option v-for="t in filterTopics" :key="t.id" :value="t.id">{{ t.name }}</option>
@@ -437,16 +389,8 @@ const columns: Column[] = [
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Dərs</label>
         <div class="flex flex-wrap items-end gap-3">
           <select
-            v-model="modalSubjectId"
-            class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
-          >
-            <option :value="null">Fən seçin</option>
-            <option v-for="s in modalSubjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-          </select>
-          <select
             v-model="modalTopicId"
-            :disabled="!modalSubjectId"
-            class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
           >
             <option :value="null">Mövzu seçin</option>
             <option v-for="t in modalTopics" :key="t.id" :value="t.id">{{ t.name }}</option>

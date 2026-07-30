@@ -2,7 +2,6 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { gradesApi, type Grade } from '../../api/grades'
-import { subjectsApi, type Subject } from '../../api/subjects'
 import { topicsApi, type Topic } from '../../api/topics'
 import { lessonsApi, type Lesson } from '../../api/lessons'
 import { questionsApi, type Question } from '../../api/questions'
@@ -46,8 +45,6 @@ const saving = ref(false)
 const formError = ref('')
 
 // Modal cascading selects
-const modalSubjects = ref<Subject[]>([])
-const modalSubjectId = ref<number | null>(null)
 const modalTopics = ref<Topic[]>([])
 const modalTopicId = ref<number | null>(null)
 const modalLessons = ref<Lesson[]>([])
@@ -65,12 +62,12 @@ const deleting = ref(false)
 // --- Init ---
 onMounted(async () => {
   try {
-    const [gradesRes, subjectsRes] = await Promise.all([
+    const [gradesRes, topicsRes] = await Promise.all([
       gradesApi.list({ per_page: 100 }),
-      subjectsApi.list({ per_page: 100 }),
+      topicsApi.list({ per_page: 100 }),
     ])
     filterGrades.value = gradesRes.data
-    modalSubjects.value = subjectsRes.data
+    modalTopics.value = topicsRes.data
     fetchExams()
   } catch {
     showToast({ type: 'error', text: 'Məlumatlar yüklənərkən xəta baş verdi' })
@@ -105,18 +102,6 @@ async function fetchExams() {
 }
 
 // --- Modal cascading ---
-watch(modalSubjectId, async () => {
-  modalTopicId.value = null
-  modalTopics.value = []
-  modalLessonId.value = null
-  modalLessons.value = []
-  if (!modalSubjectId.value) return
-  try {
-    const res = await topicsApi.list(modalSubjectId.value, { per_page: 100 })
-    modalTopics.value = res.data
-  } catch { /* ignore */ }
-})
-
 watch(modalTopicId, async () => {
   modalLessonId.value = null
   modalLessons.value = []
@@ -172,10 +157,8 @@ function openCreate() {
   modalDuration.value = 60
   modalPassingScore.value = 50
   modalDescription.value = ''
-  modalSubjectId.value = null
   modalTopicId.value = null
   modalLessonId.value = null
-  modalTopics.value = []
   modalLessons.value = []
   selectedQuestionIds.value = []
   availableQuestions.value = []
@@ -192,10 +175,8 @@ async function openEdit(exam: Exam) {
   modalDuration.value = exam.duration_minutes
   modalPassingScore.value = exam.passing_score
   modalDescription.value = exam.description || ''
-  modalSubjectId.value = null
   modalTopicId.value = null
   modalLessonId.value = null
-  modalTopics.value = []
   modalLessons.value = []
   showAllQuestions.value = false
 
@@ -487,7 +468,7 @@ const columns: Column[] = [
           </button>
           <button
             v-else
-            @click="showAllQuestions = false; modalSubjectId = null; modalTopicId = null; modalLessonId = null; availableQuestions = []"
+            @click="showAllQuestions = false; modalTopicId = null; modalLessonId = null; availableQuestions = []"
             class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
           >
             Fənn / dərs seç
@@ -497,17 +478,8 @@ const columns: Column[] = [
         <!-- Cascade filters (hidden in all-questions mode) -->
         <div v-if="!showAllQuestions" class="flex flex-wrap items-end gap-3">
           <select
-            v-model="modalSubjectId"
-            :disabled="showAllQuestions"
-            class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
-          >
-            <option :value="null">Fən seçin</option>
-            <option v-for="s in modalSubjects" :key="s.id" :value="s.id">{{ s.name }}</option>
-          </select>
-          <select
             v-model="modalTopicId"
-            :disabled="!modalSubjectId || showAllQuestions"
-            class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full max-w-xs rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100 transition-colors"
           >
             <option :value="null">Mövzu seçin</option>
             <option v-for="t in modalTopics" :key="t.id" :value="t.id">{{ t.name }}</option>

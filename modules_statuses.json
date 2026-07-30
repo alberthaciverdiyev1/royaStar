@@ -8,7 +8,7 @@
     "Quiz": true,
     "Setting": true,
     "Student": true,
-    "Subject": true,
+    "Subject": false,
     "Topic": true,
     "User": true,
     "Teacher": true,

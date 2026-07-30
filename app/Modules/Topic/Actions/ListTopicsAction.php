@@ -20,7 +20,7 @@ class ListTopicsAction extends BaseListAction
 
     protected function applyFilters(Builder $query, array $params): void
     {
-        $this->applyExactFilters($query, ['subject_id', 'difficulty_level'], $params);
+        $this->applyExactFilters($query, ['difficulty_level'], $params);
         $this->applySearch($query, ['name'], $params);
         $this->applyDateRangeFilter($query, 'created_at', $params);
 

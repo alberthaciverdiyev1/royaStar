@@ -5,7 +5,6 @@ import AdminLayout from '../layouts/AdminLayout.vue'
 import Dashboard from '../pages/Dashboard.vue'
 import CityList from '../pages/cities/CityList.vue'
 import GradeList from '../pages/grades/GradeList.vue'
-import SubjectList from '../pages/subjects/SubjectList.vue'
 import TopicList from '../pages/topics/TopicList.vue'
 
 const routes = [
@@ -23,9 +22,9 @@ const routes = [
       { path: '', name: 'Dashboard', component: Dashboard },
       { path: 'cities', name: 'Cities', component: CityList },
       { path: 'grades', name: 'Grades', component: GradeList },
-      { path: 'subjects', name: 'Subjects', component: SubjectList },
       { path: 'topics', name: 'Topics', component: TopicList },
       { path: 'lessons', name: 'Lessons', component: () => import('../pages/lessons/LessonList.vue') },
+      { path: 'lesson-reviews', name: 'LessonReviews', component: () => import('../pages/lessons/LessonReviews.vue') },
       { path: 'questions', name: 'Questions', component: () => import('../pages/questions/QuestionList.vue') },
       { path: 'quizzes', name: 'Quizzes', component: () => import('../pages/quizzes/QuizList.vue') },
       { path: 'quizzes/:id', name: 'QuizDetail', component: () => import('../pages/quizzes/QuizDetail.vue') },

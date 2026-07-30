@@ -49,7 +49,6 @@ class UpdateLessonProgressAction
 
             if ($isCompleted && !$wasAlreadyCompleted) {
                 $this->starService->awardLessonCompleted($student->user_id, $lesson->id);
-                $studentLesson->loadMissing('lesson.topic.subject');
             }
 
             return $studentLesson->fresh();

@@ -26,7 +26,7 @@ it('returns consistent validation error format', function () {
 it('returns 404 for non-existent resources', function () {
     $user = User::factory()->create(['type' => 'student']);
 
-    $response = $this->actingAs($user)->getJson('/api/subjects/99999');
+    $response = $this->actingAs($user)->getJson('/api/cities/99999');
 
     $response->assertStatus(404);
 });

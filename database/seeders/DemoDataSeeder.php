@@ -36,10 +36,9 @@ class DemoDataSeeder extends Seeder
     private function createRegularQuestion(Topic $topic, Lesson $lesson, int $i): void
     {
         $num = ($i % 10) + 1;
-        $subjectName = $topic->subject->name;
 
         $questions = [
-            "What is the basic concept of {$topic->name} in {$subjectName}?",
+            "What is the basic concept of {$topic->name}?",
             "Which of the following best describes {$topic->name}?",
             "What is the main principle of {$topic->name}?",
             "How does {$topic->name} apply to real-world problems?",
@@ -93,7 +92,6 @@ class DemoDataSeeder extends Seeder
     private function createOpenQuestion(Topic $topic, Lesson $lesson, int $i): void
     {
         $num = ($i % 10) + 1;
-        $subjectName = $topic->subject->name;
 
         Question::create([
             'question' => [
@@ -103,9 +101,9 @@ class DemoDataSeeder extends Seeder
             ],
             'type' => 'open',
             'open_answer' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusu {$subjectName} sahəsində vacib bir mövzudur. Əsas prinsiplərə daxildir: tərif, xüsusiyyətlər və tətbiq sahələri."]],
-                'en' => [['type' => 'text', 'content' => "{$topic->name} is an important topic in {$subjectName}. Key principles include: definition, characteristics, and application areas."]],
-                'ru' => [['type' => 'text', 'content' => "Тема «{$topic->name}» является важной в области {$subjectName}. Основные принципы включают: определение, характеристики и области применения."]],
+                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusu İngilis dili sahəsində vacib bir mövzudur. Əsas prinsiplərə daxildir: tərif, xüsusiyyətlər və tətbiq sahələri."]],
+                'en' => [['type' => 'text', 'content' => "{$topic->name} is an important topic in English language. Key principles include: definition, characteristics, and application areas."]],
+                'ru' => [['type' => 'text', 'content' => "Тема «{$topic->name}» является важной в области английского языка. Основные принципы включают: определение, характеристики и области применения."]],
             ],
             'difficulty_level' => $topic->difficulty_level->value,
             'lesson_id' => $lesson->id,
