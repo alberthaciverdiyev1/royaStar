@@ -85,6 +85,11 @@ class StudentExamController extends Controller
         $locale = app()->getLocale();
 
         return DB::transaction(function () use ($student, $exam, $questions, $answers, $locale) {
+            // Delete old attempts atomically with new insert
+            StudentExam::where('student_id', $student->id)
+                ->where('exam_id', $exam->id)
+                ->delete();
+
             $correctCount = 0;
             $wrongCount = 0;
             $skippedCount = 0;

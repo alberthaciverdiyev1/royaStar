@@ -80,6 +80,11 @@ class StudentQuizController extends Controller
         $locale = app()->getLocale();
 
         return DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale) {
+            // Delete old attempts atomically with new insert
+            StudentQuiz::where('student_id', $student->id)
+                ->where('quiz_id', $quiz->id)
+                ->delete();
+
             $correctCount = 0;
             $wrongCount = 0;
             $skippedCount = 0;

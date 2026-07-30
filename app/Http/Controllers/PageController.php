@@ -293,12 +293,11 @@ class PageController extends Controller
 
         abort_unless($student, 403, 'Only students can submit quizzes');
 
-        // Delete old attempts for this quiz
-        StudentQuiz::where('student_id', $student->id)
-            ->where('quiz_id', $quiz->id)
-            ->delete();
-
         $result = DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user) {
+            // Delete old attempts atomically with new insert
+            StudentQuiz::where('student_id', $student->id)
+                ->where('quiz_id', $quiz->id)
+                ->delete();
             $correctCount = 0;
             $wrongCount = 0;
             $skippedCount = 0;
@@ -552,12 +551,11 @@ class PageController extends Controller
 
         abort_unless($student, 403, 'Only students can submit exams');
 
-        // Delete old attempts
-        StudentExam::where('student_id', $student->id)
-            ->where('exam_id', $exam->id)
-            ->delete();
-
         $result = DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user) {
+            // Delete old attempts atomically with new insert
+            StudentExam::where('student_id', $student->id)
+                ->where('exam_id', $exam->id)
+                ->delete();
             $correctCount = 0;
             $wrongCount = 0;
             $skippedCount = 0;
