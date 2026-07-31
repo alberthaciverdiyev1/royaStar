@@ -14,7 +14,7 @@
     $questionResults = [];
     foreach ($result['answers'] ?? [] as $ans) {
         $qText = $ans['question_text'] ?? '';
-        $qTextStr = is_array($qText) ? collect($qText)->map(fn($b) => $b['content'] ?? '')->join(' ') : $qText;
+        $qTextStr = renderContentBlocks($qText);
         $variants = $ans['variants'] ?? [];
 
         $userLetter = $ans['answer'] ?? '';
@@ -28,7 +28,7 @@
             $correctAnswerText = '';
             foreach (['a', 'b', 'c', 'd', 'e'] as $letter) {
                 $v = $variants[$letter] ?? [];
-                $vText = is_array($v) ? collect($v)->map(fn($b) => $b['content'] ?? '')->join(' ') : $v;
+                $vText = renderContentBlocks($v);
                 if ($letter === $userLetter) $userAnswerText = $vText;
                 if ($letter === $correctLetter) $correctAnswerText = $vText;
             }
@@ -152,7 +152,7 @@
                     </div>
 
                     <h4 class="font-bold text-sm sm:text-base text-[rgb(var(--on-surface))] mb-4 leading-relaxed">
-                        {{ $res['question_text'] ?: 'Question Content' }}
+                        {!! $res['question_text'] ?: 'Question Content' !!}
                     </h4>
 
                     <!-- Answer Options Comparison -->
@@ -160,8 +160,8 @@
                         <div class="p-3 rounded-xl {{ $isCorrect ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200' }}">
                             <span class="text-4xs font-black uppercase tracking-widest block opacity-70 mb-0.5">Your Answer:</span>
                             <span class="font-black text-sm uppercase">{{ $userLetter ? strtoupper($userLetter) : 'No Answer' }}</span>
-                            @if($userAnswerText)
-                            <span class="block text-xs mt-0.5 font-bold">"{{ $userAnswerText }}"</span>
+                            @if($userAnswerText && $userLetter)
+                            <span class="block text-xs mt-0.5 font-bold">{!! $userAnswerText !!}</span>
                             @endif
                         </div>
 
@@ -169,7 +169,7 @@
                             <span class="text-4xs font-black uppercase tracking-widest block opacity-70 mb-0.5">Correct Answer:</span>
                             <span class="font-black text-sm uppercase">{{ strtoupper($correctLetter) }}</span>
                             @if($correctAnswerText)
-                            <span class="block text-xs mt-0.5 font-bold">"{{ $correctAnswerText }}"</span>
+                            <span class="block text-xs mt-0.5 font-bold">{!! $correctAnswerText !!}</span>
                             @endif
                         </div>
                     </div>

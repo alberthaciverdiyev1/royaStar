@@ -64,7 +64,7 @@
                         <span>Question {{ $index + 1 }}</span>
                     </div>
                     @php
-                        $questionContent = is_array($q['question']) ? collect($q['question'])->map(fn($block) => $block['content'] ?? '')->join(' ') : $q['question'];
+                        $questionContent = renderContentBlocks($q['question'] ?? null);
                     @endphp
                     <h3 class="text-base sm:text-lg font-bold tracking-tight text-[rgb(var(--on-surface))] leading-snug">
                         {!! $questionContent !!}
@@ -79,7 +79,7 @@
                             $variantKey = 'variant_' . $letter;
                             $variant = $q[$variantKey] ?? null;
                             if (!$variant || (is_array($variant) && empty($variant))) continue;
-                            $variantText = is_array($variant) ? collect($variant)->map(fn($block) => $block['content'] ?? '')->join(' ') : $variant;
+                            $variantText = renderContentBlocks($variant);
                             if (empty(trim($variantText))) continue;
                         @endphp
                         <button type="button" class="exam-option-btn option-btn-item" data-question="{{ $q['id'] }}" data-answer="{{ $letter }}" onclick="selectAnswer(this, {{ $q['id'] }}, '{{ $letter }}', '{{ $rightAnswer }}')">

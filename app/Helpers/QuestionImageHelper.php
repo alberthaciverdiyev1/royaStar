@@ -54,3 +54,37 @@ if (!function_exists('processQuestionMedia')) {
         }
     }
 }
+
+if (!function_exists('renderContentBlocks')) {
+
+    /**
+     * Render content block array into HTML.
+     * text → escaped text, image → <img>, audio → <audio controls>.
+     */
+    function renderContentBlocks(array|string|null $blocks): string
+    {
+        if (empty($blocks) || !is_array($blocks)) {
+            return e($blocks ?? '');
+        }
+
+        $html = '';
+        foreach ($blocks as $block) {
+            $type = $block['type'] ?? 'text';
+            $content = $block['content'] ?? '';
+
+            switch ($type) {
+                case 'image':
+                    $html .= '<img src="' . e($content) . '" alt="" class="max-w-full h-auto rounded-lg my-1.5 shadow-sm" style="max-height:320px">';
+                    break;
+                case 'audio':
+                    $html .= '<audio controls class="w-full my-1.5 h-10 rounded-lg"><source src="' . e($content) . '"></audio>';
+                    break;
+                default:
+                    $html .= e($content);
+                    break;
+            }
+        }
+
+        return $html;
+    }
+}

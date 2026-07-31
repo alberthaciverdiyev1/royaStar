@@ -12,8 +12,10 @@ beforeEach(function () {
     Spatie\Permission\Models\Role::create(['name' => 'parent', 'guard_name' => 'api']);
     Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'api']);
 
-    Grade::create(['name' => 'Grade 1']);
-    City::create(['name' => 'Baku']);
+    $grade = Grade::create(['name' => 'Grade 1']);
+    $city = City::create(['name' => 'Baku']);
+    $this->gradeId = $grade->id;
+    $this->cityId = $city->id;
 });
 
 // ─── Register ───────────────────────────────────────────────────
@@ -27,7 +29,7 @@ it('registers a new student', function () {
         'password' => 'password123',
         'password_confirmation' => 'password123',
         'type' => 'student',
-        'student' => ['grade_id' => 1, 'city_id' => 1],
+        'student' => ['grade_id' => $this->gradeId, 'city_id' => $this->cityId],
     ]);
 
     $response->assertStatus(201)
@@ -44,7 +46,7 @@ it('registers a new teacher', function () {
         'password' => 'password123',
         'password_confirmation' => 'password123',
         'type' => 'teacher',
-        'teacher' => ['city_id' => 1],
+        'teacher' => ['city_id' => $this->cityId],
     ]);
 
     $response->assertStatus(201)
@@ -71,7 +73,7 @@ it('creates school registration request instead of user for school type', functi
     $response = $this->postJson('/api/auth/register', [
         'email' => 'school@example.com',
         'type' => 'school',
-        'school' => ['name' => 'Test School', 'city_id' => 1],
+        'school' => ['name' => 'Test School', 'city_id' => $this->cityId],
     ]);
 
     $response->assertStatus(201)
@@ -140,7 +142,7 @@ it('assigns role on registration', function () {
         'password' => 'password123',
         'password_confirmation' => 'password123',
         'type' => 'teacher',
-        'teacher' => ['city_id' => 1],
+        'teacher' => ['city_id' => $this->cityId],
     ]);
 
     $response->assertStatus(201);
