@@ -91,4 +91,6 @@
 </section>
 @endsection
 
+@push('scripts')
 <script src="{{ asset('js/login.js') }}?v={{ filemtime(public_path('js/login.js')) }}"></script>
+@endpush

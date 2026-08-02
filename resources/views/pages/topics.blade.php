@@ -150,4 +150,6 @@
 </div>
 @endsection
 
+@push('scripts')
 <script src="{{ asset('js/topics.js') }}?v={{ filemtime(public_path('js/topics.js')) }}"></script>
+@endpush

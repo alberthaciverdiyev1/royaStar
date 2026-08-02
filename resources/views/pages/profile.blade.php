@@ -308,4 +308,6 @@
 </div>
 @endsection
 
+@push('scripts')
 <script src="{{ asset('js/profile.js') }}?v={{ filemtime(public_path('js/profile.js')) }}"></script>
+@endpush

@@ -127,4 +127,6 @@
 </div>
 @endsection
 
+@push('scripts')
 <script src="{{ asset('js/quiz.js') }}?v={{ filemtime(public_path('js/quiz.js')) }}"></script>
+@endpush

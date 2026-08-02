@@ -14,7 +14,8 @@
 
     <script>
         (function() {
-            var theme = localStorage.getItem('theme') || 'default';
+            var theme = 'default';
+            try { theme = localStorage.getItem('theme') || 'default'; } catch(e) {}
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>

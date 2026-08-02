@@ -408,4 +408,6 @@
 </div>
 @endsection
 
+@push('scripts')
 <script src="{{ asset('js/achievements.js') }}?v={{ filemtime(public_path('js/achievements.js')) }}"></script>
+@endpush
