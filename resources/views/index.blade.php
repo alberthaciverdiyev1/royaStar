@@ -86,7 +86,7 @@
 
                 <div class="hero__visual-inner">
                     <div class="hero__visual-bg">
-                        <span class="hero__visual-text">RS</span>
+                        <img src="{{ asset('images/logo.jpeg') }}" alt="Roya's Stars Logo" class="hero__visual-logo">
                     </div>
                 </div>
 
