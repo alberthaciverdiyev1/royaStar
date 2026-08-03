@@ -44,6 +44,38 @@
     box-shadow: 0 4px 20px rgba(0,0,0,.02);
 }
 
+/* Lesson Notes Card */
+.lesson-notes-card {
+    background: linear-gradient(135deg, rgba(var(--tertiary),.08) 0%, rgba(var(--surface-container-lowest),1) 100%);
+    border: 2px solid rgba(var(--surface-container-high),1);
+    border-radius: 1.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,.02);
+    transition: all .3s cubic-bezier(.22,1,.36,1);
+}
+.lesson-notes-card:hover {
+    border-color: rgba(var(--tertiary),.5);
+    box-shadow: 0 16px 40px rgba(var(--tertiary),.12);
+}
+.lesson-notes-icon {
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--tertiary),.15);
+    color: rgb(var(--tertiary));
+}
+.lesson-notes-content {
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.7;
+    color: rgba(var(--on-surface),.8);
+    white-space: pre-line;
+}
+
 /* Quiz Card Banner */
 .lesson-quiz-banner {
     background: linear-gradient(135deg, rgba(var(--secondary),.08) 0%, rgba(var(--surface-container-lowest),1) 100%);

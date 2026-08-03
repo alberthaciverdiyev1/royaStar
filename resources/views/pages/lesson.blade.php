@@ -34,16 +34,11 @@
                 <span class="text-amber-300 font-extrabold">{{ $lesson->name }}</span>
             </div>
 
-            <!-- Title & Description -->
+            <!-- Title -->
             <div class="space-y-1.5">
                 <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white leading-tight">
                     {{ $lesson->name }}
                 </h1>
-                @if($lesson->description)
-                <p class="text-xs sm:text-sm font-semibold text-white/80">
-                    {{ $lesson->description }}
-                </p>
-                @endif
             </div>
 
             <!-- Meta Pills -->
@@ -107,6 +102,29 @@
                         </div>
                     </div>
                     @endforeach
+                </div>
+            </section>
+            @endif
+
+            <!-- Lesson Notes -->
+            @if($lesson->description)
+            <section class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined !text-2xl text-[rgb(var(--tertiary))]">sticky_note_2</span>
+                    <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
+                        Lesson Notes
+                    </h3>
+                </div>
+
+                <div class="lesson-notes-card">
+                    <div class="flex items-start gap-4">
+                        <span class="lesson-notes-icon">
+                            <span class="material-symbols-outlined">lightbulb</span>
+                        </span>
+                        <div class="lesson-notes-content">
+                            {{ $lesson->description }}
+                        </div>
+                    </div>
                 </div>
             </section>
             @endif
