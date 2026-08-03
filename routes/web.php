@@ -32,7 +32,8 @@ Route::middleware('auth')->group(function () {
 
     // Exam
     Route::get('/exam', [PageController::class, 'exam'])->name('exam');
-    Route::get('/exam/{exam}', [PageController::class, 'examDetail'])->name('exam.detail');
+    Route::get('/exam/grade/{grade}', [PageController::class, 'examGrade'])->whereNumber('grade')->name('exam.grade');
+    Route::get('/exam/{exam}', [PageController::class, 'examDetail'])->whereNumber('exam')->name('exam.detail');
     Route::get('/exam/{exam}/start', [PageController::class, 'examStart'])->name('exam.start');
     Route::post('/exam/{exam}/submit', [PageController::class, 'examSubmit'])->name('exam.submit');
     Route::get('/exam/{exam}/result', [PageController::class, 'examResult'])->name('exam.result');

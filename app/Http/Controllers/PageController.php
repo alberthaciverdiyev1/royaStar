@@ -483,19 +483,23 @@ class PageController extends Controller
 
     public function exam()
     {
-        $exams = Exam::with('grade')
-            ->withCount('questions')
-            ->get();
+        $grades = Grade::has('exams')->withCount('exams')->orderBy('id')->get();
+
+        return view('pages.exam', compact('grades'));
+    }
+
+    public function examGrade(Grade $grade)
+    {
+        $exams = $grade->exams()->with('grade')->withCount('questions')->get();
 
         $user = Auth::user();
         $student = $user?->student;
 
         // Get past attempt scores for each exam
         $examScores = [];
-        if ($student) {
-            $examIds = $exams->pluck('id');
+        if ($student && $exams->isNotEmpty()) {
             $attempts = StudentExam::where('student_id', $student->id)
-                ->whereIn('exam_id', $examIds)
+                ->whereIn('exam_id', $exams->pluck('id'))
                 ->get()
                 ->groupBy('exam_id');
 
@@ -506,7 +510,7 @@ class PageController extends Controller
             }
         }
 
-        return view('pages.exam', compact('exams', 'examScores'));
+        return view('pages.exam', compact('grade', 'exams', 'examScores'));
     }
 
     public function examDetail(Exam $exam)
