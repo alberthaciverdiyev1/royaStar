@@ -63,8 +63,14 @@ if (!function_exists('renderContentBlocks')) {
      */
     function renderContentBlocks(array|string|null $blocks): string
     {
-        if (empty($blocks) || !is_array($blocks)) {
-            return e($blocks ?? '');
+        if ($blocks === null || $blocks === '') {
+            return '';
+        }
+        if (is_string($blocks)) {
+            return e($blocks);
+        }
+        if (empty($blocks)) {
+            return '';
         }
 
         $html = '';
