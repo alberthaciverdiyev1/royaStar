@@ -554,6 +554,9 @@ class PageController extends Controller
                 $data['variant_c'] = $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [];
                 $data['variant_d'] = $q->variant_d[$locale] ?? $q->variant_d['az'] ?? [];
                 $data['variant_e'] = $q->variant_e[$locale] ?? $q->variant_e['az'] ?? [];
+            } else {
+                $openAnswerBlocks = $q->open_answer[$locale] ?? $q->open_answer['az'] ?? [];
+                $data['correct_answer'] = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
             }
 
             return $data;

@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Modules\City\Models\City;
+use App\Modules\Grade\Models\Grade;
+use App\Modules\Student\Models\Student;
 use App\Modules\User\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -9,6 +12,8 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $grade = Grade::query()->first();
+        $city = City::query()->first();
         $admin = User::create([
             'name' => 'Admin',
             'surname' => 'Super',
@@ -63,6 +68,11 @@ class UserSeeder extends Seeder
             'is_approved' => true,
         ]);
         $student1->assignRole('student');
+        Student::create([
+            'user_id' => $student1->id,
+            'grade_id' => $grade?->id,
+            'city_id' => $city?->id,
+        ]);
 
         $student2 = User::create([
             'name' => 'Aysu',
@@ -74,6 +84,11 @@ class UserSeeder extends Seeder
             'is_approved' => true,
         ]);
         $student2->assignRole('student');
+        Student::create([
+            'user_id' => $student2->id,
+            'grade_id' => $grade?->id,
+            'city_id' => $city?->id,
+        ]);
 
         $parent = User::create([
             'name' => 'Tural',

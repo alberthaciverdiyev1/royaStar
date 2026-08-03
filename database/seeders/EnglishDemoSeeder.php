@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Exam\Models\Exam;
 use App\Modules\Lesson\Models\Lesson;
 use App\Modules\Lesson\Models\Video;
 use App\Modules\Question\Models\Question;
@@ -53,6 +54,56 @@ class EnglishDemoSeeder extends Seeder
             $this->createRegularQuestions($topic, $lesson, $index);
             $this->createQuiz($lesson, $topic);
             $index++;
+        }
+
+        $this->createExams($allGrades);
+    }
+
+    private function createExams($allGrades): void
+    {
+        $regularIds = Question::where('type', 'regular')->pluck('id')->toArray();
+        $openIds = Question::where('type', 'open')->pluck('id')->toArray();
+
+        $definitions = [
+            [
+                'name' => 'İngilis dili — Ümumi İmtahan',
+                'description' => 'Bütün mövzulardan ümumi bilik imtahanı',
+                'type' => 'general',
+                'duration_minutes' => 20,
+                'passing_score' => 50,
+                'question_count' => 10,
+            ],
+            [
+                'name' => 'İngilis dili — Final İmtahan',
+                'description' => 'Semestr sonu yekun imtahan',
+                'type' => 'final',
+                'duration_minutes' => 30,
+                'passing_score' => 60,
+                'question_count' => 20,
+            ],
+        ];
+
+        $grade = $allGrades->first();
+
+        foreach ($definitions as $def) {
+            $questionIds = array_merge(
+                array_slice($regularIds, 0, max(0, $def['question_count'] - 1)),
+                array_slice($openIds, 0, 1),
+            );
+
+            $exam = Exam::create([
+                'name' => $def['name'],
+                'description' => $def['description'],
+                'grade_id' => $grade?->id,
+                'duration_minutes' => $def['duration_minutes'],
+                'passing_score' => $def['passing_score'],
+                'total_questions' => count($questionIds),
+                'type' => $def['type'],
+            ]);
+
+            $exam->questions()->sync(
+                collect($questionIds)->mapWithKeys(fn($id, $i) => [$id => ['order' => $i + 1]])->all()
+            );
         }
     }
 
