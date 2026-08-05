@@ -274,7 +274,6 @@ class PageController extends Controller
             ];
 
             if ($q->type === 'regular') {
-                $data['right_answer'] = $this->resolveRightAnswerLetter($q, $locale);
                 $data['variant_a'] = $q->variant_a[$locale] ?? $q->variant_a['az'] ?? [];
                 $data['variant_b'] = $q->variant_b[$locale] ?? $q->variant_b['az'] ?? [];
                 $data['variant_c'] = $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [];
