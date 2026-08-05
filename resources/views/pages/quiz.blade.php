@@ -45,7 +45,7 @@
         @csrf
 
         @foreach($questions as $index => $q)
-        <section class="quiz-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}" style="{{ $index > 0 ? 'display:none' : '' }}">
+        <section class="quiz-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}" data-correct="{{ $q['correct_answer'] ?? '' }}" data-video="{{ $q['explanation_video_url'] ?? '' }}" style="{{ $index > 0 ? 'display:none' : '' }}">
             <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 sm:p-6 shadow-md space-y-4">
 
                 <!-- Question Header & Text -->
@@ -90,6 +90,9 @@
                 <!-- Hidden inputs for backend submission -->
                 <input type="hidden" name="answers[{{ $index }}][question_id]" value="{{ $q['id'] }}">
                 <input type="hidden" name="answers[{{ $index }}][answer]" id="answer_{{ $q['id'] }}" value="">
+
+                <!-- Inline feedback (revealed by quiz.js after answering) -->
+                <div class="feedback-box" id="feedback_{{ $q['id'] }}" style="display:none"></div>
             </div>
         </section>
         @endforeach

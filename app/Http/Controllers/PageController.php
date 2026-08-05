@@ -239,6 +239,8 @@ class PageController extends Controller
                 'answer_type' => $q->answer_type,
                 'question' => $q->question ?? [],
                 'difficulty_level' => $q->difficulty_level,
+                'correct_answer' => $this->inlineCorrectAnswer($q),
+                'explanation_video_url' => $q->explanation_video_url ?? null,
             ];
 
             if ($q->type === 'regular') {
@@ -401,6 +403,8 @@ class PageController extends Controller
                 'answer_type' => $q->answer_type,
                 'question' => $q->question ?? [],
                 'difficulty_level' => $q->difficulty_level,
+                'correct_answer' => $this->inlineCorrectAnswer($q),
+                'explanation_video_url' => $q->explanation_video_url ?? null,
             ];
 
             if ($q->type === 'regular') {
@@ -470,6 +474,25 @@ class PageController extends Controller
             'exam' => $exam,
             'result' => $result,
         ]);
+    }
+
+    /**
+     * Resolve the "expected answer" for a question so the solve page can show
+     * instant inline feedback. Regular → correct letter (a–e), open → model text.
+     */
+    private function inlineCorrectAnswer($q): string
+    {
+        if ($q->type === 'regular') {
+            return $this->assessmentService->resolveRightAnswerLetter($q);
+        }
+
+        $openAnswer = $q->open_answer ?? [];
+
+        if (is_array($openAnswer)) {
+            return trim((string) ($openAnswer[0]['content'] ?? ''));
+        }
+
+        return trim((string) $openAnswer);
     }
 
     // ═══════════════════════════════════════════
