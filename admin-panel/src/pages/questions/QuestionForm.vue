@@ -11,6 +11,7 @@ import {
 import Toast from '../../components/Toast.vue'
 import ContentBlockEditor from '../../components/ContentBlockEditor.vue'
 import type { ContentBlock } from '../../components/ContentBlockEditor.vue'
+import VariantMediaUpload from '../../components/VariantMediaUpload.vue'
 import { showToast } from '../../stores/toast'
 
 const route = useRoute()
@@ -57,65 +58,6 @@ const VARIANT_TYPE_OPTIONS = [
 ]
 
 const variantType = ref<ContentBlock['type']>('text')
-
-const pendingFiles = ref<Map<string, File>>(new Map())
-
-function triggerFileUpload(targetRef: typeof variantABlocks, accept: string) {
-  const input = document.createElement('input')
-  input.type = 'file'
-  input.accept = accept
-  input.style.display = 'none'
-  input.addEventListener('change', () => {
-    const file = input.files?.[0]
-    if (!file) return
-    const blobUrl = URL.createObjectURL(file)
-    if (targetRef.value[0]) {
-      targetRef.value = [{ ...targetRef.value[0], content: blobUrl }]
-    }
-    pendingFiles.value.set(blobUrl, file)
-  })
-  document.body.appendChild(input)
-  input.click()
-  setTimeout(() => document.body.removeChild(input), 2000)
-}
-
-function cleanupPendingFiles() {
-  for (const blobUrl of pendingFiles.value.keys()) {
-    URL.revokeObjectURL(blobUrl)
-  }
-  pendingFiles.value = new Map()
-}
-
-async function convertPendingFiles() {
-  const map = pendingFiles.value
-  if (!map.size) return
-  const entries = [...map.entries()]
-  const allBlocks = [
-    questionBlocks, variantABlocks, variantBBlocks, variantCBlocks,
-    variantDBlocks, variantEBlocks, openAnswerBlocks, explanationBlocks,
-  ]
-  for (const [blobUrl, file] of entries) {
-    try {
-      const dataUrl = await fileToDataUrl(file)
-      for (const blocks of allBlocks) {
-        for (const block of blocks.value) {
-          if (block.content === blobUrl) block.content = dataUrl
-        }
-      }
-    } catch { /* keep blob URL if conversion fails */ }
-    URL.revokeObjectURL(blobUrl)
-    map.delete(blobUrl)
-  }
-}
-
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
-}
 
 function resetForm() {
   questionBlocks.value = [{ type: 'text', content: '' }]
@@ -165,7 +107,6 @@ async function loadLessons(topicId: number) {
 }
 
 function onVariantTypeChange(type: ContentBlock['type']) {
-  cleanupPendingFiles()
   variantType.value = type
   variantABlocks.value = [{ type, content: '' }]
   variantBBlocks.value = [{ type, content: '' }]
@@ -279,7 +220,6 @@ async function handleSave() {
   saving.value = true
   formError.value = ''
   try {
-    await convertPendingFiles()
     const payload = buildPayload()
 
     if (editingId.value) {
@@ -447,26 +387,12 @@ const availableVariants = computed(() => {
             placeholder="Variant A"
             class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 resize-none transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
           />
-          <div v-else-if="variantType === 'image'" class="space-y-2">
-            <div v-if="variantABlocks[0]?.content" class="flex items-center gap-3">
-              <img :src="variantABlocks[0].content" class="h-16 w-16 rounded-xl object-cover border border-gray-200" />
-              <button type="button" @click="variantABlocks = [{ type: 'image', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantABlocks, 'image/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-green-300 hover:text-green-500 hover:bg-green-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              {{ variantABlocks[0]?.content ? 'Şəkili dəyiş' : 'Şəkil seç' }}
-            </button>
-          </div>
-          <div v-else-if="variantType === 'audio'" class="space-y-2">
-            <div v-if="variantABlocks[0]?.content" class="flex items-center gap-3">
-              <audio :src="variantABlocks[0].content" controls class="h-9 rounded-lg" />
-              <button type="button" @click="variantABlocks = [{ type: 'audio', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantABlocks, 'audio/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-amber-300 hover:text-amber-500 hover:bg-amber-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-              {{ variantABlocks[0]?.content ? 'Səsi dəyiş' : 'Səs seç' }}
-            </button>
-          </div>
+          <VariantMediaUpload
+            v-else
+            :model-value="variantABlocks[0]"
+            :variant-type="variantType"
+            @update:model-value="variantABlocks[0] = $event"
+          />
         </div>
 
         <!-- Variant B -->
@@ -481,26 +407,12 @@ const availableVariants = computed(() => {
             placeholder="Variant B"
             class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 resize-none transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
           />
-          <div v-else-if="variantType === 'image'" class="space-y-2">
-            <div v-if="variantBBlocks[0]?.content" class="flex items-center gap-3">
-              <img :src="variantBBlocks[0].content" class="h-16 w-16 rounded-xl object-cover border border-gray-200" />
-              <button type="button" @click="variantBBlocks = [{ type: 'image', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantBBlocks, 'image/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-green-300 hover:text-green-500 hover:bg-green-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              {{ variantBBlocks[0]?.content ? 'Şəkili dəyiş' : 'Şəkil seç' }}
-            </button>
-          </div>
-          <div v-else-if="variantType === 'audio'" class="space-y-2">
-            <div v-if="variantBBlocks[0]?.content" class="flex items-center gap-3">
-              <audio :src="variantBBlocks[0].content" controls class="h-9 rounded-lg" />
-              <button type="button" @click="variantBBlocks = [{ type: 'audio', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantBBlocks, 'audio/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-amber-300 hover:text-amber-500 hover:bg-amber-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-              {{ variantBBlocks[0]?.content ? 'Səsi dəyiş' : 'Səs seç' }}
-            </button>
-          </div>
+          <VariantMediaUpload
+            v-else
+            :model-value="variantBBlocks[0]"
+            :variant-type="variantType"
+            @update:model-value="variantBBlocks[0] = $event"
+          />
         </div>
 
         <!-- Variant C -->
@@ -515,26 +427,12 @@ const availableVariants = computed(() => {
             placeholder="Variant C"
             class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 resize-none transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
           />
-          <div v-else-if="variantType === 'image'" class="space-y-2">
-            <div v-if="variantCBlocks[0]?.content" class="flex items-center gap-3">
-              <img :src="variantCBlocks[0].content" class="h-16 w-16 rounded-xl object-cover border border-gray-200" />
-              <button type="button" @click="variantCBlocks = [{ type: 'image', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantCBlocks, 'image/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-green-300 hover:text-green-500 hover:bg-green-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              {{ variantCBlocks[0]?.content ? 'Şəkili dəyiş' : 'Şəkil seç' }}
-            </button>
-          </div>
-          <div v-else-if="variantType === 'audio'" class="space-y-2">
-            <div v-if="variantCBlocks[0]?.content" class="flex items-center gap-3">
-              <audio :src="variantCBlocks[0].content" controls class="h-9 rounded-lg" />
-              <button type="button" @click="variantCBlocks = [{ type: 'audio', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantCBlocks, 'audio/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-amber-300 hover:text-amber-500 hover:bg-amber-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-              {{ variantCBlocks[0]?.content ? 'Səsi dəyiş' : 'Səs seç' }}
-            </button>
-          </div>
+          <VariantMediaUpload
+            v-else
+            :model-value="variantCBlocks[0]"
+            :variant-type="variantType"
+            @update:model-value="variantCBlocks[0] = $event"
+          />
         </div>
 
         <!-- Variant D -->
@@ -547,26 +445,12 @@ const availableVariants = computed(() => {
             placeholder="Variant D"
             class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 resize-none transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
           />
-          <div v-else-if="variantType === 'image'" class="space-y-2">
-            <div v-if="variantDBlocks[0]?.content" class="flex items-center gap-3">
-              <img :src="variantDBlocks[0].content" class="h-16 w-16 rounded-xl object-cover border border-gray-200" />
-              <button type="button" @click="variantDBlocks = [{ type: 'image', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantDBlocks, 'image/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-green-300 hover:text-green-500 hover:bg-green-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              {{ variantDBlocks[0]?.content ? 'Şəkili dəyiş' : 'Şəkil seç' }}
-            </button>
-          </div>
-          <div v-else-if="variantType === 'audio'" class="space-y-2">
-            <div v-if="variantDBlocks[0]?.content" class="flex items-center gap-3">
-              <audio :src="variantDBlocks[0].content" controls class="h-9 rounded-lg" />
-              <button type="button" @click="variantDBlocks = [{ type: 'audio', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantDBlocks, 'audio/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-amber-300 hover:text-amber-500 hover:bg-amber-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-              {{ variantDBlocks[0]?.content ? 'Səsi dəyiş' : 'Səs seç' }}
-            </button>
-          </div>
+          <VariantMediaUpload
+            v-else
+            :model-value="variantDBlocks[0]"
+            :variant-type="variantType"
+            @update:model-value="variantDBlocks[0] = $event"
+          />
         </div>
 
         <!-- Variant E -->
@@ -579,26 +463,12 @@ const availableVariants = computed(() => {
             placeholder="Variant E"
             class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 resize-none transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
           />
-          <div v-else-if="variantType === 'image'" class="space-y-2">
-            <div v-if="variantEBlocks[0]?.content" class="flex items-center gap-3">
-              <img :src="variantEBlocks[0].content" class="h-16 w-16 rounded-xl object-cover border border-gray-200" />
-              <button type="button" @click="variantEBlocks = [{ type: 'image', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantEBlocks, 'image/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-green-300 hover:text-green-500 hover:bg-green-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              {{ variantEBlocks[0]?.content ? 'Şəkili dəyiş' : 'Şəkil seç' }}
-            </button>
-          </div>
-          <div v-else-if="variantType === 'audio'" class="space-y-2">
-            <div v-if="variantEBlocks[0]?.content" class="flex items-center gap-3">
-              <audio :src="variantEBlocks[0].content" controls class="h-9 rounded-lg" />
-              <button type="button" @click="variantEBlocks = [{ type: 'audio', content: '' }]" class="rounded-lg px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">Sil</button>
-            </div>
-            <button type="button" @click="triggerFileUpload(variantEBlocks, 'audio/*')" class="flex items-center justify-center w-full rounded-xl border-2 border-dashed border-gray-200 bg-white px-4 py-4 text-sm text-gray-400 hover:border-amber-300 hover:text-amber-500 hover:bg-amber-50 transition-colors">
-              <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-              {{ variantEBlocks[0]?.content ? 'Səsi dəyiş' : 'Səs seç' }}
-            </button>
-          </div>
+          <VariantMediaUpload
+            v-else
+            :model-value="variantEBlocks[0]"
+            :variant-type="variantType"
+            @update:model-value="variantEBlocks[0] = $event"
+          />
         </div>
       </div>
 
