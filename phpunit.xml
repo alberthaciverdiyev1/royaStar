@@ -24,6 +24,7 @@
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_DATABASE" value="roya_testing"/>
         <env name="DB_ACTIVITY_CONNECTION" value="sqlite"/>
         <env name="DB_ACTIVITY_DATABASE" value="database/testing/activity-test.sqlite"/>
         <env name="DB_ACTIVITY_URL" value=""/>

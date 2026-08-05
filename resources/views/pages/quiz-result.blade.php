@@ -44,6 +44,7 @@
             'user_answer_text' => $userAnswerText,
             'correct_answer_text' => $correctAnswerText,
             'question_text' => $qTextStr,
+            'explanation_video_url' => $ans['explanation_video_url'] ?? null,
         ];
     }
 @endphp
@@ -173,6 +174,16 @@
                             @endif
                         </div>
                     </div>
+
+                    @if($res['explanation_video_url'])
+                    <div class="mt-3 pt-3 border-t border-[rgb(var(--surface-container-high))/0.6]">
+                        <span class="inline-flex items-center gap-1.5 text-4xs font-black uppercase tracking-widest text-[rgb(var(--primary))] mb-1">
+                            <span class="material-symbols-outlined !text-sm">play_circle</span>
+                            İzah Videosu
+                        </span>
+                        {!! renderVideoEmbed($res['explanation_video_url']) !!}
+                    </div>
+                    @endif
                 </div>
                 @endforeach
             </div>

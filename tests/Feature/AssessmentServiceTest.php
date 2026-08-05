@@ -434,3 +434,37 @@ it('builds empty result when no attempts', function () {
         ->and($result['total'])->toBe(0)
         ->and($result['answers'])->toBe([]);
 });
+
+it('carries explanation_video_url into evaluation and persisted result rebuilds', function () {
+    $this->regularQuestion->update(['explanation_video_url' => 'https://youtu.be/dQw4w9WgXcQ']);
+
+    $quiz = Quiz::create(['name' => 'Video Quiz', 'lesson_id' => $this->lesson->id, 'type' => 'topic_based']);
+    $quiz->questions()->attach([$this->regularQuestion->id, $this->openQuestion->id]);
+
+    $result = $this->service->submitQuiz(
+        $this->user,
+        $this->student,
+        $quiz,
+        [
+            ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
+            ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
+        ],
+        'en',
+    );
+
+    $byQuestion = collect($result['answers'])->keyBy('question_id');
+
+    // Fresh submission carries the URL through the evaluation result.
+    expect($byQuestion[$this->regularQuestion->id]['explanation_video_url'])->toBe('https://youtu.be/dQw4w9WgXcQ')
+        ->and($byQuestion[$this->openQuestion->id]['explanation_video_url'])->toBeNull();
+
+    // Rebuilding from persisted attempts also carries the URL.
+    $attempts = StudentQuiz::where('student_id', $this->student->id)
+        ->where('quiz_id', $quiz->id)
+        ->with('question')
+        ->get();
+
+    $rebuilt = collect($this->service->buildResultFromAttempts($attempts, 'en')['answers'])->keyBy('question_id');
+    expect($rebuilt[$this->regularQuestion->id]['explanation_video_url'])->toBe('https://youtu.be/dQw4w9WgXcQ')
+        ->and($rebuilt[$this->openQuestion->id]['explanation_video_url'])->toBeNull();
+});

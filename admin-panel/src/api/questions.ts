@@ -19,6 +19,7 @@ export interface Question {
   variant_e: { type: string; content: string }[] | null;
   open_answer: { type: string; content: string }[] | null;
   explanation: { type: string; content: string }[] | null;
+  explanation_video_url: string | null;
 }
 
 export interface QuestionFormData {
@@ -35,6 +36,7 @@ export interface QuestionFormData {
   open_answer?: { type: string; content: string }[];
   answer_type?: string;
   explanation?: { type: string; content: string }[];
+  explanation_video_url?: string | null;
 }
 
 export function toContentBlock(text: string): { type: string; content: string }[] {

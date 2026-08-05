@@ -95,6 +95,7 @@ class StudentQuizController extends Controller
             'answer' => $a['answer'],
             'correct_answer' => $a['correct_answer'],
             'is_correct' => $a['is_correct'],
+            'explanation_video_url' => $a['explanation_video_url'] ?? null,
         ])->values()->all();
 
         return apiResponse(data: [
@@ -151,6 +152,7 @@ class StudentQuizController extends Controller
                     'answer' => $a->answer,
                     'correct_answer' => $a->correct_answer,
                     'is_correct' => $a->is_correct,
+                    'explanation_video_url' => $a->question?->explanation_video_url,
                 ];
             }),
         ]);

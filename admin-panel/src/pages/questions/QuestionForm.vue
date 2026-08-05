@@ -36,6 +36,7 @@ const rightAnswer = ref('')
 const openAnswerBlocks = ref<ContentBlock[]>([])
 const answerType = ref('')
 const explanationBlocks = ref<ContentBlock[]>([])
+const explanationVideoUrl = ref('')
 const difficulty = ref<number>(3)
 const saving = ref(false)
 const formError = ref('')
@@ -128,6 +129,7 @@ function resetForm() {
   openAnswerBlocks.value = [{ type: 'text', content: '' }]
   answerType.value = ''
   explanationBlocks.value = []
+  explanationVideoUrl.value = ''
   difficulty.value = 3
   formError.value = ''
 }
@@ -146,6 +148,7 @@ function populateForm(q: Question) {
   openAnswerBlocks.value = q.open_answer ?? []
   answerType.value = q.answer_type || ''
   explanationBlocks.value = q.explanation ?? []
+  explanationVideoUrl.value = q.explanation_video_url || ''
   difficulty.value = q.difficulty_level
 }
 
@@ -236,6 +239,10 @@ function buildPayload() {
 
   if (explanationBlocks.value.length) {
     payload.explanation = explanationBlocks.value
+  }
+
+  if (explanationVideoUrl.value.trim()) {
+    payload.explanation_video_url = explanationVideoUrl.value.trim()
   }
 
   return payload
@@ -647,6 +654,21 @@ const availableVariants = computed(() => {
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">İzah (istəyə bağlı)</label>
         <ContentBlockEditor v-model="explanationBlocks" placeholder="Sualın izahı" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          İzah videosu URL <span class="text-gray-400 font-normal">(istəyə bağlı)</span>
+        </label>
+        <input
+          v-model="explanationVideoUrl"
+          type="url"
+          placeholder="https://www.youtube.com/watch?v=..."
+          class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
+        />
+        <p class="mt-1 text-xs text-gray-400">
+          YouTube və ya birbaşa video linki. Şagird sualı cavabladıqdan sonra bu video göstərilir.
+        </p>
       </div>
     </div>
 

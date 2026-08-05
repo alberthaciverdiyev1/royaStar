@@ -65,6 +65,38 @@ if (!function_exists('processQuestionMedia')) {
     }
 }
 
+if (!function_exists('renderVideoEmbed')) {
+
+    /**
+     * Render an explanation video URL as an embeddable player.
+     * YouTube links become iframes; anything else falls back to <video controls>.
+     */
+    function renderVideoEmbed(?string $url): string
+    {
+        if (empty($url)) {
+            return '';
+        }
+
+        $url = trim($url);
+
+        // YouTube — normalize watch / youtu.be / shorts links into an embeddable iframe.
+        if (preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{6,})~', $url, $m)) {
+            $videoId = $m[1];
+            return '<div class="mt-3 rounded-xl overflow-hidden border border-[rgb(var(--surface-container-high))/0.6] bg-black/5">'
+                . '<iframe class="w-full aspect-video" src="https://www.youtube.com/embed/' . e($videoId) . '?rel=0" '
+                . 'title="Explanation video" frameborder="0" '
+                . 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" '
+                . 'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
+                . '</div>';
+        }
+
+        // Generic video file (mp4, webm, etc.).
+        return '<div class="mt-3 rounded-xl overflow-hidden border border-[rgb(var(--surface-container-high))/0.6] bg-black/5">'
+            . '<video class="w-full aspect-video" src="' . e($url) . '" controls preload="none"></video>'
+            . '</div>';
+    }
+}
+
 if (!function_exists('renderContentBlocks')) {
 
     /**

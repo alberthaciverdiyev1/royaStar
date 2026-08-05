@@ -18,6 +18,7 @@ class QuestionResource extends BaseResource
             'answer_type' => $this->answer_type,
             'difficulty_level' => $this->difficulty_level,
             'question' => $this->question,
+            'explanation_video_url' => $this->explanation_video_url,
             'created_at' => $this->created_at,
         ];
 

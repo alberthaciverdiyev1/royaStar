@@ -25,6 +25,7 @@ class UpdateQuestionRequest extends FormRequest
             'explanation' => 'nullable|array',
             'explanation.*.type' => 'in:text,image,audio',
             'explanation.*.content' => 'string',
+            'explanation_video_url' => 'nullable|url|max:1000',
             'answer_type' => 'nullable|string|in:exact,similar',
             'difficulty_level' => ['sometimes', Rule::enum(DifficultyLevel::class)],
             'lesson_id' => 'sometimes|exists:lessons,id',

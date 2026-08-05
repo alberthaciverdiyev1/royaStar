@@ -16,7 +16,7 @@ class Question extends Model
     protected $fillable = [
         'question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e',
         'right_answer', 'open_answer', 'type', 'explanation',
-        'difficulty_level', 'lesson_id', 'answer_type',
+        'difficulty_level', 'lesson_id', 'answer_type', 'explanation_video_url',
     ];
 
     protected function casts(): array

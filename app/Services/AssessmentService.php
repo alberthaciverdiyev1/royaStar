@@ -217,6 +217,7 @@ class AssessmentService
                 'correct_answer' => $correctAnswer,
                 'is_correct' => $isCorrect,
                 'question_text' => $question->question[$locale] ?? $question->question['az'] ?? [],
+                'explanation_video_url' => $question->explanation_video_url,
                 'variants' => [
                     'a' => $question->variant_a[$locale] ?? $question->variant_a['az'] ?? [],
                     'b' => $question->variant_b[$locale] ?? $question->variant_b['az'] ?? [],
@@ -268,6 +269,7 @@ class AssessmentService
                     'correct_answer' => $a->correct_answer,
                     'is_correct' => $a->is_correct,
                     'question_text' => $q?->question[$locale] ?? $q?->question['az'] ?? [],
+                    'explanation_video_url' => $q?->explanation_video_url,
                     'variants' => [
                         'a' => $q?->variant_a[$locale] ?? $q?->variant_a['az'] ?? [],
                         'b' => $q?->variant_b[$locale] ?? $q?->variant_b['az'] ?? [],
