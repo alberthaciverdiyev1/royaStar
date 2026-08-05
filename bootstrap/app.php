@@ -28,7 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
             \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\TokenFromCookie::class,
         ]);
 

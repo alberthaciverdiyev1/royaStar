@@ -35,7 +35,7 @@
                     <select name="city_id" class="signup-input">
                         <option value="">Select City</option>
                         @foreach($cities as $city)
-                        <option value="{{ $city->id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name[app()->getLocale()] ?? $city->name['az'] ?? '' }}</option>
+                        <option value="{{ $city->id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -44,7 +44,7 @@
                     <select name="grade_id" class="signup-input">
                         <option value="">Select Grade</option>
                         @foreach($grades as $grade)
-                        <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>{{ $grade->name[app()->getLocale()] ?? $grade->name['az'] ?? '' }}</option>
+                        <option value="{{ $grade->id }}" {{ old('grade_id') == $grade->id ? 'selected' : '' }}>{{ $grade->name }}</option>
                         @endforeach
                     </select>
                 </div>

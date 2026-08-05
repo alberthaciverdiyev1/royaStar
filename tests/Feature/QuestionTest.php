@@ -29,27 +29,22 @@ beforeEach(function () {
 
 function t(string $content): array
 {
-    return ['type' => 'text', 'content' => $content];
-}
-
-function loc(string $en, string $az): array
-{
-    return ['en' => t($en), 'az' => t($az)];
+    return [['type' => 'text', 'content' => $content]];
 }
 
 function regularQuestionData($lessonId, $overrides = []): array
 {
     return array_merge([
-        'question' => loc('What is 2+2?', '2+2 neçədir?'),
+        'question' => t('What is 2+2?'),
         'type' => 'regular',
-        'variant_a' => loc('3', '3'),
-        'variant_b' => loc('4', '4'),
-        'variant_c' => loc('5', '5'),
-        'variant_d' => loc('6', '6'),
-        'variant_e' => loc('7', '7'),
+        'variant_a' => t('3'),
+        'variant_b' => t('4'),
+        'variant_c' => t('5'),
+        'variant_d' => t('6'),
+        'variant_e' => t('7'),
         'right_answer' => 'variant_b',
         'open_answer' => null,
-        'explanation' => loc('Basic addition', 'Sadə toplama'),
+        'explanation' => t('Basic addition'),
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $lessonId,
     ], $overrides);
@@ -58,11 +53,11 @@ function regularQuestionData($lessonId, $overrides = []): array
 function openQuestionData($lessonId, $overrides = []): array
 {
     return array_merge([
-        'question' => loc('Explain gravity', 'Cazibə qüvvəsini izah edin'),
+        'question' => t('Explain gravity'),
         'type' => 'open',
         'answer_type' => 'exact',
-        'open_answer' => loc('A force that attracts', 'Cəlb edən qüvvə'),
-        'explanation' => loc('Physics concept', 'Fizika anlayışı'),
+        'open_answer' => t('A force that attracts'),
+        'explanation' => t('Physics concept'),
         'difficulty_level' => DifficultyLevel::Advanced->value,
         'lesson_id' => $lessonId,
     ], $overrides);
@@ -158,7 +153,7 @@ it('shows a question by id', function () {
     $response->assertStatus(200)
         ->assertJson(['success' => true, 'status_code' => 200]);
     expect($response->json('data.id'))->toBe($question->id);
-    expect($response->json('data.question.en.content'))->toBe('What is 2+2?');
+    expect($response->json('data.question.0.content'))->toBe('What is 2+2?');
 });
 
 it('shows an open type question', function () {
@@ -168,7 +163,7 @@ it('shows an open type question', function () {
 
     $response->assertStatus(200);
     expect($response->json('data.type'))->toBe('open');
-    expect($response->json('data.open_answer.en.content'))->toBe('A force that attracts');
+    expect($response->json('data.open_answer.0.content'))->toBe('A force that attracts');
     expect($response->json('data.right_answer'))->toBeNull();
 });
 
@@ -197,13 +192,13 @@ it('allows admin to show question', function () {
     $response->assertStatus(200);
 });
 
-it('returns raw nested translation array for admin', function () {
+it('returns raw content-block array for admin', function () {
     $question = Question::create(regularQuestionData($this->lesson->id));
 
-    // Admin access — returns raw translation array
+    // Admin access — returns the plain content-block array as stored.
     $response = $this->actingAs($this->admin)->getJson("/api/admin/questions/{$question->id}");
-    expect($response->json('data.question.en.content'))->toBe('What is 2+2?');
-    expect($response->json('data.question.az.content'))->toBe('2+2 neçədir?');
+    expect($response->json('data.question.0.content'))->toBe('What is 2+2?');
+    expect($response->json('data.question'))->toBe(t('What is 2+2?'));
 });
 
 // ─── Store Question (Admin) ─────────────────────────────────────────
@@ -218,7 +213,7 @@ it('creates a regular question as admin', function () {
     $response->assertStatus(201)
         ->assertJson(['success' => true, 'status_code' => 201]);
     assertQuestionStructure($response->json('data'), 'regular');
-    expect($response->json('data.variant_a.en'))->toBe(t('3'));
+    expect($response->json('data.variant_a.0'))->toBe(['type' => 'text', 'content' => '3']);
     expect($response->json('data.right_answer'))->toBe('variant_b');
     expect($response->json('data.difficulty_level'))->toBe(DifficultyLevel::Beginner->value);
     $this->assertDatabaseHas('questions', ['id' => $response->json('data.id')]);
@@ -233,18 +228,17 @@ it('creates an open question as admin', function () {
 
     $response->assertStatus(201);
     expect($response->json('data.type'))->toBe('open');
-    expect($response->json('data.open_answer.en'))->toBe(t('A force that attracts'));
+    expect($response->json('data.open_answer.0'))->toBe(['type' => 'text', 'content' => 'A force that attracts']);
     // Open questions should have null variants
     expect($response->json('data.variant_a'))->toBeNull();
     expect($response->json('data.right_answer'))->toBeNull();
 });
 
-it('normalizes plain content blocks from the admin panel into all locales', function () {
+it('stores plain content-block arrays from the admin panel as-is', function () {
     $admin = User::factory()->create(['type' => 'admin']);
     $admin->assignRole('admin');
 
-    // This is exactly what the admin panel sends: plain content-block arrays,
-    // not locale-keyed objects.
+    // This is exactly what the admin panel sends: plain content-block arrays.
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
         'question' => [['type' => 'text', 'content' => 'salammm']],
         'type' => 'regular',
@@ -259,18 +253,13 @@ it('normalizes plain content blocks from the admin panel into all locales', func
     $response->assertStatus(201);
     $id = $response->json('data.id');
 
-    // Stored shape is locale-keyed so web/API reads work.
+    // Stored and returned shape is the same plain array (single-language).
     $stored = Question::find($id);
-    expect($stored->question)->toHaveKeys(['az', 'en', 'ru'])
-        ->and($stored->question['az'][0]['content'])->toBe('salammm')
-        ->and($stored->question['en'][0]['content'])->toBe('salammm');
-
-    // The read path resolves plain content for any locale (what web + API use).
-    expect(contentForLocale($stored->question, 'en'))->toBe([['type' => 'text', 'content' => 'salammm']])
-        ->and(contentForLocale($stored->question, 'az'))->toBe([['type' => 'text', 'content' => 'salammm']]);
+    expect($stored->question)->toBe([['type' => 'text', 'content' => 'salammm']])
+        ->and($response->json('data.question'))->toBe([['type' => 'text', 'content' => 'salammm']]);
 });
 
-it('reads plain content-block arrays stored before normalization', function () {
+it('reads plain content-block arrays from any stored question', function () {
     $question = Question::create([
         'question' => [['type' => 'text', 'content' => 'legacy plain']],
         'type' => 'regular',
@@ -282,10 +271,10 @@ it('reads plain content-block arrays stored before normalization', function () {
         'lesson_id' => $this->lesson->id,
     ]);
 
-    // Old rows that were never normalized still render through the read helper.
-    expect(contentForLocale($question->question, 'en'))->toBe([['type' => 'text', 'content' => 'legacy plain']])
-        ->and(contentForLocale($question->variant_a, 'az'))->toBe([['type' => 'text', 'content' => 'A']])
-        ->and(contentForLocale(null, 'en'))->toBe([]);
+    // Read path exposes the plain content directly.
+    expect($question->question)->toBe([['type' => 'text', 'content' => 'legacy plain']])
+        ->and($question->variant_a)->toBe([['type' => 'text', 'content' => 'A']])
+        ->and($question->open_answer ?? [])->toBe([]);
 });
 
 it('fails to create question without admin role', function () {
@@ -331,7 +320,7 @@ it('validates type field is required and must be valid', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
     ]);
 
     $response->assertStatus(422);
@@ -343,7 +332,7 @@ it('rejects invalid type value', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
         'type' => 'invalid_type',
         'lesson_id' => $this->lesson->id,
         'difficulty_level' => DifficultyLevel::Beginner->value,
@@ -357,7 +346,7 @@ it('validates difficulty_level must be a valid enum value', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
         'type' => 'regular',
         'difficulty_level' => 99,
         'lesson_id' => $this->lesson->id,
@@ -384,7 +373,7 @@ it('requires open_answer when type is open', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Explain?')],
+        'question' => t('Explain?'),
         'type' => 'open',
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
@@ -419,7 +408,7 @@ it('requires variant_a, variant_b, variant_c when type is regular', function () 
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
         'type' => 'regular',
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
@@ -436,11 +425,11 @@ it('allows variant_d and variant_e to be optional for regular questions', functi
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
         'type' => 'regular',
-        'variant_a' => ['en' => t('A')],
-        'variant_b' => ['en' => t('B')],
-        'variant_c' => ['en' => t('C')],
+        'variant_a' => t('A'),
+        'variant_b' => t('B'),
+        'variant_c' => t('C'),
         'right_answer' => 'variant_a',
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
@@ -456,11 +445,11 @@ it('requires right_answer when type is regular', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
         'type' => 'regular',
-        'variant_a' => ['en' => t('A')],
-        'variant_b' => ['en' => t('B')],
-        'variant_c' => ['en' => t('C')],
+        'variant_a' => t('A'),
+        'variant_b' => t('B'),
+        'variant_c' => t('C'),
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
     ]);
@@ -474,18 +463,18 @@ it('validates question.*.type must be text or image', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
-        'question' => ['en' => ['type' => 'video', 'content' => 'x']],
+        'question' => [['type' => 'video', 'content' => 'x']],
         'type' => 'regular',
-        'variant_a' => ['en' => t('A')],
-        'variant_b' => ['en' => t('B')],
-        'variant_c' => ['en' => t('C')],
+        'variant_a' => t('A'),
+        'variant_b' => t('B'),
+        'variant_c' => t('C'),
         'right_answer' => 'variant_a',
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
     ]);
 
     $response->assertStatus(422);
-    expect($response->json('errors'))->toHaveKey('question.en.type');
+    expect($response->json('errors'))->toHaveKey('question.0.type');
 });
 
 it('stores an image-type variant', function () {
@@ -493,13 +482,13 @@ it('stores an image-type variant', function () {
     $admin->assignRole('admin');
 
     $data = regularQuestionData($this->lesson->id, [
-        'variant_a' => ['en' => ['type' => 'image', 'content' => 'variants/a.jpg']],
+        'variant_a' => [['type' => 'image', 'content' => 'variants/a.jpg']],
     ]);
 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', $data);
 
     $response->assertStatus(201);
-    expect($response->json('data.variant_a.en'))->toBe(['type' => 'image', 'content' => 'variants/a.jpg']);
+    expect($response->json('data.variant_a.0'))->toBe(['type' => 'image', 'content' => 'variants/a.jpg']);
 });
 
 it('stores a base64 image and replaces content with url on create', function () {
@@ -508,7 +497,7 @@ it('stores a base64 image and replaces content with url on create', function () 
 
     $data = regularQuestionData($this->lesson->id, [
         'variant_a' => [
-            'en' => [
+            [
                 'type' => 'image',
                 'content' => 'data:image/png;base64,' . base64_encode('fake-png-content'),
             ],
@@ -518,7 +507,7 @@ it('stores a base64 image and replaces content with url on create', function () 
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', $data);
 
     $response->assertStatus(201);
-    $url = $response->json('data.variant_a.en.content');
+    $url = $response->json('data.variant_a.0.content');
     expect($url)->toMatch('#/storage/questions/[a-f0-9-]+\.png$#');
     // Verify the file was actually saved
     $disk = \Illuminate\Support\Facades\Storage::disk('public');
@@ -534,7 +523,7 @@ it('stores a base64 image on update', function () {
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'variant_a' => [
-            'en' => [
+            [
                 'type' => 'image',
                 'content' => 'data:image/jpeg;base64,' . base64_encode('updated-image'),
             ],
@@ -542,7 +531,7 @@ it('stores a base64 image on update', function () {
     ]);
 
     $response->assertStatus(200);
-    $url = $response->json('data.variant_a.en.content');
+    $url = $response->json('data.variant_a.0.content');
     expect($url)->toMatch('#/storage/questions/[a-f0-9-]+\.jpg$#');
     $disk = \Illuminate\Support\Facades\Storage::disk('public');
     $relativePath = substr(parse_url($url, PHP_URL_PATH), strlen('/storage/'));
@@ -558,7 +547,7 @@ it('does not modify text content in image processing', function () {
     $response = $this->actingAs($admin)->postJson('/api/admin/questions', $data);
 
     $response->assertStatus(201);
-    expect($response->json('data.variant_a.en'))->toBe(['type' => 'text', 'content' => '3']);
+    expect($response->json('data.variant_a.0'))->toBe(['type' => 'text', 'content' => '3']);
 });
 // ─── Update Question (Admin) ────────────────────────────────────────
 
@@ -568,16 +557,16 @@ it('updates a regular question as admin', function () {
     $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
-        'question' => loc('What is 3+3?', '3+3 neçədir?'),
-        'variant_a' => loc('5', '5'),
-        'variant_b' => loc('6', '6'),
-        'variant_c' => loc('7', '7'),
+        'question' => t('What is 3+3?'),
+        'variant_a' => t('5'),
+        'variant_b' => t('6'),
+        'variant_c' => t('7'),
         'right_answer' => 'variant_b',
     ]);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true, 'status_code' => 200]);
-    expect($response->json('data.question.en'))->toBe(t('What is 3+3?'));
+    expect($response->json('data.question.0'))->toBe(['type' => 'text', 'content' => 'What is 3+3?']);
     expect($response->json('data.right_answer'))->toBe('variant_b');
 });
 
@@ -587,13 +576,13 @@ it('updates an open question as admin', function () {
     $question = Question::create(openQuestionData($this->lesson->id));
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
-        'question' => ['en' => t('Explain dark matter')],
-        'open_answer' => ['en' => t('Mysterious matter')],
+        'question' => t('Explain dark matter'),
+        'open_answer' => t('Mysterious matter'),
     ]);
 
     $response->assertStatus(200);
-    expect($response->json('data.question.en'))->toBe(t('Explain dark matter'));
-    expect($response->json('data.open_answer.en'))->toBe(t('Mysterious matter'));
+    expect($response->json('data.question.0'))->toBe(['type' => 'text', 'content' => 'Explain dark matter']);
+    expect($response->json('data.open_answer.0'))->toBe(['type' => 'text', 'content' => 'Mysterious matter']);
 });
 
 it('updates question type from regular to open', function () {
@@ -603,12 +592,12 @@ it('updates question type from regular to open', function () {
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'type' => 'open',
-        'open_answer' => ['en' => t('New answer')],
+        'open_answer' => t('New answer'),
     ]);
 
     $response->assertStatus(200);
     expect($response->json('data.type'))->toBe('open');
-    expect($response->json('data.open_answer.en'))->toBe(t('New answer'));
+    expect($response->json('data.open_answer.0'))->toBe(['type' => 'text', 'content' => 'New answer']);
 });
 
 it('returns 404 when updating non-existent question', function () {
@@ -616,7 +605,7 @@ it('returns 404 when updating non-existent question', function () {
     $admin->assignRole('admin');
 
     $response = $this->actingAs($admin)->putJson('/api/admin/questions/99999', [
-        'question' => ['en' => t('Test')],
+        'question' => t('Test'),
     ]);
 
     $response->assertStatus(404);
@@ -627,7 +616,7 @@ it('fails to update question without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 
     $response = $this->actingAs($user)->putJson("/api/admin/questions/{$question->id}", [
-        'question' => ['en' => t('Hacked')],
+        'question' => t('Hacked'),
     ]);
 
     $response->assertStatus(403);
@@ -637,7 +626,7 @@ it('fails to update question without authentication', function () {
     $question = Question::create(regularQuestionData($this->lesson->id));
 
     $response = $this->putJson("/api/admin/questions/{$question->id}", [
-        'question' => ['en' => t('Hacked')],
+        'question' => t('Hacked'),
     ]);
 
     $response->assertStatus(401);
@@ -691,9 +680,9 @@ it('validates right_answer required when updating type to regular', function () 
 
     $response = $this->actingAs($admin)->putJson("/api/admin/questions/{$question->id}", [
         'type' => 'regular',
-        'variant_a' => ['en' => t('A')],
-        'variant_b' => ['en' => t('B')],
-        'variant_c' => ['en' => t('C')],
+        'variant_a' => t('A'),
+        'variant_b' => t('B'),
+        'variant_c' => t('C'),
     ]);
 
     $response->assertStatus(422);

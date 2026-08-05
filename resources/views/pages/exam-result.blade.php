@@ -79,7 +79,7 @@
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white">
                     <span class="material-symbols-outlined !text-xs">assignment_turned_in</span>
                     @if($exam->grade)
-                    @php $gradeName = $exam->grade->name[app()->getLocale()] ?? $exam->grade->name['az'] ?? ''; @endphp
+                    @php $gradeName = $exam->grade->name ?? ''; @endphp
                     {{ $gradeName }} Exam Report
                     @else
                     Exam Report

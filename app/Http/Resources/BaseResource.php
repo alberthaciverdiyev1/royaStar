@@ -16,9 +16,4 @@ abstract class BaseResource extends JsonResource
 
         return $user && ($user->hasAnyRole(['super-admin', 'admin']) || $user->type === 'admin');
     }
-
-    protected function translate(string $field): mixed
-    {
-        return $this->resource->localeValue($field);
-    }
 }

@@ -37,34 +37,34 @@ beforeEach(function () {
 
     // Regular question — correct answer is 'b'
     $this->regularQuestion = Question::create([
-        'question' => ['en' => [['type' => 'text', 'content' => 'What is 2+2?']]],
+        'question' => [['type' => 'text', 'content' => 'What is 2+2?']],
         'type' => 'regular',
         'right_answer' => 'b',
-        'variant_a' => ['en' => [['type' => 'text', 'content' => '3']]],
-        'variant_b' => ['en' => [['type' => 'text', 'content' => '4']]],
-        'variant_c' => ['en' => [['type' => 'text', 'content' => '5']]],
-        'variant_d' => ['en' => [['type' => 'text', 'content' => '6']]],
-        'variant_e' => ['en' => [['type' => 'text', 'content' => '7']]],
+        'variant_a' => [['type' => 'text', 'content' => '3']],
+        'variant_b' => [['type' => 'text', 'content' => '4']],
+        'variant_c' => [['type' => 'text', 'content' => '5']],
+        'variant_d' => [['type' => 'text', 'content' => '6']],
+        'variant_e' => [['type' => 'text', 'content' => '7']],
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $lesson->id,
     ]);
 
     // Open question — exact answer 'Paris'
     $this->openQuestion = Question::create([
-        'question' => ['en' => [['type' => 'text', 'content' => 'Capital of France?']]],
+        'question' => [['type' => 'text', 'content' => 'Capital of France?']],
         'type' => 'open',
         'answer_type' => 'exact',
-        'open_answer' => ['en' => [['type' => 'text', 'content' => 'Paris']]],
+        'open_answer' => [['type' => 'text', 'content' => 'Paris']],
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $lesson->id,
     ]);
 
     // Open question — similar answer 'Azerbaijan'
     $this->similarQuestion = Question::create([
-        'question' => ['en' => [['type' => 'text', 'content' => 'Country of Baku?']]],
+        'question' => [['type' => 'text', 'content' => 'Country of Baku?']],
         'type' => 'open',
         'answer_type' => 'similar',
-        'open_answer' => ['en' => [['type' => 'text', 'content' => 'Azerbaijan']]],
+        'open_answer' => [['type' => 'text', 'content' => 'Azerbaijan']],
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $lesson->id,
     ]);
@@ -89,44 +89,44 @@ beforeEach(function () {
 
 it('resolves a letter right_answer', function () {
     $q = Question::create([
-        'question' => ['en' => [['type' => 'text', 'content' => 'Q']]],
+        'question' => [['type' => 'text', 'content' => 'Q']],
         'type' => 'regular',
         'right_answer' => 'c',
-        'variant_a' => ['en' => [['type' => 'text', 'content' => '1']]],
-        'variant_b' => ['en' => [['type' => 'text', 'content' => '2']]],
-        'variant_c' => ['en' => [['type' => 'text', 'content' => '3']]],
-        'variant_d' => ['en' => [['type' => 'text', 'content' => '4']]],
-        'variant_e' => ['en' => [['type' => 'text', 'content' => '5']]],
+        'variant_a' => [['type' => 'text', 'content' => '1']],
+        'variant_b' => [['type' => 'text', 'content' => '2']],
+        'variant_c' => [['type' => 'text', 'content' => '3']],
+        'variant_d' => [['type' => 'text', 'content' => '4']],
+        'variant_e' => [['type' => 'text', 'content' => '5']],
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
     ]);
 
-    expect($this->service->resolveRightAnswerLetter($q, 'en'))->toBe('c');
+    expect($this->service->resolveRightAnswerLetter($q))->toBe('c');
 });
 
 it('resolves variant_x right_answer by matching variant text', function () {
     $q = Question::create([
-        'question' => ['en' => [['type' => 'text', 'content' => 'Q']]],
+        'question' => [['type' => 'text', 'content' => 'Q']],
         'type' => 'regular',
         'right_answer' => 'variant_d',
-        'variant_a' => ['en' => [['type' => 'text', 'content' => '1']]],
-        'variant_b' => ['en' => [['type' => 'text', 'content' => '2']]],
-        'variant_c' => ['en' => [['type' => 'text', 'content' => '3']]],
-        'variant_d' => ['en' => [['type' => 'text', 'content' => '4']]],
-        'variant_e' => ['en' => [['type' => 'text', 'content' => '5']]],
+        'variant_a' => [['type' => 'text', 'content' => '1']],
+        'variant_b' => [['type' => 'text', 'content' => '2']],
+        'variant_c' => [['type' => 'text', 'content' => '3']],
+        'variant_d' => [['type' => 'text', 'content' => '4']],
+        'variant_e' => [['type' => 'text', 'content' => '5']],
         'difficulty_level' => DifficultyLevel::Beginner->value,
         'lesson_id' => $this->lesson->id,
     ]);
 
-    expect($this->service->resolveRightAnswerLetter($q, 'en'))->toBe('d');
+    expect($this->service->resolveRightAnswerLetter($q))->toBe('d');
 });
 
 it('returns empty string for open questions', function () {
-    expect($this->service->resolveRightAnswerLetter($this->openQuestion, 'en'))->toBe('');
+    expect($this->service->resolveRightAnswerLetter($this->openQuestion))->toBe('');
 });
 
 it('returns empty string for null question', function () {
-    expect($this->service->resolveRightAnswerLetter(null, 'en'))->toBe('');
+    expect($this->service->resolveRightAnswerLetter(null))->toBe('');
 });
 
 // ─── evaluateAnswers ────────────────────────────────────────────
@@ -137,7 +137,7 @@ it('evaluates a fully correct quiz', function () {
     $result = $this->service->evaluateAnswers([
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['score'])->toEqual(100)
         ->and($result['total'])->toBe(2)
@@ -152,7 +152,7 @@ it('evaluates wrong, skipped, and correct answers', function () {
     $result = $this->service->evaluateAnswers([
         ['question_id' => $this->regularQuestion->id, 'answer' => 'a'], // wrong
         ['question_id' => $this->openQuestion->id, 'answer' => ''],     // skipped
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['score'])->toEqual(0)
         ->and($result['total'])->toBe(2)
@@ -166,7 +166,7 @@ it('accepts a similar open answer that matches exactly', function () {
 
     $result = $this->service->evaluateAnswers([
         ['question_id' => $this->similarQuestion->id, 'answer' => 'Azerbaijan'],
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['score'])->toEqual(100)
         ->and($result['correct'])->toBe(1)
@@ -178,7 +178,7 @@ it('accepts a similar open answer with light typos or formatting noise', functio
 
     $result = $this->service->evaluateAnswers([
         ['question_id' => $this->similarQuestion->id, 'answer' => ' azerbaijan! '],
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['score'])->toEqual(100)
         ->and($result['correct'])->toBe(1)
@@ -190,7 +190,7 @@ it('rejects a clearly unrelated similar answer', function () {
 
     $result = $this->service->evaluateAnswers([
         ['question_id' => $this->similarQuestion->id, 'answer' => 'Brazil'],
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['score'])->toEqual(0)
         ->and($result['correct'])->toBe(0)
@@ -200,7 +200,7 @@ it('rejects a clearly unrelated similar answer', function () {
 it('handles empty answers array', function () {
     $questions = collect([$this->regularQuestion])->keyBy('id');
 
-    $result = $this->service->evaluateAnswers([], $questions, 'en');
+    $result = $this->service->evaluateAnswers([], $questions);
 
     // Every question without a submitted answer counts as skipped, and a
     // per-question record is still produced so persisted scores stay consistent.
@@ -218,7 +218,7 @@ it('persists skipped questions when submission is partial', function () {
     // Only one of the two questions is submitted.
     $result = $this->service->evaluateAnswers([
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['total'])->toBe(2)
         ->and($result['correct'])->toBe(1)
@@ -234,7 +234,7 @@ it('ignores answers for unknown questions', function () {
 
     $result = $this->service->evaluateAnswers([
         ['question_id' => 99999, 'answer' => 'b'],
-    ], $questions, 'en');
+    ], $questions);
 
     expect($result['total'])->toBe(1)
         ->and($result['correct'])->toBe(0);
@@ -252,7 +252,7 @@ it('persists quiz attempts and awards stars on first completion', function () {
     $result = $this->service->submitQuiz($this->user, $this->student, $quiz, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     expect($result['score'])->toEqual(100);
 
@@ -283,13 +283,13 @@ it('does not award duplicate stars on repeated quiz completion', function () {
     $this->service->submitQuiz($this->user, $this->student, $quiz, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     // Second attempt replaces records
     $this->service->submitQuiz($this->user, $this->student, $quiz, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     // Old attempts soft-deleted and replaced, not duplicated
     expect(StudentQuiz::where('student_id', $this->student->id)->where('quiz_id', $quiz->id)->count())->toBe(2);
@@ -308,7 +308,7 @@ it('does not award perfect star when score is not 100', function () {
     $this->service->submitQuiz($this->user, $this->student, $quiz, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'a'], // wrong
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     $this->assertDatabaseHas('user_stars', [
         'user_id' => $this->user->id,
@@ -339,7 +339,7 @@ it('persists exam attempts and awards stars on passing score', function () {
     $result = $this->service->submitExam($this->user, $this->student, $exam, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     expect($result['score'])->toEqual(100);
 
@@ -372,12 +372,12 @@ it('replaces exam attempts on resubmission', function () {
     $this->service->submitExam($this->user, $this->student, $exam, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     $this->service->submitExam($this->user, $this->student, $exam, [
         ['question_id' => $this->regularQuestion->id, 'answer' => 'a'],
         ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
-    ], 'en');
+    ]);
 
     // Old attempts soft-deleted and replaced, not duplicated
     expect(StudentExam::where('student_id', $this->student->id)->where('exam_id', $exam->id)->count())->toBe(2);
@@ -415,7 +415,7 @@ it('builds result from persisted quiz attempts', function () {
         ->with('question')
         ->get();
 
-    $result = $this->service->buildResultFromAttempts($attempts, 'en');
+    $result = $this->service->buildResultFromAttempts($attempts);
 
     expect($result['score'])->toEqual(50)
         ->and($result['total'])->toBe(2)
@@ -428,7 +428,7 @@ it('builds result from persisted quiz attempts', function () {
 it('builds empty result when no attempts', function () {
     $attempts = collect();
 
-    $result = $this->service->buildResultFromAttempts($attempts, 'en');
+    $result = $this->service->buildResultFromAttempts($attempts);
 
     expect($result['score'])->toEqual(0)
         ->and($result['total'])->toBe(0)
@@ -449,7 +449,6 @@ it('carries explanation_video_url into evaluation and persisted result rebuilds'
             ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
             ['question_id' => $this->openQuestion->id, 'answer' => 'Paris'],
         ],
-        'en',
     );
 
     $byQuestion = collect($result['answers'])->keyBy('question_id');
@@ -464,7 +463,7 @@ it('carries explanation_video_url into evaluation and persisted result rebuilds'
         ->with('question')
         ->get();
 
-    $rebuilt = collect($this->service->buildResultFromAttempts($attempts, 'en')['answers'])->keyBy('question_id');
+    $rebuilt = collect($this->service->buildResultFromAttempts($attempts)['answers'])->keyBy('question_id');
     expect($rebuilt[$this->regularQuestion->id]['explanation_video_url'])->toBe('https://youtu.be/dQw4w9WgXcQ')
         ->and($rebuilt[$this->openQuestion->id]['explanation_video_url'])->toBeNull();
 });

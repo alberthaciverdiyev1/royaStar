@@ -48,7 +48,6 @@ class EnglishDemoSeeder extends Seeder
                 'lesson_id' => $lesson->id,
                 'name' => "{$topic->name} Video Dərs",
                 'youtube_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                'lang' => 'en',
             ]);
 
             $this->createRegularQuestions($topic, $lesson, $index);
@@ -184,41 +183,27 @@ class EnglishDemoSeeder extends Seeder
 
             Question::create([
                 'question' => [
-                    'az' => [['type' => 'text', 'content' => "{$qData['q']}"]],
-                    'en' => [['type' => 'text', 'content' => "{$qData['q']}"]],
-                    'ru' => [['type' => 'text', 'content' => "{$qData['q']}"]],
+                    ['type' => 'text', 'content' => "{$qData['q']}"],
                 ],
                 'type' => 'regular',
                 'right_answer' => $rightAnswer,
                 'variant_a' => [
-                    'az' => [['type' => 'text', 'content' => $qData['a']]],
-                    'en' => [['type' => 'text', 'content' => $qData['a']]],
-                    'ru' => [['type' => 'text', 'content' => $qData['a']]],
+                    ['type' => 'text', 'content' => $qData['a']],
                 ],
                 'variant_b' => [
-                    'az' => [['type' => 'text', 'content' => $qData['b']]],
-                    'en' => [['type' => 'text', 'content' => $qData['b']]],
-                    'ru' => [['type' => 'text', 'content' => $qData['b']]],
+                    ['type' => 'text', 'content' => $qData['b']],
                 ],
                 'variant_c' => [
-                    'az' => [['type' => 'text', 'content' => $qData['c']]],
-                    'en' => [['type' => 'text', 'content' => $qData['c']]],
-                    'ru' => [['type' => 'text', 'content' => $qData['c']]],
+                    ['type' => 'text', 'content' => $qData['c']],
                 ],
                 'variant_d' => [
-                    'az' => [['type' => 'text', 'content' => $qData['d']]],
-                    'en' => [['type' => 'text', 'content' => $qData['d']]],
-                    'ru' => [['type' => 'text', 'content' => $qData['d']]],
+                    ['type' => 'text', 'content' => $qData['d']],
                 ],
                 'variant_e' => [
-                    'az' => [['type' => 'text', 'content' => "I don't know"]],
-                    'en' => [['type' => 'text', 'content' => "I don't know"]],
-                    'ru' => [['type' => 'text', 'content' => "I don't know"]],
+                    ['type' => 'text', 'content' => "I don't know"],
                 ],
                 'explanation' => [
-                    'az' => [['type' => 'text', 'content' => "Doğru cavab: {$qData['a']}"]],
-                    'en' => [['type' => 'text', 'content' => "Correct answer: {$qData['a']}"]],
-                    'ru' => [['type' => 'text', 'content' => "Правильный ответ: {$qData['a']}"]],
+                    ['type' => 'text', 'content' => "Doğru cavab: {$qData['a']}"],
                 ],
                 'difficulty_level' => $topic->difficulty_level->value,
                 'lesson_id' => $lesson->id,
@@ -228,15 +213,11 @@ class EnglishDemoSeeder extends Seeder
         // Open question
         Question::create([
             'question' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusunu izah edin və nümunələr verin."]],
-                'en' => [['type' => 'text', 'content' => "Explain {$topic->name}. Provide examples."]],
-                'ru' => [['type' => 'text', 'content' => "Объясните тему «{$topic->name}». Приведите примеры."]],
+                ['type' => 'text', 'content' => "{$topic->name} mövzusunu izah edin və nümunələr verin."],
             ],
             'type' => 'open',
             'open_answer' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusu İngilis dili sahəsində vacib bir mövzudur."]],
-                'en' => [['type' => 'text', 'content' => "{$topic->name} is an important topic in English language learning."]],
-                'ru' => [['type' => 'text', 'content' => "Тема «{$topic->name}» является важной в изучении английского языка."]],
+                ['type' => 'text', 'content' => "{$topic->name} mövzusu İngilis dili sahəsində vacib bir mövzudur."],
             ],
             'difficulty_level' => $topic->difficulty_level->value,
             'lesson_id' => $lesson->id,

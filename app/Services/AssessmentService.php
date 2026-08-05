@@ -32,7 +32,7 @@ class AssessmentService
     /**
      * Resolve which letter (a–e) holds the correct answer for a regular question.
      */
-    public function resolveRightAnswerLetter($question, string $locale = 'az'): string
+    public function resolveRightAnswerLetter($question): string
     {
         if (!$question || $question->type !== 'regular') {
             return '';
@@ -53,7 +53,7 @@ class AssessmentService
             $varData = $question->$varKey ?? null;
             if (!$varData) continue;
 
-            $varText = $this->variantText($varData, $locale);
+            $varText = $this->variantText($varData);
 
             if (mb_strtolower(trim($varText)) === mb_strtolower($rawRight)) {
                 return $letter;
@@ -64,26 +64,18 @@ class AssessmentService
     }
 
     /**
-     * Normalize a variant value (translatable block array, locale-scoped array,
-     * or plain string) into its display text.
+     * Normalize a variant value (content-block array or plain string) into its
+     * display text.
      */
-    private function variantText(mixed $varData, string $locale): string
+    private function variantText(mixed $varData): string
     {
         if (is_array($varData)) {
-            $locData = $varData[$locale] ?? $varData['az'] ?? $varData;
-
-            if (is_string($locData)) {
-                return $locData;
-            }
-
-            if (is_array($locData)) {
-                return collect($locData)->map(function ($block) {
-                    if (is_array($block)) {
-                        return $block['content'] ?? '';
-                    }
-                    return (string) $block;
-                })->join(' ');
-            }
+            return collect($varData)->map(function ($block) {
+                if (is_array($block)) {
+                    return $block['content'] ?? '';
+                }
+                return (string) $block;
+            })->join(' ');
         }
 
         return (string) $varData;
@@ -161,7 +153,7 @@ class AssessmentService
      *
      * @return array{score: int, total: int, correct: int, wrong: int, skipped: int, answers: array}
      */
-    public function evaluateAnswers(array $answers, BaseCollection $questions, string $locale): array
+    public function evaluateAnswers(array $answers, BaseCollection $questions): array
     {
         $correctCount = 0;
         $wrongCount = 0;
@@ -185,19 +177,19 @@ class AssessmentService
                 $skippedCount++;
                 $answer = null;
                 if ($question->type === 'regular') {
-                    $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
+                    $correctAnswer = $this->resolveRightAnswerLetter($question);
                 } else {
-                    $openAnswerBlocks = contentForLocale($question->open_answer, $locale);
+                    $openAnswerBlocks = $question->open_answer ?? [];
                     $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
                 }
             } elseif ($question->type === 'regular') {
-                $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
+                $correctAnswer = $this->resolveRightAnswerLetter($question);
                 $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
 
                 $isCorrect = ($userAnswerNorm === $correctAnswer);
                 $isCorrect ? $correctCount++ : $wrongCount++;
             } else {
-                $openAnswerBlocks = contentForLocale($question->open_answer, $locale);
+                $openAnswerBlocks = $question->open_answer ?? [];
                 $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
 
                 if ($question->answer_type === 'exact') {
@@ -216,14 +208,14 @@ class AssessmentService
                 'answer' => $answer,
                 'correct_answer' => $correctAnswer,
                 'is_correct' => $isCorrect,
-                'question_text' => contentForLocale($question->question, $locale),
+                'question_text' => $question->question ?? [],
                 'explanation_video_url' => $question->explanation_video_url,
                 'variants' => [
-                    'a' => contentForLocale($question->variant_a, $locale),
-                    'b' => contentForLocale($question->variant_b, $locale),
-                    'c' => contentForLocale($question->variant_c, $locale),
-                    'd' => contentForLocale($question->variant_d, $locale),
-                    'e' => contentForLocale($question->variant_e, $locale),
+                    'a' => $question->variant_a ?? [],
+                    'b' => $question->variant_b ?? [],
+                    'c' => $question->variant_c ?? [],
+                    'd' => $question->variant_d ?? [],
+                    'e' => $question->variant_e ?? [],
                 ],
             ];
         }
@@ -247,7 +239,7 @@ class AssessmentService
      * @param  BaseCollection<int, StudentQuiz|StudentExam>  $attempts
      * @return array{score: int, total: int, correct: int, wrong: int, skipped: int, answers: array}
      */
-    public function buildResultFromAttempts(BaseCollection $attempts, string $locale): array
+    public function buildResultFromAttempts(BaseCollection $attempts): array
     {
         $total = $attempts->count();
         $correct = $attempts->where('is_correct', true)->count();
@@ -260,7 +252,7 @@ class AssessmentService
             'correct' => $correct,
             'wrong' => $wrong,
             'skipped' => $skipped,
-            'answers' => $attempts->map(function ($a) use ($locale) {
+            'answers' => $attempts->map(function ($a) {
                 $q = $a->question;
                 return [
                     'question_id' => $a->question_id,
@@ -268,14 +260,14 @@ class AssessmentService
                     'answer' => $a->answer,
                     'correct_answer' => $a->correct_answer,
                     'is_correct' => $a->is_correct,
-                    'question_text' => contentForLocale($q?->question, $locale),
+                    'question_text' => $q?->question ?? [],
                     'explanation_video_url' => $q?->explanation_video_url,
                     'variants' => [
-                        'a' => contentForLocale($q?->variant_a, $locale),
-                        'b' => contentForLocale($q?->variant_b, $locale),
-                        'c' => contentForLocale($q?->variant_c, $locale),
-                        'd' => contentForLocale($q?->variant_d, $locale),
-                        'e' => contentForLocale($q?->variant_e, $locale),
+                        'a' => $q?->variant_a ?? [],
+                        'b' => $q?->variant_b ?? [],
+                        'c' => $q?->variant_c ?? [],
+                        'd' => $q?->variant_d ?? [],
+                        'e' => $q?->variant_e ?? [],
                     ],
                 ];
             })->toArray(),
@@ -285,7 +277,7 @@ class AssessmentService
     /**
      * Evaluate + persist a quiz submission, awarding stars on first completion.
      */
-    public function submitQuiz(User $user, Student $student, Quiz $quiz, array $answers, string $locale): array
+    public function submitQuiz(User $user, Student $student, Quiz $quiz, array $answers): array
     {
         $questions = $quiz->questions->keyBy('id');
 
@@ -303,13 +295,13 @@ class AssessmentService
             ->where('reference_id', $quiz->id)
             ->exists();
 
-        return DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user, $alreadyAwardedCompleted, $alreadyAwardedPerfect) {
+        return DB::transaction(function () use ($student, $quiz, $questions, $answers, $user, $alreadyAwardedCompleted, $alreadyAwardedPerfect) {
             // Delete old attempts atomically with new insert
             StudentQuiz::where('student_id', $student->id)
                 ->where('quiz_id', $quiz->id)
                 ->delete();
 
-            $result = $this->evaluateAnswers($answers, $questions, $locale);
+            $result = $this->evaluateAnswers($answers, $questions);
 
             foreach ($result['answers'] as $detail) {
                 StudentQuiz::create([
@@ -338,7 +330,7 @@ class AssessmentService
     /**
      * Evaluate + persist an exam submission, awarding stars on first completion.
      */
-    public function submitExam(User $user, Student $student, Exam $exam, array $answers, string $locale): array
+    public function submitExam(User $user, Student $student, Exam $exam, array $answers): array
     {
         $questions = $exam->questions->keyBy('id');
 
@@ -356,13 +348,13 @@ class AssessmentService
             ->where('reference_id', $exam->id)
             ->exists();
 
-        return DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user, $alreadyAwardedPassed, $alreadyAwardedExcellent) {
+        return DB::transaction(function () use ($student, $exam, $questions, $answers, $user, $alreadyAwardedPassed, $alreadyAwardedExcellent) {
             // Delete old attempts atomically with new insert
             StudentExam::where('student_id', $student->id)
                 ->where('exam_id', $exam->id)
                 ->delete();
 
-            $result = $this->evaluateAnswers($answers, $questions, $locale);
+            $result = $this->evaluateAnswers($answers, $questions);
 
             foreach ($result['answers'] as $detail) {
                 StudentExam::create([

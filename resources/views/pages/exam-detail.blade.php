@@ -19,7 +19,7 @@
         <div class="flex items-start justify-between gap-4">
             <div class="space-y-1.5">
                 @if($exam->grade)
-                @php $gradeName = $exam->grade->name[app()->getLocale()] ?? $exam->grade->name['az'] ?? ''; @endphp
+                @php $gradeName = $exam->grade->name ?? ''; @endphp
                 <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[rgb(var(--primary))]">
                     <span class="w-1.5 h-1.5 rounded-full bg-[rgb(var(--primary))]"></span>
                     <span>{{ $gradeName }} Exam</span>

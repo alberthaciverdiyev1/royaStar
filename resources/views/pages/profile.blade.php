@@ -93,7 +93,7 @@
                             <select name="city_id" class="profile-field__input profile-field__select">
                                 <option value="">Şəhər Seçin</option>
                                 @foreach($cities as $city)
-                                <option value="{{ $city->id }}" {{ ($student->city_id ?? '') == $city->id ? 'selected' : '' }}>{{ $city->name[app()->getLocale()] ?? $city->name['az'] ?? '' }}</option>
+                                <option value="{{ $city->id }}" {{ ($student->city_id ?? '') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -105,7 +105,7 @@
                             <select name="grade_id" class="profile-field__input profile-field__select">
                                 <option value="">Sinif Seçin</option>
                                 @foreach($grades as $grade)
-                                <option value="{{ $grade->id }}" {{ ($student->grade_id ?? '') == $grade->id ? 'selected' : '' }}>{{ $grade->name[app()->getLocale()] ?? $grade->name['az'] ?? '' }}</option>
+                                <option value="{{ $grade->id }}" {{ ($student->grade_id ?? '') == $grade->id ? 'selected' : '' }}>{{ $grade->name }}</option>
                                 @endforeach
                             </select>
                         </div>

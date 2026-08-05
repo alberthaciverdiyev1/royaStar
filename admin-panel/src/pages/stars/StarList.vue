@@ -74,7 +74,7 @@ async function savePoint(star: Star) {
     const res = await starsApi.update(star.id, { point: newPoint })
     star.point = res.data.point
     dirtyPoints.value[star.id] = res.data.point
-    showToast({ type: 'success', text: `"${star.name?.az || star.type}" üçün bal yeniləndi: ${res.data.point}` })
+    showToast({ type: 'success', text: `"${star.name || star.type}" üçün bal yeniləndi: ${res.data.point}` })
   } catch {
     dirtyPoints.value[star.id] = star.point
     showToast({ type: 'error', text: 'Bal yenilənərkən xəta baş verdi' })
@@ -90,7 +90,7 @@ async function toggleActive(star: Star) {
     star.is_active = res.data.is_active
     showToast({
       type: 'success',
-      text: `"${star.name?.az || star.type}" ${star.is_active ? 'aktiv edildi' : 'deaktiv edildi'}`,
+      text: `"${star.name || star.type}" ${star.is_active ? 'aktiv edildi' : 'deaktiv edildi'}`,
     })
   } catch {
     showToast({ type: 'error', text: 'Status dəyişdirilərkən xəta baş verdi' })
@@ -100,11 +100,11 @@ async function toggleActive(star: Star) {
 }
 
 function nameFallback(star: Star): string {
-  return star.name?.az || star.name?.en || star.type
+  return star.name || star.type
 }
 
 function descFallback(star: Star): string {
-  return star.description?.az || star.description?.en || ''
+  return star.description || ''
 }
 </script>
 

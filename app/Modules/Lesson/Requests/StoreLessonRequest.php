@@ -16,7 +16,6 @@ class StoreLessonRequest extends FormRequest
             'videos' => 'nullable|array',
             'videos.*.youtube_url' => 'required|string|max:255',
             'videos.*.name' => 'nullable|string|max:255',
-            'videos.*.lang' => 'nullable|string',
         ];
     }
 }

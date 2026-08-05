@@ -96,11 +96,7 @@ return new class extends Migration
         $appName = $this->parseJsonField($rows['app_name'] ?? null);
 
         if (empty($appName)) {
-            $appName = [
-                'az' => 'RoyaStar',
-                'en' => 'RoyaStar',
-                'ru' => 'RoyaStar',
-            ];
+            $appName = 'RoyaStar';
         }
 
         $data = [
@@ -162,14 +158,12 @@ return new class extends Migration
         $decoded = json_decode($value, true);
 
         if (is_array($decoded)) {
+            // Legacy multi-locale object from an older database; the later
+            // single-language migration extracts the primary value.
             return $decoded;
         }
 
-        return [
-            'az' => $value,
-            'en' => $value,
-            'ru' => $value,
-        ];
+        return $value;
     }
 
     private function nullableString(mixed $value): ?string

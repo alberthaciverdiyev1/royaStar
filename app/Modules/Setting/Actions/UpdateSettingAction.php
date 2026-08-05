@@ -11,7 +11,7 @@ class UpdateSettingAction
     {
         return DB::transaction(function () use ($data) {
             $setting = Setting::firstOr(fn () => Setting::create([
-                'app_name' => ['az' => 'RoyaStar', 'en' => 'RoyaStar', 'ru' => 'RoyaStar'],
+                'app_name' => 'RoyaStar',
             ]));
 
             $setting->update($data);

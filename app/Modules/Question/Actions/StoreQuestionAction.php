@@ -15,7 +15,6 @@ class StoreQuestionAction extends BaseStoreAction
     protected function beforeCreate(array $data): array
     {
         processQuestionMedia($data);
-        normalizeQuestionLocales($data);
 
         return $data;
     }

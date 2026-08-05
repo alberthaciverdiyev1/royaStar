@@ -11,13 +11,10 @@ class UpdateSettingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'app_name' => 'sometimes|array',
-            'app_name.az' => 'sometimes|string',
-            'app_name.en' => 'sometimes|string',
-            'app_name.ru' => 'sometimes|string',
+            'app_name' => 'sometimes|string',
             'logo' => 'nullable|string',
             'favicon' => 'nullable|string',
-            'address' => 'sometimes|array',
+            'address' => 'sometimes|string',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'facebook' => 'nullable|string',
@@ -26,9 +23,9 @@ class UpdateSettingRequest extends FormRequest
             'twitter' => 'nullable|string',
             'telegram' => 'nullable|string',
             'whatsapp' => 'nullable|string',
-            'about_text' => 'sometimes|array',
-            'terms_text' => 'sometimes|array',
-            'privacy_text' => 'sometimes|array',
+            'about_text' => 'sometimes|string',
+            'terms_text' => 'sometimes|string',
+            'privacy_text' => 'sometimes|string',
             'maintenance_mode' => 'boolean',
         ];
     }

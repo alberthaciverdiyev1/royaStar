@@ -9,7 +9,7 @@ class Video extends Model
 {
     use SerializesDates;
 
-    protected $fillable = ['lesson_id', 'name', 'youtube_url', 'lang'];
+    protected $fillable = ['lesson_id', 'name', 'youtube_url'];
 
     public function lesson()
     {

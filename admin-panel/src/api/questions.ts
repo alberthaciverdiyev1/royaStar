@@ -22,14 +22,12 @@ export interface Question {
   explanation_video_url: string | null;
 }
 
-/** A content-block array, or a locale-keyed map of them (e.g. { az: [...], en: [...] }). */
-export type ContentBlocks = { type: string; content: string }[] | Record<string, { type: string; content: string }[]>;
+/** A content-block array (project is single-language). */
+export type ContentBlocks = { type: string; content: string }[];
 
-/** Flatten content to a plain block array regardless of storage shape. */
+/** Coerce content to a plain block array. */
 export function flattenBlocks(blocks: ContentBlocks | null | undefined): { type: string; content: string }[] {
-  if (!blocks) return [];
-  if (Array.isArray(blocks)) return blocks;
-  return blocks.az ?? blocks.en ?? blocks.ru ?? [];
+  return blocks && Array.isArray(blocks) ? blocks : [];
 }
 
 export interface QuestionFormData {

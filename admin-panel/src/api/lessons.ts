@@ -7,7 +7,6 @@ export interface Video {
   name: string | null;
   youtube_url: string;
   embed_url: string | null;
-  lang: string | null;
   created_at: string;
 }
 
@@ -24,7 +23,7 @@ export interface Lesson {
 export interface LessonFormData {
   name: string;
   description?: string;
-  videos?: { youtube_url: string; name?: string; lang?: string }[];
+  videos?: { youtube_url: string; name?: string }[];
 }
 
 export const lessonsApi = {

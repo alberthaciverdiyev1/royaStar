@@ -9,7 +9,7 @@ class ShowSettingAction
     public function execute(): Setting
     {
         return Setting::firstOr(fn () => Setting::create([
-            'app_name' => ['az' => 'RoyaStar', 'en' => 'RoyaStar', 'ru' => 'RoyaStar'],
+            'app_name' => 'RoyaStar',
         ]));
     }
 }

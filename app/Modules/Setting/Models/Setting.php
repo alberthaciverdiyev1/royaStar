@@ -2,13 +2,12 @@
 
 namespace App\Modules\Setting\Models;
 
-use App\Traits\HasTranslations;
 use App\Traits\SerializesDates;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    use HasTranslations, SerializesDates;
+    use SerializesDates;
 
     protected $fillable = [
         'app_name', 'logo', 'favicon',
@@ -21,11 +20,6 @@ class Setting extends Model
     protected function casts(): array
     {
         return [
-            'app_name' => 'array',
-            'address' => 'array',
-            'about_text' => 'array',
-            'terms_text' => 'array',
-            'privacy_text' => 'array',
             'maintenance_mode' => 'boolean',
         ];
     }

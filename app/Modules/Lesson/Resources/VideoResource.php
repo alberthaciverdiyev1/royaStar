@@ -15,7 +15,6 @@ class VideoResource extends BaseResource
             'name' => $this->name,
             'youtube_url' => $this->youtube_url,
             'embed_url' => $this->embed_url,
-            'lang' => $this->lang,
             'created_at' => $this->created_at,
         ];
     }

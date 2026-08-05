@@ -12,12 +12,9 @@ class QuizResultResource extends BaseResource
     {
         $answers = $this->relationLoaded('answers')
             ? $this->answers->map(function ($a) {
-                $locale = app()->getLocale();
-                $q = $a->question;
-                $questionContent = contentForLocale($q?->question, $locale);
                 return [
                     'question_id' => $a->question_id,
-                    'question' => $questionContent,
+                    'question' => $a->question?->question ?? [],
                     'type' => $a->type,
                     'answer' => $a->answer,
                     'correct_answer' => $a->correct_answer,

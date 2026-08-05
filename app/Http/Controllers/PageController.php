@@ -232,23 +232,21 @@ class PageController extends Controller
             abort(403, 'This quiz is not available for your grade.');
         }
 
-        $locale = app()->getLocale();
-
-        $questions = $quiz->questions->map(function ($q) use ($locale) {
+        $questions = $quiz->questions->map(function ($q) {
             $data = [
                 'id' => $q->id,
                 'type' => $q->type,
                 'answer_type' => $q->answer_type,
-                'question' => contentForLocale($q->question, $locale),
+                'question' => $q->question ?? [],
                 'difficulty_level' => $q->difficulty_level,
             ];
 
             if ($q->type === 'regular') {
-                $data['variant_a'] = contentForLocale($q->variant_a, $locale);
-                $data['variant_b'] = contentForLocale($q->variant_b, $locale);
-                $data['variant_c'] = contentForLocale($q->variant_c, $locale);
-                $data['variant_d'] = contentForLocale($q->variant_d, $locale);
-                $data['variant_e'] = contentForLocale($q->variant_e, $locale);
+                $data['variant_a'] = $q->variant_a ?? [];
+                $data['variant_b'] = $q->variant_b ?? [];
+                $data['variant_c'] = $q->variant_c ?? [];
+                $data['variant_d'] = $q->variant_d ?? [];
+                $data['variant_e'] = $q->variant_e ?? [];
             }
 
             return $data;
@@ -276,13 +274,12 @@ class PageController extends Controller
         ]);
 
         $answers = $request->input('answers', []);
-        $locale = app()->getLocale();
         $user = Auth::user();
         $student = $user->student;
 
         abort_unless($student, 403, 'Only students can submit quizzes');
 
-        $result = $this->assessmentService->submitQuiz($user, $student, $quiz, $answers, $locale);
+        $result = $this->assessmentService->submitQuiz($user, $student, $quiz, $answers);
 
         return redirect()->route('quiz.result', $id)
             ->with('quiz_result', $result);
@@ -304,7 +301,7 @@ class PageController extends Controller
                 ->get();
 
             if ($attempts->isNotEmpty()) {
-                $result = $this->assessmentService->buildResultFromAttempts($attempts, app()->getLocale());
+                $result = $this->assessmentService->buildResultFromAttempts($attempts);
             }
         }
 
@@ -397,23 +394,21 @@ class PageController extends Controller
             abort(403, 'This exam is not available for your grade.');
         }
 
-        $locale = app()->getLocale();
-
-        $questions = $exam->questions->map(function ($q) use ($locale) {
+        $questions = $exam->questions->map(function ($q) {
             $data = [
                 'id' => $q->id,
                 'type' => $q->type,
                 'answer_type' => $q->answer_type,
-                'question' => contentForLocale($q->question, $locale),
+                'question' => $q->question ?? [],
                 'difficulty_level' => $q->difficulty_level,
             ];
 
             if ($q->type === 'regular') {
-                $data['variant_a'] = contentForLocale($q->variant_a, $locale);
-                $data['variant_b'] = contentForLocale($q->variant_b, $locale);
-                $data['variant_c'] = contentForLocale($q->variant_c, $locale);
-                $data['variant_d'] = contentForLocale($q->variant_d, $locale);
-                $data['variant_e'] = contentForLocale($q->variant_e, $locale);
+                $data['variant_a'] = $q->variant_a ?? [];
+                $data['variant_b'] = $q->variant_b ?? [];
+                $data['variant_c'] = $q->variant_c ?? [];
+                $data['variant_d'] = $q->variant_d ?? [];
+                $data['variant_e'] = $q->variant_e ?? [];
             }
 
             return $data;
@@ -437,13 +432,12 @@ class PageController extends Controller
         ]);
 
         $answers = $request->input('answers', []);
-        $locale = app()->getLocale();
         $user = Auth::user();
         $student = $user->student;
 
         abort_unless($student, 403, 'Only students can submit exams');
 
-        $result = $this->assessmentService->submitExam($user, $student, $exam, $answers, $locale);
+        $result = $this->assessmentService->submitExam($user, $student, $exam, $answers);
 
         return redirect()->route('exam.result', $exam)
             ->with('exam_result', $result);
@@ -464,7 +458,7 @@ class PageController extends Controller
                 ->get();
 
             if ($attempts->isNotEmpty()) {
-                $result = $this->assessmentService->buildResultFromAttempts($attempts, app()->getLocale());
+                $result = $this->assessmentService->buildResultFromAttempts($attempts);
             }
         }
 

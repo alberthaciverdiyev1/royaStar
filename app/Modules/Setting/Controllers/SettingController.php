@@ -28,8 +28,8 @@ class SettingController extends Controller
 
     #[OA\Put(path: '/admin/settings', summary: 'Update settings',
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
-            new OA\Property(property: 'app_name', type: 'object'),
-            new OA\Property(property: 'description', type: 'object'),
+            new OA\Property(property: 'app_name', type: 'string'),
+            new OA\Property(property: 'description', type: 'string'),
             new OA\Property(property: 'keywords', type: 'string'),
             new OA\Property(property: 'logo', type: 'string'),
             new OA\Property(property: 'favicon', type: 'string'),

@@ -59,7 +59,6 @@ class VideoController extends Controller
         requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(properties: [
             new OA\Property(property: 'name', type: 'string', nullable: true),
             new OA\Property(property: 'youtube_url', type: 'string', description: 'YouTube video URL'),
-            new OA\Property(property: 'lang', type: 'string', nullable: true),
         ])),
         responses: [new OA\Response(response: 201, description: 'Video created')]),
     ]
@@ -74,7 +73,6 @@ class VideoController extends Controller
         requestBody: new OA\RequestBody(content: new OA\JsonContent(properties: [
             new OA\Property(property: 'name', type: 'string', nullable: true),
             new OA\Property(property: 'youtube_url', type: 'string', description: 'YouTube video URL'),
-            new OA\Property(property: 'lang', type: 'string', nullable: true),
         ])),
         responses: [new OA\Response(response: 200, description: 'Video updated')]),
     ]

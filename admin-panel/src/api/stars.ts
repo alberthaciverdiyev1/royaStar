@@ -4,8 +4,8 @@ import type { ApiResponse } from './types';
 export interface Star {
   id: number;
   type: string;
-  name: Record<string, string> | null;
-  description: Record<string, string> | null;
+  name: string | null;
+  description: string | null;
   icon: string | null;
   category: string | null;
   group: string | null;

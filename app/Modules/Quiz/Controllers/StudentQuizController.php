@@ -33,7 +33,6 @@ class StudentQuizController extends Controller
         }
 
         $quiz->load('questions');
-        $locale = app()->getLocale();
 
         return apiResponse(data: [
             'quiz' => [
@@ -41,17 +40,17 @@ class StudentQuizController extends Controller
                 'name' => $quiz->name,
                 'type' => $quiz->type,
             ],
-            'questions' => $quiz->questions->map(function($q) use ($locale) {
+            'questions' => $quiz->questions->map(function($q) {
                 return [
                     'id' => $q->id,
                     'type' => $q->type,
                     'answer_type' => $q->answer_type,
-                    'question' => contentForLocale($q->question, $locale),
-                    'variant_a' => contentForLocale($q->variant_a, $locale),
-                    'variant_b' => contentForLocale($q->variant_b, $locale),
-                    'variant_c' => contentForLocale($q->variant_c, $locale),
-                    'variant_d' => contentForLocale($q->variant_d, $locale),
-                    'variant_e' => contentForLocale($q->variant_e, $locale),
+                    'question' => $q->question ?? [],
+                    'variant_a' => $q->variant_a ?? [],
+                    'variant_b' => $q->variant_b ?? [],
+                    'variant_c' => $q->variant_c ?? [],
+                    'variant_d' => $q->variant_d ?? [],
+                    'variant_e' => $q->variant_e ?? [],
                     'difficulty_level' => $q->difficulty_level,
                 ];
             }),
@@ -86,7 +85,6 @@ class StudentQuizController extends Controller
             $student,
             $quiz,
             $request->input('answers', []),
-            app()->getLocale(),
         );
 
         $answerDetails = collect($result['answers'])->map(fn($a) => [
@@ -131,7 +129,6 @@ class StudentQuizController extends Controller
             return apiResponse(data: null);
         }
 
-        $locale = app()->getLocale();
         $total = $answers->count();
         $correctCount = $answers->where('is_correct', true)->count();
         $wrongCount = $answers->where('is_correct', false)->whereNotNull('answer')->where('answer', '!=', '')->count();
@@ -144,10 +141,10 @@ class StudentQuizController extends Controller
             'correct_count' => $correctCount,
             'wrong_count' => $wrongCount,
             'skipped_count' => $skippedCount,
-            'answers' => $answers->map(function($a) use ($locale) {
+            'answers' => $answers->map(function($a) {
                 return [
                     'question_id' => $a->question_id,
-                    'question' => contentForLocale($a->question?->question, $locale),
+                    'question' => $a->question?->question ?? [],
                     'type' => $a->type,
                     'answer' => $a->answer,
                     'correct_answer' => $a->correct_answer,

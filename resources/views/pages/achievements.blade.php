@@ -111,8 +111,8 @@
                         @foreach($earnedUserStars->take(5) as $userStar)
                         @php
                             $starObj = $userStar->star;
-                            $starName = is_array($starObj?->name) ? ($starObj?->name[app()->getLocale()] ?? $starObj?->name['az'] ?? 'Star Award') : ($starObj?->name ?? 'Star Award');
-                            $starDesc = is_array($starObj?->description) ? ($starObj?->description[app()->getLocale()] ?? $starObj?->description['az'] ?? '') : ($starObj?->description ?? '');
+                            $starName = $starObj?->name ?? 'Star Award';
+                            $starDesc = $starObj?->description ?? '';
                         @endphp
                         <div class="sidebar-widget-card p-4 flex items-center justify-between gap-4 transition-all">
                             <div class="flex items-center gap-3.5">
@@ -170,8 +170,8 @@
                         @foreach($allStars as $star)
                         @php
                             $isUnlocked = in_array($star->id, $earnedStarIds);
-                            $starTitle = is_array($star->name) ? ($star->name[app()->getLocale()] ?? $star->name['az'] ?? $star->type) : ($star->name ?? $star->type);
-                            $starDetails = is_array($star->description) ? ($star->description[app()->getLocale()] ?? $star->description['az'] ?? '') : ($star->description ?? '');
+                            $starTitle = $star->name ?? $star->type;
+                            $starDetails = $star->description ?? '';
                         @endphp
                         <div class="badge-card {{ $isUnlocked ? 'unlocked' : 'locked' }} badge-item-card" data-status="{{ $isUnlocked ? 'unlocked' : 'locked' }}">
                             <div class="flex items-start justify-between gap-3">

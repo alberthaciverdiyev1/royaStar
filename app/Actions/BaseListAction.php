@@ -47,7 +47,7 @@ abstract class BaseListAction
     }
 
     /**
-     * Convenience: apply full-text-like search on translatable or plain columns.
+     * Convenience: apply full-text-like search on plain columns.
      * Delegates to global `filterLike()` helper.
      */
     protected function applySearch(Builder $query, array|string $columns, array $params): Builder

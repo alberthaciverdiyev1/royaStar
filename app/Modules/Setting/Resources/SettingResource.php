@@ -10,10 +10,10 @@ class SettingResource extends BaseResource
     public function toArray(Request $request): array
     {
         return [
-            'app_name' => $this->translate('app_name'),
+            'app_name' => $this->app_name,
             'logo' => $this->logo,
             'favicon' => $this->favicon,
-            'address' => $this->translate('address'),
+            'address' => $this->address,
             'email' => $this->email,
             'phone' => $this->phone,
             'facebook' => $this->facebook,
@@ -22,9 +22,9 @@ class SettingResource extends BaseResource
             'twitter' => $this->twitter,
             'telegram' => $this->telegram,
             'whatsapp' => $this->whatsapp,
-            'about_text' => $this->translate('about_text'),
-            'terms_text' => $this->translate('terms_text'),
-            'privacy_text' => $this->translate('privacy_text'),
+            'about_text' => $this->about_text,
+            'terms_text' => $this->terms_text,
+            'privacy_text' => $this->privacy_text,
             'maintenance_mode' => $this->maintenance_mode,
         ];
     }

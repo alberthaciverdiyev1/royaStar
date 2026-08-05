@@ -37,19 +37,6 @@ class DemoDataSeeder extends Seeder
     {
         $num = ($i % 10) + 1;
 
-        $questions = [
-            "What is the basic concept of {$topic->name}?",
-            "Which of the following best describes {$topic->name}?",
-            "What is the main principle of {$topic->name}?",
-            "How does {$topic->name} apply to real-world problems?",
-            "Which formula is used in {$topic->name}?",
-            "What is the primary focus of {$topic->name}?",
-            "Which theory is most relevant to {$topic->name}?",
-            "What is the correct definition of {$topic->name}?",
-            "Which method is commonly used in {$topic->name}?",
-            "What is the key characteristic of {$topic->name}?",
-        ];
-
         $rightAnswerIdx = $num % 5;
 
         $variants = ['a', 'b', 'c', 'd', 'e'];
@@ -58,31 +45,23 @@ class DemoDataSeeder extends Seeder
         foreach ($variants as $j => $v) {
             if ($j === $rightAnswerIdx) {
                 $answers["variant_{$v}"] = [
-                    'az' => [['type' => 'text', 'content' => "Düzgün cavab: {$topic->name} — sual {$num}"]],
-                    'en' => [['type' => 'text', 'content' => "Correct answer for {$topic->name} — question {$num}"]],
-                    'ru' => [['type' => 'text', 'content' => "Правильный ответ: {$topic->name} — вопрос {$num}"]],
+                    ['type' => 'text', 'content' => "Düzgün cavab: {$topic->name} — sual {$num}"],
                 ];
             } else {
                 $answers["variant_{$v}"] = [
-                    'az' => [['type' => 'text', 'content' => "Seçim {$v}: Səhv cavab {$num}"]],
-                    'en' => [['type' => 'text', 'content' => "Option {$v}: Wrong answer {$num}"]],
-                    'ru' => [['type' => 'text', 'content' => "Вариант {$v}: Неправильный ответ {$num}"]],
+                    ['type' => 'text', 'content' => "Seçim {$v}: Səhv cavab {$num}"],
                 ];
             }
         }
 
         Question::create(array_merge([
             'question' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} haqqında sual {$num}?"]],
-                'en' => [['type' => 'text', 'content' => $questions[$i % count($questions)]]],
-                'ru' => [['type' => 'text', 'content' => "Вопрос о {$topic->name} {$num}?"]],
+                ['type' => 'text', 'content' => "{$topic->name} haqqında sual {$num}?"],
             ],
             'type' => 'regular',
             'right_answer' => $rightAnswer,
             'explanation' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusu üçün izahat {$num}"]],
-                'en' => [['type' => 'text', 'content' => "Explanation for {$topic->name} question {$num}"]],
-                'ru' => [['type' => 'text', 'content' => "Объяснение для вопроса {$num} по теме {$topic->name}"]],
+                ['type' => 'text', 'content' => "{$topic->name} mövzusu üçün izahat {$num}"],
             ],
             'difficulty_level' => $topic->difficulty_level->value,
             'lesson_id' => $lesson->id,
@@ -95,15 +74,11 @@ class DemoDataSeeder extends Seeder
 
         Question::create([
             'question' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusunu izah edin. Nümunələr verin."]],
-                'en' => [['type' => 'text', 'content' => "Explain {$topic->name}. Provide examples."]],
-                'ru' => [['type' => 'text', 'content' => "Объясните тему «{$topic->name}». Приведите примеры."]],
+                ['type' => 'text', 'content' => "{$topic->name} mövzusunu izah edin. Nümunələr verin."],
             ],
             'type' => 'open',
             'open_answer' => [
-                'az' => [['type' => 'text', 'content' => "{$topic->name} mövzusu İngilis dili sahəsində vacib bir mövzudur. Əsas prinsiplərə daxildir: tərif, xüsusiyyətlər və tətbiq sahələri."]],
-                'en' => [['type' => 'text', 'content' => "{$topic->name} is an important topic in English language. Key principles include: definition, characteristics, and application areas."]],
-                'ru' => [['type' => 'text', 'content' => "Тема «{$topic->name}» является важной в области английского языка. Основные принципы включают: определение, характеристики и области применения."]],
+                ['type' => 'text', 'content' => "{$topic->name} mövzusu İngilis dili sahəsində vacib bir mövzudur. Əsas prinsiplərə daxildir: tərif, xüsusiyyətlər və tətbiq sahələri."],
             ],
             'difficulty_level' => $topic->difficulty_level->value,
             'lesson_id' => $lesson->id,

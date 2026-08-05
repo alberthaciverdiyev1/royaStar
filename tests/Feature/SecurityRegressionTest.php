@@ -106,12 +106,12 @@ function makeSecureQuiz(): array
     $topic = Topic::create(['name' => 'Algebra', 'difficulty_level' => DifficultyLevel::Beginner->value]);
     $lesson = Lesson::create(['topic_id' => $topic->id, 'name' => 'Lesson', 'description' => 'desc']);
     $question = Question::create([
-        'question' => ['az' => [['type' => 'text', 'content' => '2+2?']]],
-        'variant_a' => ['az' => [['type' => 'text', 'content' => '3']]],
-        'variant_b' => ['az' => [['type' => 'text', 'content' => '4']]],
-        'variant_c' => ['az' => [['type' => 'text', 'content' => '5']]],
-        'variant_d' => ['az' => [['type' => 'text', 'content' => '6']]],
-        'variant_e' => ['az' => [['type' => 'text', 'content' => '7']]],
+        'question' => [['type' => 'text', 'content' => '2+2?']],
+        'variant_a' => [['type' => 'text', 'content' => '3']],
+        'variant_b' => [['type' => 'text', 'content' => '4']],
+        'variant_c' => [['type' => 'text', 'content' => '5']],
+        'variant_d' => [['type' => 'text', 'content' => '6']],
+        'variant_e' => [['type' => 'text', 'content' => '7']],
         'right_answer' => 'variant_b',
         'type' => 'regular',
         'difficulty_level' => DifficultyLevel::Beginner->value,
@@ -169,7 +169,7 @@ it('filters total stars by month', function () {
     $star = Star::create([
         'type' => 'quiz_completed',
         'point' => 10,
-        'name' => ['az' => 'Quiz'],
+        'name' => 'Quiz',
     ]);
 
     $lastMonth = new UserStar([
@@ -225,7 +225,7 @@ it('does not award lesson completed star by opening lesson page', function () {
     $star = Star::create([
         'type' => 'lesson_completed',
         'point' => 5,
-        'name' => ['az' => 'Lesson'],
+        'name' => 'Lesson',
     ]);
     $student = User::factory()->create(['type' => 'student']);
 

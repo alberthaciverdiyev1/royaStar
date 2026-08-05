@@ -14,7 +14,7 @@
                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider text-white">
                         <span class="material-symbols-outlined !text-xs">assignment</span>
                         @if($exam->grade)
-                        @php $gradeName = $exam->grade->name[app()->getLocale()] ?? $exam->grade->name['az'] ?? ''; @endphp
+                        @php $gradeName = $exam->grade->name ?? ''; @endphp
                         {{ $gradeName }} Exam
                         @else
                         Exam
