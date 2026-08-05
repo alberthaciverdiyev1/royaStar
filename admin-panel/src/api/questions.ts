@@ -5,6 +5,7 @@ export interface Question {
   id: number;
   lesson_id: number;
   lesson_name: string | null;
+  topic_id: number | null;
   type: 'regular' | 'open';
   answer_type: string | null;
   right_answer: string | null;

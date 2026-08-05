@@ -13,6 +13,7 @@ class QuestionResource extends BaseResource
             'id' => $this->id,
             'lesson_id' => $this->lesson_id,
             'lesson_name' => $this->relationLoaded('lesson') ? $this->lesson?->name : null,
+            'topic_id' => $this->relationLoaded('lesson') ? $this->lesson?->topic_id : null,
             'type' => $this->type,
             'answer_type' => $this->answer_type,
             'difficulty_level' => $this->difficulty_level,
