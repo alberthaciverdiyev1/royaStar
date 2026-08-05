@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
 
     // Quiz
     Route::get('/quiz/{id}', [PageController::class, 'quiz'])->name('quiz');
+    Route::post('/quiz/{id}/check-answer', [PageController::class, 'quizCheckAnswer'])->name('quiz.check-answer');
     Route::post('/quiz/{id}/submit', [PageController::class, 'quizSubmit'])->name('quiz.submit');
     Route::get('/quiz/{id}/result', [PageController::class, 'quizResult'])->name('quiz.result');
 

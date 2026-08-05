@@ -124,6 +124,36 @@
     border: 1.5px solid #fecaca;
     color: #991b1b;
 }
+.feedback-box.pending {
+    background-color: rgba(var(--surface-container-high), 0.5);
+    border: 1.5px dashed rgba(var(--on-surface), 0.25);
+    color: rgba(var(--on-surface), 0.7);
+}
+
+.confirm-wrap {
+    margin-top: 0.875rem;
+    display: flex;
+    justify-content: flex-end;
+}
+.confirm-btn {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 9999px;
+    background: rgba(var(--primary), 1);
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 16px -6px rgba(var(--primary), 0.4);
+    transition: all 0.2s ease;
+}
+.confirm-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+.confirm-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 
 .options-list {
     display: flex;

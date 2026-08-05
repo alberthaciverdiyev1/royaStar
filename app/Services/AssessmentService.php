@@ -149,6 +149,30 @@ class AssessmentService
     }
 
     /**
+     * Evaluate a single open-ended answer (exact or similar) without revealing
+     * the model answer text. Used by the quiz solve page's per-question check.
+     */
+    public function evaluateOpenAnswer($question, string $answer): bool
+    {
+        if (!$question || $question->type !== 'open' || trim($answer) === '') {
+            return false;
+        }
+
+        $openAnswerBlocks = $question->open_answer ?? [];
+        $modelAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
+
+        if ($modelAnswer === null || trim((string) $modelAnswer) === '') {
+            return false;
+        }
+
+        if ($question->answer_type === 'exact') {
+            return mb_strtolower(trim($answer)) === mb_strtolower(trim((string) $modelAnswer));
+        }
+
+        return $this->isSimilarAnswer($answer, (string) $modelAnswer);
+    }
+
+    /**
      * Evaluate submitted answers against the question set.
      *
      * @return array{score: int, total: int, correct: int, wrong: int, skipped: int, answers: array}

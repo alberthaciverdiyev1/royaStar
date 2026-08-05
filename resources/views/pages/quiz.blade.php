@@ -4,7 +4,7 @@
 <link href="{{ asset('css/quiz.css') }}?v={{ filemtime(public_path('css/quiz.css')) }}" rel="stylesheet">
 
 @section('content')
-<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}">
+<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}">
 
     <!-- Compact Header Banner -->
     <section class="quiz-hero-banner group">
@@ -80,16 +80,35 @@
                         </button>
                     @endforeach
                 </div>
+
+                <!-- Confirm step: committing the answer reveals right/wrong + video -->
+                <div class="confirm-wrap">
+                    <button type="button" class="confirm-btn" id="confirm_{{ $q['id'] }}" data-question="{{ $q['id'] }}" data-answer="" onclick="confirmAnswer(this)">
+                        <span class="material-symbols-outlined !text-lg">task_alt</span>
+                        Confirm Answer
+                    </button>
+                </div>
                 @else
                 <!-- Open Ended Question -->
                 <div class="space-y-3">
                     <textarea name="open_answer_{{ $q['id'] }}" id="open_input_{{ $q['id'] }}" class="w-full min-h-[100px] rounded-xl p-3.5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.4] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.6] transition-all" placeholder="Type your answer here..." oninput="setOpenAnswer({{ $q['id'] }}, this.value)"></textarea>
+                </div>
+
+                <!-- Confirm step for open answers -->
+                <div class="confirm-wrap">
+                    <button type="button" class="confirm-btn" id="confirm_open_{{ $q['id'] }}" data-question="{{ $q['id'] }}" onclick="confirmOpenAnswer(this)">
+                        <span class="material-symbols-outlined !text-lg">task_alt</span>
+                        Confirm Answer
+                    </button>
                 </div>
                 @endif
 
                 <!-- Hidden inputs for backend submission -->
                 <input type="hidden" name="answers[{{ $index }}][question_id]" value="{{ $q['id'] }}">
                 <input type="hidden" name="answers[{{ $index }}][answer]" id="answer_{{ $q['id'] }}" value="">
+
+                <!-- Inline feedback (revealed by quiz.js after confirming) -->
+                <div class="feedback-box" id="feedback_{{ $q['id'] }}" style="display:none"></div>
             </div>
         </section>
         @endforeach
