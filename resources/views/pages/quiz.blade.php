@@ -4,7 +4,7 @@
 <link href="{{ asset('css/quiz.css') }}?v={{ filemtime(public_path('css/quiz.css')) }}" rel="stylesheet">
 
 @section('content')
-<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}">
+<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}">
 
     <!-- Compact Header Banner -->
     <section class="quiz-hero-banner group">
@@ -45,7 +45,7 @@
         @csrf
 
         @foreach($questions as $index => $q)
-        <section class="quiz-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}" data-correct="{{ $q['correct_answer'] ?? '' }}" data-video="{{ $q['explanation_video_url'] ?? '' }}" style="{{ $index > 0 ? 'display:none' : '' }}">
+        <section class="quiz-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}" style="{{ $index > 0 ? 'display:none' : '' }}">
             <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 sm:p-6 shadow-md space-y-4">
 
                 <!-- Question Header & Text -->

@@ -124,6 +124,11 @@
     border: 1.5px solid #fecaca;
     color: #991b1b;
 }
+.feedback-box.pending {
+    background-color: rgba(var(--surface-container-high), 0.5);
+    border: 1.5px dashed rgba(var(--on-surface), 0.25);
+    color: rgba(var(--on-surface), 0.7);
+}
 
 .options-list {
     display: flex;

@@ -239,8 +239,6 @@ class PageController extends Controller
                 'answer_type' => $q->answer_type,
                 'question' => $q->question ?? [],
                 'difficulty_level' => $q->difficulty_level,
-                'correct_answer' => $this->inlineCorrectAnswer($q),
-                'explanation_video_url' => $q->explanation_video_url ?? null,
             ];
 
             if ($q->type === 'regular') {
@@ -403,8 +401,6 @@ class PageController extends Controller
                 'answer_type' => $q->answer_type,
                 'question' => $q->question ?? [],
                 'difficulty_level' => $q->difficulty_level,
-                'correct_answer' => $this->inlineCorrectAnswer($q),
-                'explanation_video_url' => $q->explanation_video_url ?? null,
             ];
 
             if ($q->type === 'regular') {
@@ -477,22 +473,61 @@ class PageController extends Controller
     }
 
     /**
-     * Resolve the "expected answer" for a question so the solve page can show
-     * instant inline feedback. Regular → correct letter (a–e), open → model text.
+     * Per-question answer check used by the quiz solve page's inline feedback.
+     *
+     * The correct answer is NEVER embedded in the page HTML (that would leak it
+     * via DevTools). Instead the browser asks the server to evaluate the single
+     * selected answer, and only then receives right/wrong + the explanation video.
      */
-    private function inlineCorrectAnswer($q): string
+    public function quizCheckAnswer(Request $request, $id)
     {
-        if ($q->type === 'regular') {
-            return $this->assessmentService->resolveRightAnswerLetter($q);
+        $quiz = Quiz::with('questions')->findOrFail($id);
+
+        abort_unless(Auth::user()?->student, 403, 'Only students can take quizzes');
+
+        if (!$quiz->isAvailableForGrade(Auth::user()->student->grade_id)) {
+            abort(403, 'This quiz is not available for your grade.');
         }
 
-        $openAnswer = $q->open_answer ?? [];
+        $request->validate([
+            'question_id' => 'required|integer',
+            'answer' => 'required|string|max:2000',
+        ]);
 
-        if (is_array($openAnswer)) {
-            return trim((string) ($openAnswer[0]['content'] ?? ''));
+        $question = $quiz->questions->firstWhere('id', (int) $request->question_id);
+
+        if (!$question) {
+            return response()->json(['error' => 'Question not found'], 404);
         }
 
-        return trim((string) $openAnswer);
+        return response()->json($this->buildCheckResponse($question, $request->answer));
+    }
+
+    /**
+     * Evaluate one answer server-side. Regular → exact letter match. Open →
+     * we never reveal the model answer mid-typing, only offer the explanation
+     * video (full grading happens at submission time).
+     */
+    private function buildCheckResponse($question, string $answer): array
+    {
+        if ($question->type === 'regular') {
+            $correctLetter = $this->assessmentService->resolveRightAnswerLetter($question);
+            $isCorrect = (str_replace('variant_', '', strtolower(trim($answer))) === $correctLetter);
+
+            return [
+                'type' => 'regular',
+                'correct' => $isCorrect,
+                'correct_answer' => $correctLetter,
+                'explanation_video_url' => $question->explanation_video_url ?? null,
+            ];
+        }
+
+        return [
+            'type' => 'open',
+            'correct' => false,
+            'correct_answer' => null,
+            'explanation_video_url' => $question->explanation_video_url ?? null,
+        ];
     }
 
     // ═══════════════════════════════════════════

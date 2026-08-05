@@ -59,12 +59,18 @@
             + '<video class="w-full aspect-video rounded-xl bg-black/5" src="' + escapeHtml(url) + '" controls preload="none"></video></div>';
     }
 
-    function showRegularFeedback(container, chosenAnswer) {
+    function setPendingFeedback(fb, message) {
+        if (!fb) return;
+        fb.style.display = 'flex';
+        fb.className = 'feedback-box pending';
+        fb.innerHTML = '<span class="material-symbols-outlined !text-xl animate-spin">progress_activity</span>'
+            + '<div><span class="font-black">' + escapeHtml(message) + '</span></div>';
+    }
+
+    function showRegularFeedback(container, result) {
         var fb = container.querySelector('.feedback-box');
         if (!fb) return;
-        var correctLetter = (container.getAttribute('data-correct') || '').toLowerCase();
-        var videoUrl = container.getAttribute('data-video') || '';
-        var isCorrect = correctLetter !== '' && chosenAnswer.toLowerCase() === correctLetter;
+        var isCorrect = !!result.correct;
 
         fb.style.display = 'flex';
         fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'wrong');
@@ -75,18 +81,15 @@
             : '<span class="material-symbols-outlined !text-xl">cancel</span>'
               + '<div><span class="font-black">Incorrect!</span><span class="block text-xs opacity-80">The correct answer is highlighted in green.</span></div>';
 
-        html += videoEmbedHtml(videoUrl);
+        html += videoEmbedHtml(result.explanation_video_url || '');
         fb.innerHTML = html;
     }
 
-    window.selectAnswer = function(btn, questionId, chosenAnswer) {
-        var container = btn.closest('.quiz-question');
+    // The correct letter comes ONLY from the server response — never from the page HTML.
+    function lockAndHighlight(container, result, pickedBtn) {
         var allBtns = container.querySelectorAll('.quiz-option-btn');
-        var correctLetter = (container.getAttribute('data-correct') || '').toLowerCase();
+        var correctLetter = (result.correct_answer || '').toLowerCase();
 
-        document.getElementById('answer_' + questionId).value = chosenAnswer;
-
-        // Lock the question: highlight the correct option, mark the picked one.
         allBtns.forEach(function(b) {
             var letter = (b.getAttribute('data-answer') || '').toLowerCase();
             var icon = b.querySelector('.icon-status');
@@ -96,23 +99,65 @@
             if (letter === correctLetter) {
                 b.classList.add('is-correct-target');
                 if (icon) { icon.textContent = 'check_circle'; icon.style.opacity = '1'; }
-            } else if (b === btn) {
-                b.classList.add('is-wrong');
-                if (icon) { icon.textContent = 'cancel'; icon.style.opacity = '1'; }
-            } else {
+            } else if (b !== pickedBtn) {
                 if (icon) { icon.textContent = 'radio_button_unchecked'; icon.style.opacity = '0'; }
             }
         });
 
-        if (correctLetter === chosenAnswer.toLowerCase()) {
-            btn.classList.add('is-correct');
+        if (result.correct) {
+            pickedBtn.classList.add('is-correct');
         } else {
-            btn.classList.add('is-wrong');
+            pickedBtn.classList.add('is-wrong');
+            var icon = pickedBtn.querySelector('.icon-status');
+            if (icon) { icon.textContent = 'cancel'; icon.style.opacity = '1'; }
         }
+    }
 
-        showRegularFeedback(container, chosenAnswer);
+    function postCheck(checkUrl, payload) {
+        var form = document.getElementById('quizForm');
+        var csrfToken = form ? form.querySelector('input[name="_token"]').value : '';
+        return fetch(checkUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        }).then(function(r) {
+            if (!r.ok) { throw new Error('Server rejected check'); }
+            return r.json();
+        });
+    }
+
+    window.selectAnswer = function(btn, questionId, chosenAnswer) {
+        var container = btn.closest('.quiz-question');
+        var allBtns = container.querySelectorAll('.quiz-option-btn');
+        var fb = container ? container.querySelector('.feedback-box') : null;
+
+        document.getElementById('answer_' + questionId).value = chosenAnswer;
+
+        // Lock immediately so the student cannot change their pick while checking.
+        allBtns.forEach(function(b) {
+            b.classList.add('is-disabled');
+            b.classList.remove('is-selected');
+        });
+        setPendingFeedback(fb, 'Checking...');
+
+        var checkUrl = document.querySelector('.quiz-wrapper').getAttribute('data-check-url');
+        postCheck(checkUrl, { question_id: questionId, answer: chosenAnswer })
+            .then(function(result) {
+                lockAndHighlight(container, result, btn);
+                showRegularFeedback(container, result);
+            })
+            .catch(function() {
+                // Network/server failure → unlock so the student can try again.
+                allBtns.forEach(function(b) { b.classList.remove('is-disabled'); });
+                if (fb) { fb.style.display = 'none'; }
+            });
     };
 
+    var openTimers = {};
     window.setOpenAnswer = function(questionId, value) {
         document.getElementById('answer_' + questionId).value = value;
         var input = document.getElementById('open_input_' + questionId);
@@ -126,17 +171,25 @@
             return;
         }
 
-        var modelAnswer = container.getAttribute('data-correct') || '';
-        var videoUrl = container.getAttribute('data-video') || '';
+        clearTimeout(openTimers[questionId]);
+        openTimers[questionId] = setTimeout(function() {
+            // Show the explanation video as guidance (no right/wrong, no model
+            // answer — grading for open questions happens at submission time).
+            setPendingFeedback(fb, 'Loading explanation video...');
 
-        fb.style.display = 'flex';
-        fb.className = 'feedback-box correct';
-
-        var html = '<span class="material-symbols-outlined !text-xl">lightbulb</span>'
-            + '<div><span class="font-black">Expected answer:</span>'
-            + (modelAnswer ? '<span class="block text-xs font-bold mt-0.5">' + escapeHtml(modelAnswer) + '</span>' : '')
-            + '</div>';
-        html += videoEmbedHtml(videoUrl);
-        fb.innerHTML = html;
+            var checkUrl = document.querySelector('.quiz-wrapper').getAttribute('data-check-url');
+            postCheck(checkUrl, { question_id: questionId, answer: value })
+                .then(function(result) {
+                    fb.style.display = 'flex';
+                    fb.className = 'feedback-box correct';
+                    var html = '<span class="material-symbols-outlined !text-xl">lightbulb</span>'
+                        + '<div><span class="font-black">Explanation video:</span></div>';
+                    html += videoEmbedHtml(result.explanation_video_url || '');
+                    fb.innerHTML = html;
+                })
+                .catch(function() {
+                    if (fb) { fb.style.display = 'none'; }
+                });
+        }, 500);
     };
 })();
