@@ -19,9 +19,6 @@ class SendOtpAction
                 'otp' => $code,
                 'expires_at' => now()->addMinutes(10),
             ]);
-
-            // TODO: Queue SMS/email sending with $code via SendOtpNotification job
-            // \App\Modules\User\Jobs\SendOtpNotification::dispatch($phone, $code);
         });
     }
 }

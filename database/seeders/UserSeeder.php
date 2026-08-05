@@ -19,44 +19,11 @@ class UserSeeder extends Seeder
             'surname' => 'Super',
             'phone' => '5550000000',
             'email' => 'admin@royastar.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt(env('ADMIN_SEED_PASSWORD', 'password')),
             'type' => 'admin',
             'is_approved' => true,
         ]);
         $admin->assignRole('super-admin');
-
-        $schoolAdmin = User::create([
-            'name' => 'School',
-            'surname' => 'Admin',
-            'phone' => '5550000001',
-            'email' => 'school@royastar.com',
-            'password' => bcrypt('password'),
-            'type' => 'school',
-            'is_approved' => true,
-        ]);
-        $schoolAdmin->assignRole('school');
-
-        $teacher1 = User::create([
-            'name' => 'Elvin',
-            'surname' => 'Məmmədov',
-            'phone' => '5550000002',
-            'email' => 'elvin@royastar.com',
-            'password' => bcrypt('password'),
-            'type' => 'teacher',
-            'is_approved' => true,
-        ]);
-        $teacher1->assignRole('teacher');
-
-        $teacher2 = User::create([
-            'name' => 'Leyla',
-            'surname' => 'Həsənova',
-            'phone' => '5550000003',
-            'email' => 'leyla@royastar.com',
-            'password' => bcrypt('password'),
-            'type' => 'teacher',
-            'is_approved' => true,
-        ]);
-        $teacher2->assignRole('teacher');
 
         $student1 = User::create([
             'name' => 'Səid',
@@ -89,17 +56,6 @@ class UserSeeder extends Seeder
             'grade_id' => $grade?->id,
             'city_id' => $city?->id,
         ]);
-
-        $parent = User::create([
-            'name' => 'Tural',
-            'surname' => 'Rəhimli',
-            'phone' => '5550000006',
-            'email' => 'tural@royastar.com',
-            'password' => bcrypt('password'),
-            'type' => 'parent',
-            'is_approved' => true,
-        ]);
-        $parent->assignRole('parent');
 
         $editor = User::create([
             'name' => 'Editor',

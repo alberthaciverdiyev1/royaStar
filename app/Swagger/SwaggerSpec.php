@@ -7,7 +7,7 @@ use OpenApi\Attributes as OA;
 #[
     OA\Info(
         version: '1.0.0',
-        description: 'LMS platform for managing students, teachers, schools, and curriculum.',
+        description: 'LMS platform for managing students and curriculum.',
         title: 'RoyaStar Backend API',
     ),
     OA\Server(url: '/api', description: 'API Server'),
@@ -71,25 +71,17 @@ class SwaggerSpec {}
     // ─── Reusable Request Schemas ───
     OA\Schema(
         schema: 'RegisterRequest',
-        required: ['email', 'type'],
+        required: ['name', 'phone', 'email', 'password', 'type'],
         properties: [
-            new OA\Property(property: 'name', description: 'Required for non-school types', type: 'string'),
+            new OA\Property(property: 'name', type: 'string'),
             new OA\Property(property: 'surname', type: 'string', nullable: true),
-            new OA\Property(property: 'phone', description: 'Required for non-school types', type: 'string'),
+            new OA\Property(property: 'phone', type: 'string'),
             new OA\Property(property: 'email', type: 'string', format: 'email'),
-            new OA\Property(property: 'password', description: 'Required for non-school types', type: 'string', minLength: 8),
+            new OA\Property(property: 'password', type: 'string', minLength: 8),
             new OA\Property(property: 'password_confirmation', description: 'Must match password, required with password', type: 'string'),
-            new OA\Property(property: 'type', type: 'string', default: 'student', enum: ['student', 'teacher', 'parent', 'school', 'admin']),
-            new OA\Property(property: 'teacher', properties: [
-                new OA\Property(property: 'city_id', type: 'integer'),
-            ], type: 'object', nullable: true),
-            new OA\Property(property: 'student', properties: [
+            new OA\Property(property: 'type', type: 'string', default: 'student', enum: ['student']),
+            new OA\Property(property: 'student', required: ['grade_id', 'city_id'], properties: [
                 new OA\Property(property: 'grade_id', type: 'integer'),
-                new OA\Property(property: 'city_id', type: 'integer'),
-            ], type: 'object', nullable: true),
-            new OA\Property(property: 'school', properties: [
-                new OA\Property(property: 'name', type: 'string'),
-                new OA\Property(property: 'no', type: 'string', nullable: true),
                 new OA\Property(property: 'city_id', type: 'integer'),
             ], type: 'object', nullable: true),
         ],

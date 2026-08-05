@@ -10,7 +10,10 @@ class AdminLoginAction
 {
     public function execute(string $email, string $password): User
     {
-        $user = User::where('email', $email)->where('type', 'admin')->first();
+        $user = User::where('email', $email)
+            ->where('type', 'admin')
+            ->where('is_approved', true)
+            ->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages(['email' => [__('auth.invalid_credentials')]]);

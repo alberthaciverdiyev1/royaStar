@@ -29,7 +29,6 @@ class DashboardController extends Controller
         $quizzes = Quiz::count();
         $exams = Exam::count();
         $students = Student::count();
-        $teachers = User::role('teacher')->count();
         $users = User::count();
         $pendingUsers = User::where('is_approved', false)->count();
 
@@ -107,7 +106,6 @@ class DashboardController extends Controller
             'quizzes' => $quizzes,
             'exams' => $exams,
             'students' => $students,
-            'teachers' => $teachers,
             'users' => $users,
             'pending_users' => $pendingUsers,
             'total_quiz_attempts' => $totalQuizAttempts,

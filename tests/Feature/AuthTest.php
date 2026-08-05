@@ -4,12 +4,9 @@ use App\Modules\User\Models\User;
 use App\Modules\User\Models\Otp;
 use App\Modules\Grade\Models\Grade;
 use App\Modules\City\Models\City;
-use App\Modules\School\Models\SchoolRegistrationRequest;
 
 beforeEach(function () {
     Spatie\Permission\Models\Role::create(['name' => 'student', 'guard_name' => 'api']);
-    Spatie\Permission\Models\Role::create(['name' => 'teacher', 'guard_name' => 'api']);
-    Spatie\Permission\Models\Role::create(['name' => 'parent', 'guard_name' => 'api']);
     Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'api']);
 
     $grade = Grade::create(['name' => 'Grade 1']);
@@ -35,51 +32,6 @@ it('registers a new student', function () {
     $response->assertStatus(201)
         ->assertJsonStructure(['success', 'status_code', 'message', 'data' => ['user']])
         ->assertJson(['success' => true, 'status_code' => 201]);
-});
-
-it('registers a new teacher', function () {
-    $response = $this->postJson('/api/auth/register', [
-        'name' => 'Jane',
-        'surname' => 'Smith',
-        'phone' => '+994501234568',
-        'email' => 'jane@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-        'type' => 'teacher',
-        'teacher' => ['city_id' => $this->cityId],
-    ]);
-
-    $response->assertStatus(201)
-        ->assertJsonStructure(['success', 'status_code', 'message', 'data' => ['user']])
-        ->assertJson(['success' => true, 'status_code' => 201]);
-    $this->assertDatabaseHas('users', ['email' => 'jane@example.com', 'type' => 'teacher']);
-});
-
-it('registers a new parent', function () {
-    $response = $this->postJson('/api/auth/register', [
-        'name' => 'Bob',
-        'surname' => 'Parent',
-        'phone' => '+994501234569',
-        'email' => 'bob@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-        'type' => 'parent',
-    ]);
-
-    $response->assertStatus(201);
-});
-
-it('creates school registration request instead of user for school type', function () {
-    $response = $this->postJson('/api/auth/register', [
-        'email' => 'school@example.com',
-        'type' => 'school',
-        'school' => ['name' => 'Test School', 'city_id' => $this->cityId],
-    ]);
-
-    $response->assertStatus(201)
-        ->assertJson(['message' => __('auth.school_registration_pending')]);
-    $this->assertDatabaseHas('school_registration_requests', ['email' => 'school@example.com']);
-    $this->assertDatabaseMissing('users', ['email' => 'school@example.com']);
 });
 
 it('fails registration with missing required fields', function () {
@@ -141,13 +93,13 @@ it('assigns role on registration', function () {
         'email' => 'role@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'type' => 'teacher',
-        'teacher' => ['city_id' => $this->cityId],
+        'type' => 'student',
+        'student' => ['grade_id' => $this->gradeId, 'city_id' => $this->cityId],
     ]);
 
     $response->assertStatus(201);
     $user = User::where('email', 'role@example.com')->first();
-    expect($user->hasRole('teacher'))->toBeTrue();
+    expect($user->hasRole('student'))->toBeTrue();
 });
 
 // ─── Login ──────────────────────────────────────────────────────

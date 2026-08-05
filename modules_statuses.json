@@ -3,7 +3,6 @@
     "Course": false,
     "Grade": true,
     "Lesson": true,
-    "Payment": true,
     "Question": true,
     "Quiz": true,
     "Setting": true,
@@ -11,9 +10,6 @@
     "Subject": false,
     "Topic": true,
     "User": true,
-    "Teacher": true,
-    "School": true,
-    "Parent": true,
     "Star": true,
     "Exam": true,
     "Banner": true

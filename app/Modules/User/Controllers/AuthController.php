@@ -3,7 +3,6 @@
 namespace App\Modules\User\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\School\Models\SchoolRegistrationRequest;
 use App\Modules\User\Actions\AdminLoginAction;
 use App\Modules\User\Actions\LoginAction;
 use App\Modules\User\Actions\RegisterAction;
@@ -44,7 +43,7 @@ class AuthController extends Controller
         responses: [
             new OA\Response(
                 response: 201,
-                description: 'User registered / School request pending'),
+                description: 'User registered'),
             new OA\Response(
                 ref: '#/components/responses/ValidationError',
                 response: 422
@@ -53,21 +52,17 @@ class AuthController extends Controller
     ]
     public function register(RegisterRequest $request): JsonResponse
     {
-        $result = $this->registerAction->execute($request->validated());
+        $user = $this->registerAction->execute($request->validated());
 
-        if ($result instanceof SchoolRegistrationRequest) {
-            return apiResponse(
-                statusCode: 201,
-                message: 'auth.school_registration_pending'
-            );
-        }
-
-        $token = $result->createToken('auth-token')->plainTextToken;
-
+        // New accounts start unapproved (is_approved = false) and must be
+        // approved by an admin before they can log in — mirroring the web
+        // flow. No token is issued here, so a pending user cannot access
+        // student APIs until LoginAction approves them.
         return apiResponse(
-            data: ['user' => new UserResource($result)],
+            data: ['user' => new UserResource($user)],
+            message: 'auth.registration_pending',
             statusCode: 201
-        )->withCookie(createAuthCookie($token));
+        );
     }
 
     #[OA\Post(

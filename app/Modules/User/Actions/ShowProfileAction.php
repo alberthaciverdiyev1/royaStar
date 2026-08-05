@@ -9,6 +9,6 @@ class ShowProfileAction
 {
     public function execute(Request $request): User
     {
-        return $request->user()->load(['student', 'teacher', 'family', 'school']);
+        return $request->user()->load(['student']);
     }
 }

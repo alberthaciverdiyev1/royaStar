@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('surname')->nullable();
             $table->string('phone')->unique()->comment('Phone number');
             $table->string('avatar')->nullable()->comment('Avatar image');
-            $table->enum('type',['student','teacher','parent','school','admin'])->default('student')->comment('User type');
+            $table->enum('type',['student','admin'])->default('student')->comment('User type');
             $table->index('type');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
