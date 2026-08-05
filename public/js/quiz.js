@@ -40,31 +40,51 @@
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // ── Feedback rendering ─────────────────────────────────────────────
+    // These are styled entirely by self-contained classes in public/css/quiz.css
+    // (no Tailwind arbitrary classes — public/js is not scanned by Tailwind).
+
+    // Status row: icon + title + optional subtitle. Pass isCorrect = null for
+    // the "pending/checking" state (spinner icon).
+    function fbStatusHtml(isCorrect, title, sub) {
+        var icon = isCorrect === null ? 'progress_activity' : (isCorrect ? 'check_circle' : 'cancel');
+        var iconClass = isCorrect === null ? ' fb-status-icon--spin' : '';
+        return '<div class="fb-status">'
+            + '<span class="material-symbols-outlined fb-status-icon' + iconClass + '">' + icon + '</span>'
+            + '<div class="fb-status-text">'
+            + '<span class="fb-status-title">' + escapeHtml(title) + '</span>'
+            + (sub ? '<span class="fb-status-sub">' + escapeHtml(sub) + '</span>' : '')
+            + '</div>'
+            + '</div>';
+    }
+
+    // Video card: "İzah Videosu" header + a 16:9 frame with the player.
     function videoEmbedHtml(url) {
         if (!url) return '';
         var m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+        var media;
         if (m) {
-            return '<div class="mt-3 pt-3 border-t border-[rgb(var(--surface-container-high))/0.6]">'
-                + '<div class="inline-flex items-center gap-1.5 text-3xs font-black uppercase tracking-widest text-[rgb(var(--primary))] mb-1.5">'
-                + '<span class="material-symbols-outlined !text-sm">play_circle</span>İzah Videosu</div>'
-                + '<div class="rounded-xl overflow-hidden border border-[rgb(var(--surface-container-high))/0.6] bg-black/5">'
-                + '<iframe class="w-full aspect-video" src="https://www.youtube.com/embed/' + m[1] + '?rel=0" '
+            media = '<iframe class="fb-media" src="https://www.youtube.com/embed/' + m[1] + '?rel=0" '
                 + 'title="Explanation video" frameborder="0" '
                 + 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" '
-                + 'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></div>';
+                + 'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+        } else {
+            media = '<video class="fb-media" src="' + escapeHtml(url) + '" controls preload="none"></video>';
         }
-        return '<div class="mt-3 pt-3 border-t border-[rgb(var(--surface-container-high))/0.6]">'
-            + '<div class="inline-flex items-center gap-1.5 text-3xs font-black uppercase tracking-widest text-[rgb(var(--primary))] mb-1.5">'
-            + '<span class="material-symbols-outlined !text-sm">play_circle</span>İzah Videosu</div>'
-            + '<video class="w-full aspect-video rounded-xl bg-black/5" src="' + escapeHtml(url) + '" controls preload="none"></video></div>';
+        return '<div class="fb-video">'
+            + '<div class="fb-video-head">'
+            + '<span class="material-symbols-outlined fb-video-head-icon">play_circle</span>'
+            + '<span class="fb-video-head-label">İzah Videosu</span>'
+            + '</div>'
+            + '<div class="fb-video-frame">' + media + '</div>'
+            + '</div>';
     }
 
     function setPendingFeedback(fb, message) {
         if (!fb) return;
-        fb.style.display = 'flex';
+        fb.style.display = 'block';
         fb.className = 'feedback-box pending';
-        fb.innerHTML = '<span class="material-symbols-outlined !text-xl animate-spin">progress_activity</span>'
-            + '<div><span class="font-black">' + escapeHtml(message) + '</span></div>';
+        fb.innerHTML = fbStatusHtml(null, message, '');
     }
 
     function showRegularFeedback(container, result) {
@@ -72,17 +92,14 @@
         if (!fb) return;
         var isCorrect = !!result.correct;
 
-        fb.style.display = 'flex';
+        fb.style.display = 'block';
         fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'wrong');
 
-        var html = isCorrect
-            ? '<span class="material-symbols-outlined !text-xl">check_circle</span>'
-              + '<div><span class="font-black">Correct!</span><span class="block text-xs opacity-80">Your answer is right.</span></div>'
-            : '<span class="material-symbols-outlined !text-xl">cancel</span>'
-              + '<div><span class="font-black">Incorrect!</span><span class="block text-xs opacity-80">The correct answer is highlighted in green.</span></div>';
+        var status = isCorrect
+            ? fbStatusHtml(true, 'Correct!', 'Your answer is right.')
+            : fbStatusHtml(false, 'Incorrect!', 'The correct answer is highlighted in green.');
 
-        html += videoEmbedHtml(result.explanation_video_url || '');
-        fb.innerHTML = html;
+        fb.innerHTML = status + videoEmbedHtml(result.explanation_video_url || '');
     }
 
     function showOpenFeedback(container, result) {
@@ -90,17 +107,14 @@
         if (!fb) return;
         var isCorrect = !!result.correct;
 
-        fb.style.display = 'flex';
+        fb.style.display = 'block';
         fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'wrong');
 
-        var html = isCorrect
-            ? '<span class="material-symbols-outlined !text-xl">check_circle</span>'
-              + '<div><span class="font-black">Correct!</span><span class="block text-xs opacity-80">Your answer is right.</span></div>'
-            : '<span class="material-symbols-outlined !text-xl">cancel</span>'
-              + '<div><span class="font-black">Incorrect!</span><span class="block text-xs opacity-80">The expected answer is shown on the result page.</span></div>';
+        var status = isCorrect
+            ? fbStatusHtml(true, 'Correct!', 'Your answer is right.')
+            : fbStatusHtml(false, 'Incorrect!', 'The expected answer is shown on the result page.');
 
-        html += videoEmbedHtml(result.explanation_video_url || '');
-        fb.innerHTML = html;
+        fb.innerHTML = status + videoEmbedHtml(result.explanation_video_url || '');
     }
 
     // Reveal the correct option + the picked one using the SERVER response

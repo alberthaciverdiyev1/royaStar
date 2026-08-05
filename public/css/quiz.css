@@ -101,13 +101,17 @@
     background-color: rgba(var(--primary), 1) !important; color: #ffffff !important;
 }
 
+/* ── Feedback + explanation video card ───────────────────────────────
+   These classes are self-contained in quiz.css (public/js is not scanned
+   by Tailwind, so no Tailwind arbitrary classes are used in JS-injected
+   markup). The video lives in its own card below the status row — never
+   squeezed into a flex row. */
+
 .feedback-box {
     margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    display: none;
     animation: slideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @keyframes slideDown {
@@ -116,18 +120,96 @@
 }
 .feedback-box.correct {
     background-color: #ecfdf5;
-    border: 1.5px solid #a7f3d0;
-    color: #065f46;
+    border: 2px solid #a7f3d0;
 }
 .feedback-box.wrong {
     background-color: #fef2f2;
-    border: 1.5px solid #fecaca;
-    color: #991b1b;
+    border: 2px solid #fecaca;
 }
 .feedback-box.pending {
     background-color: rgba(var(--surface-container-high), 0.5);
-    border: 1.5px dashed rgba(var(--on-surface), 0.25);
-    color: rgba(var(--on-surface), 0.7);
+    border: 2px dashed rgba(var(--on-surface), 0.25);
+}
+
+/* Status row (icon + title + subtitle) */
+.fb-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+.fb-status-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+.feedback-box.correct .fb-status-icon { color: #059669; }
+.feedback-box.wrong .fb-status-icon { color: #dc2626; }
+.fb-status-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.fb-status-title {
+    font-size: 0.95rem;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+}
+.fb-status-sub {
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+.feedback-box.correct .fb-status-title,
+.feedback-box.correct .fb-status-sub { color: #065f46; }
+.feedback-box.wrong .fb-status-title,
+.feedback-box.wrong .fb-status-sub { color: #991b1b; }
+.feedback-box.pending .fb-status-icon,
+.feedback-box.pending .fb-status-title,
+.feedback-box.pending .fb-status-sub { color: rgba(var(--on-surface), 0.7); }
+.fb-status-icon--spin { animation: fb-spin 1s linear infinite; }
+@keyframes fb-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Video card */
+.fb-video {
+    margin: 0 1rem 1rem;
+    padding: 0.875rem;
+    border-radius: 1rem;
+    background-color: rgba(var(--surface-container-lowest), 0.85);
+    border: 1.5px solid rgba(var(--surface-container-high), 0.8);
+}
+.fb-video-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.625rem;
+    color: rgba(var(--primary), 1);
+}
+.fb-video-head-icon { font-size: 1.2rem; }
+.fb-video-head-label {
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+.fb-video-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background-color: #000;
+    box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.35);
+}
+.fb-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: contain;
 }
 
 .confirm-wrap {
