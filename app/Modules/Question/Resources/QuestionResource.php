@@ -9,21 +9,26 @@ class QuestionResource extends BaseResource
 {
     public function toArray(Request $request): array
     {
-        $textFields = ['question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e', 'open_answer', 'explanation'];
-
         $data = [
             'id' => $this->id,
             'lesson_id' => $this->lesson_id,
             'lesson_name' => $this->relationLoaded('lesson') ? $this->lesson?->name : null,
             'type' => $this->type,
             'answer_type' => $this->answer_type,
-            'right_answer' => $this->right_answer,
             'difficulty_level' => $this->difficulty_level,
+            'question' => $this->question,
             'created_at' => $this->created_at,
         ];
 
-        foreach ($textFields as $field) {
-            $data[$field] = $this->{$field};
+        foreach (['variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e'] as $variant) {
+            $data[$variant] = $this->{$variant};
+        }
+
+        // Sensitive answer fields are only exposed in admin context.
+        if ($this->isAdmin()) {
+            $data['right_answer'] = $this->right_answer;
+            $data['open_answer'] = $this->open_answer;
+            $data['explanation'] = $this->explanation;
         }
 
         return $data;

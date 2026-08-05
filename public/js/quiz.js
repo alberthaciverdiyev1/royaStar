@@ -36,84 +36,24 @@
         stepLabel.textContent = currentIndex + 1;
     };
 
-    window.selectAnswer = function(btn, questionId, chosenAnswer, rightAnswer) {
+    window.selectAnswer = function(btn, questionId, chosenAnswer) {
         var container = btn.closest('.quiz-question');
-        var feedbackEl = document.getElementById('feedback_' + questionId);
         var allBtns = container.querySelectorAll('.quiz-option-btn');
-        var alreadyAnswered = false;
-        allBtns.forEach(function(b) {
-            if (b.classList.contains('is-correct') || b.classList.contains('is-wrong')) {
-                alreadyAnswered = true;
-            }
-        });
-        if (alreadyAnswered) return;
 
         document.getElementById('answer_' + questionId).value = chosenAnswer;
-        var isRight = (chosenAnswer.toLowerCase() === rightAnswer.toLowerCase());
 
         allBtns.forEach(function(b) {
-            b.classList.add('is-disabled');
-            var ans = b.getAttribute('data-answer');
+            b.classList.remove('is-selected');
             var icon = b.querySelector('.icon-status');
-
-            if (ans.toLowerCase() === chosenAnswer.toLowerCase()) {
-                if (isRight) {
-                    b.classList.add('is-correct');
-                    if (icon) { icon.textContent = 'check_circle'; icon.style.opacity = '1'; }
-                } else {
-                    b.classList.add('is-wrong');
-                    if (icon) { icon.textContent = 'cancel'; icon.style.opacity = '1'; }
-                }
-            } else if (!isRight && ans.toLowerCase() === rightAnswer.toLowerCase()) {
-                b.classList.add('is-correct-target');
-                if (icon) { icon.textContent = 'check_circle'; icon.style.opacity = '1'; }
-            }
+            if (icon) { icon.textContent = 'radio_button_unchecked'; icon.style.opacity = '0'; }
         });
 
-        if (feedbackEl) {
-            feedbackEl.classList.remove('hidden');
-            if (isRight) {
-                feedbackEl.className = 'feedback-box correct';
-                feedbackEl.innerHTML = '<span class="material-symbols-outlined !text-xl">auto_awesome</span>' +
-                    '<div><strong class="font-black text-xs uppercase tracking-wide block">Correct Answer! ⭐</strong>' +
-                    '<span class="text-[11px]">Great job!</span></div>';
-            } else {
-                feedbackEl.className = 'feedback-box wrong';
-                feedbackEl.innerHTML = '<span class="material-symbols-outlined !text-xl">error</span>' +
-                    '<div><strong class="font-black text-xs uppercase tracking-wide block">Incorrect Answer!</strong>' +
-                    '<span class="text-[11px]">The correct answer is Option <strong>' + rightAnswer.toUpperCase() + '</strong>.</span></div>';
-            }
-        }
+        btn.classList.add('is-selected');
+        var icon = btn.querySelector('.icon-status');
+        if (icon) { icon.textContent = 'check_circle'; icon.style.opacity = '1'; }
     };
 
     window.setOpenAnswer = function(questionId, value) {
         document.getElementById('answer_' + questionId).value = value;
-    };
-
-    window.checkOpenAnswer = function(questionId, expectedAnswer) {
-        var inputVal = (document.getElementById('open_input_' + questionId).value || '').trim();
-        var feedbackEl = document.getElementById('feedback_' + questionId);
-
-        if (!inputVal) {
-            alert('Please type an answer first!');
-            return;
-        }
-
-        if (feedbackEl) {
-            feedbackEl.classList.remove('hidden');
-            var isMatch = inputVal.toLowerCase() === expectedAnswer.trim().toLowerCase();
-
-            if (isMatch) {
-                feedbackEl.className = 'feedback-box correct';
-                feedbackEl.innerHTML = '<span class="material-symbols-outlined !text-xl">auto_awesome</span>' +
-                    '<div><strong class="font-black text-xs uppercase tracking-wide block">Correct Answer! ⭐</strong>' +
-                    '<span class="text-[11px]">Your answer matches the expected answer!</span></div>';
-            } else {
-                feedbackEl.className = 'feedback-box wrong';
-                feedbackEl.innerHTML = '<span class="material-symbols-outlined !text-xl">info</span>' +
-                    '<div><strong class="font-black text-xs uppercase tracking-wide block">Submitted for Evaluation</strong>' +
-                    '<span class="text-[11px]">Expected answer: <strong>' + expectedAnswer + '</strong></span></div>';
-            }
-        }
     };
 })();

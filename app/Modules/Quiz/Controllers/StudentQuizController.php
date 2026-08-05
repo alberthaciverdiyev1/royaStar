@@ -6,17 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Modules\Quiz\Models\Quiz;
 use App\Modules\Quiz\Models\StudentQuiz;
 use App\Modules\Quiz\Requests\SubmitQuizRequest;
-use App\Modules\Star\Models\Star;
-use App\Modules\Star\Models\UserStar;
-use App\Modules\Star\Services\StarService;
+use App\Services\AssessmentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
 class StudentQuizController extends Controller
 {
     public function __construct(
-        private readonly StarService $starService,
+        private readonly AssessmentService $assessmentService,
     ) {}
     #[OA\Post(path: '/quizzes/{quiz}/start', summary: 'Start a quiz attempt (get questions)',
         tags: ['Quizzes'],
@@ -31,13 +28,17 @@ class StudentQuizController extends Controller
         $student = auth()->user()->student;
         abort_unless($student, 403, 'Only students can start quizzes');
 
+        if (!$quiz->isAvailableForGrade($student->grade_id)) {
+            abort(403, 'This quiz is not available for your grade.');
+        }
+
         $quiz->load('questions');
         $locale = app()->getLocale();
 
         return apiResponse(data: [
             'quiz' => [
                 'id' => $quiz->id,
-                'name' => $quiz->translate('name'),
+                'name' => $quiz->name,
                 'type' => $quiz->type,
             ],
             'questions' => $quiz->questions->map(function($q) use ($locale) {
@@ -76,119 +77,34 @@ class StudentQuizController extends Controller
         $student = auth()->user()->student;
         abort_unless($student, 403, 'Only students can submit quizzes');
 
-        $quiz->load('questions');
-        $questions = $quiz->questions->keyBy('id');
-        $answers = $request->input('answers', []);
-        $locale = app()->getLocale();
-        $user = auth()->user();
+        if (!$quiz->isAvailableForGrade($student->grade_id)) {
+            abort(403, 'This quiz is not available for your grade.');
+        }
 
-        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
-        $alreadyAwardedCompleted = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'quiz_completed')->pluck('id'))
-            ->where('reference_type', 'quiz')
-            ->where('reference_id', $quiz->id)
-            ->exists();
-        $alreadyAwardedPerfect = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'quiz_perfect')->pluck('id'))
-            ->where('reference_type', 'quiz')
-            ->where('reference_id', $quiz->id)
-            ->exists();
+        $result = $this->assessmentService->submitQuiz(
+            auth()->user(),
+            $student,
+            $quiz,
+            $request->input('answers', []),
+            app()->getLocale(),
+        );
 
-        return DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user, $alreadyAwardedCompleted, $alreadyAwardedPerfect) {
-            // Delete old attempts atomically with new insert
-            StudentQuiz::where('student_id', $student->id)
-                ->where('quiz_id', $quiz->id)
-                ->delete();
+        $answerDetails = collect($result['answers'])->map(fn($a) => [
+            'question_id' => $a['question_id'],
+            'type' => $a['type'],
+            'answer' => $a['answer'],
+            'correct_answer' => $a['correct_answer'],
+            'is_correct' => $a['is_correct'],
+        ])->values()->all();
 
-            $correctCount = 0;
-            $wrongCount = 0;
-            $skippedCount = 0;
-            $total = $questions->count();
-
-            $answerDetails = [];
-
-            foreach ($answers as $item) {
-                $questionId = $item['question_id'];
-                $answer = $item['answer'] ?? null;
-
-                $question = $questions->get($questionId);
-                if (!$question) continue;
-
-                $isCorrect = false;
-                $correctAnswer = null;
-
-                if ($answer === null || trim($answer) === '') {
-                    $skippedCount++;
-                    $answer = null;
-                    if ($question->type === 'regular') {
-                        $rawRight = $question->right_answer ?? '';
-                        $correctAnswer = str_replace('variant_', '', strtolower(trim($rawRight)));
-                    } else {
-                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-                    }
-                } elseif ($question->type === 'regular') {
-                    $rawRight = $question->right_answer ?? '';
-                    $correctAnswer = str_replace('variant_', '', strtolower(trim($rawRight)));
-                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
-
-                    $isCorrect = ($userAnswerNorm === $correctAnswer);
-                    $isCorrect ? $correctCount++ : $wrongCount++;
-                } else {
-                    // Open question
-                    $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-
-                    if ($question->answer_type === 'exact') {
-                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
-                        $isCorrect ? $correctCount++ : $wrongCount++;
-                    } else {
-                        // similar — set is_correct = false for now, awaiting admin review
-                        $isCorrect = false;
-                        $wrongCount++;
-                    }
-                }
-
-                StudentQuiz::create([
-                    'student_id' => $student->id,
-                    'quiz_id' => $quiz->id,
-                    'question_id' => $questionId,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                    'type' => $question->type,
-                ]);
-
-                $answerDetails[] = [
-                    'question_id' => $questionId,
-                    'type' => $question->type,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                ];
-            }
-
-            $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
-
-            // Award stars only on first completion
-            if (!$alreadyAwardedCompleted) {
-                $this->starService->awardQuizCompleted($user->id, $quiz->id);
-            }
-            if ($score === 100 && !$alreadyAwardedPerfect) {
-                $this->starService->awardQuizPerfect($user->id, $quiz->id);
-            }
-
-            return apiResponse(data: [
-                'score' => $score,
-                'total_questions' => $total,
-                'correct_count' => $correctCount,
-                'wrong_count' => $wrongCount,
-                'skipped_count' => $skippedCount,
-                'answers' => $answerDetails,
-            ]);
-        });
+        return apiResponse(data: [
+            'score' => $result['score'],
+            'total_questions' => $result['total'],
+            'correct_count' => $result['correct'],
+            'wrong_count' => $result['wrong'],
+            'skipped_count' => $result['skipped'],
+            'answers' => $answerDetails,
+        ]);
     }
 
     #[OA\Get(path: '/quizzes/{quiz}/result', summary: 'Get latest quiz result',

@@ -166,16 +166,14 @@ class PageController extends Controller
     {
         $lesson = \App\Modules\Lesson\Models\Lesson::with(['topic', 'videos', 'quiz.questions'])->findOrFail($id);
 
-        // Track lesson view
-        \App\Modules\Lesson\Models\LessonView::updateOrCreate(['lesson_id' => $lesson->id])->increment('count');
-
-        // Award lesson completed star
-        $user = Auth::user();
-        if ($user) {
-            $this->starService->awardLessonCompleted($user->id, $lesson->id);
-        }
+        // NOTE:
+        // - Lesson view counting lives in UpdateLessonProgressAction (first
+        //   engagement per student), so simply opening the page does not inflate it.
+        // - The "lesson completed" star is awarded there too, only when progress
+        //   reaches 100% — not by merely opening the lesson page.
 
         // Get existing review if user is authenticated
+        $user = Auth::user();
         $existingReview = null;
         if ($user) {
             $existingReview = LessonReview::where('user_id', $user->id)
@@ -188,9 +186,12 @@ class PageController extends Controller
 
     public function lessonRate(Request $request, $id)
     {
+        // Lesson must exist, and at least one of rating/review is required.
+        \App\Modules\Lesson\Models\Lesson::findOrFail($id);
+
         $request->validate([
-            'rating' => 'nullable|integer|min:1|max:5',
-            'review' => 'nullable|string|max:1000',
+            'rating' => 'required_without:review|integer|min:1|max:5',
+            'review' => 'required_without:rating|string|max:1000',
         ]);
 
         $user = Auth::user();
@@ -223,14 +224,14 @@ class PageController extends Controller
     // QUIZ — Dynamic
     // ═══════════════════════════════════════════
 
-    private function resolveRightAnswerLetter($question, string $locale = 'az'): string
-    {
-        return $this->assessmentService->resolveRightAnswerLetter($question, $locale);
-    }
-
     public function quiz($id)
     {
         $quiz = Quiz::with('questions')->findOrFail($id);
+
+        if (Auth::user()?->student && !$quiz->isAvailableForGrade(Auth::user()->student->grade_id)) {
+            abort(403, 'This quiz is not available for your grade.');
+        }
+
         $locale = app()->getLocale();
 
         $questions = $quiz->questions->map(function ($q) use ($locale) {
@@ -263,6 +264,17 @@ class PageController extends Controller
     public function quizSubmit(Request $request, $id)
     {
         $quiz = Quiz::with('questions')->findOrFail($id);
+
+        if (Auth::user()?->student && !$quiz->isAvailableForGrade(Auth::user()->student->grade_id)) {
+            abort(403, 'This quiz is not available for your grade.');
+        }
+
+        $request->validate([
+            'answers' => 'required|array|min:1',
+            'answers.*.question_id' => 'required|integer|exists:questions,id',
+            'answers.*.answer' => 'nullable|string',
+        ]);
+
         $answers = $request->input('answers', []);
         $locale = app()->getLocale();
         $user = Auth::user();
@@ -319,6 +331,12 @@ class PageController extends Controller
 
     public function examGrade(Grade $grade)
     {
+        // Students may only browse exams for their own grade.
+        $student = Auth::user()?->student;
+        if ($student && $student->grade_id && $student->grade_id !== $grade->id) {
+            abort(403, 'This exam is not available for your grade.');
+        }
+
         $exams = $grade->exams()->with('grade')->withCount('questions')->get();
 
         $user = Auth::user();
@@ -344,11 +362,14 @@ class PageController extends Controller
 
     public function examDetail(Exam $exam)
     {
+        // Students may only view exams for their own grade.
+        $student = Auth::user()?->student;
+        if ($student && !$exam->isAvailableForGrade($student->grade_id)) {
+            abort(403, 'This exam is not available for your grade.');
+        }
+
         $exam->load('grade');
         $exam->loadCount('questions');
-
-        $user = Auth::user();
-        $student = $user?->student;
         $pastScore = null;
 
         if ($student) {
@@ -369,6 +390,13 @@ class PageController extends Controller
     public function examStart(Exam $exam)
     {
         $exam->load('questions', 'grade');
+
+        // Students may only take exams for their own grade.
+        $student = Auth::user()?->student;
+        if ($student && $exam->grade_id && $student->grade_id && $student->grade_id !== $exam->grade_id) {
+            abort(403, 'This exam is not available for your grade.');
+        }
+
         $locale = app()->getLocale();
 
         $questions = $exam->questions->map(function ($q) use ($locale) {
@@ -381,15 +409,11 @@ class PageController extends Controller
             ];
 
             if ($q->type === 'regular') {
-                $data['right_answer'] = $this->resolveRightAnswerLetter($q, $locale);
                 $data['variant_a'] = $q->variant_a[$locale] ?? $q->variant_a['az'] ?? [];
                 $data['variant_b'] = $q->variant_b[$locale] ?? $q->variant_b['az'] ?? [];
                 $data['variant_c'] = $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [];
                 $data['variant_d'] = $q->variant_d[$locale] ?? $q->variant_d['az'] ?? [];
                 $data['variant_e'] = $q->variant_e[$locale] ?? $q->variant_e['az'] ?? [];
-            } else {
-                $openAnswerBlocks = $q->open_answer[$locale] ?? $q->open_answer['az'] ?? [];
-                $data['correct_answer'] = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
             }
 
             return $data;
@@ -405,6 +429,13 @@ class PageController extends Controller
     public function examSubmit(Request $request, Exam $exam)
     {
         $exam->load('questions');
+
+        $request->validate([
+            'answers' => 'required|array|min:1',
+            'answers.*.question_id' => 'required|integer|exists:questions,id',
+            'answers.*.answer' => 'nullable|string',
+        ]);
+
         $answers = $request->input('answers', []);
         $locale = app()->getLocale();
         $user = Auth::user();

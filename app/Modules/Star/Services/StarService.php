@@ -86,11 +86,18 @@ class StarService
         $this->award($userId, 'login_streak', 'streak', (int) now()->format('Ymd'));
     }
 
-    public function getUserTotalStars(int $userId): int
+    public function getUserTotalStars(int $userId, ?string $month = null): int
     {
-        return (int) UserStar::where('user_id', $userId)
-            ->join('stars', 'user_stars.star_id', '=', 'stars.id')
-            ->sum('stars.point');
+        $query = UserStar::where('user_id', $userId)
+            ->join('stars', 'user_stars.star_id', '=', 'stars.id');
+
+        if ($month !== null) {
+            $start = \Carbon\Carbon::parse($month . '-01')->startOfMonth();
+            $end = \Carbon\Carbon::parse($month . '-01')->endOfMonth();
+            $query->whereBetween('user_stars.created_at', [$start, $end]);
+        }
+
+        return (int) $query->sum('stars.point');
     }
 
     public function getStarHistory(int $userId): Collection

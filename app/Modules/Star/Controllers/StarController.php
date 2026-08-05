@@ -10,6 +10,7 @@ use App\Modules\Star\Requests\UpdateStarRequest;
 use App\Modules\Star\Resources\StarResource;
 use App\Modules\Star\Services\StarService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StarController extends Controller
 {
@@ -36,13 +37,18 @@ class StarController extends Controller
         return apiResponse(data: new StarResource($this->updateStarAction->execute($star, $request->validated())), message: 'crud.updated');
     }
 
-    public function userStars(): JsonResponse
+    public function userStars(Request $request): JsonResponse
     {
         $user = auth()->user();
         abort_unless($user, 401);
 
+        $month = $request->input('month');
+        if ($month !== null && !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = null;
+        }
+
         return apiResponse(data: [
-            'total' => $this->starService->getUserTotalStars($user->id),
+            'total' => $this->starService->getUserTotalStars($user->id, $month),
             'history' => $this->starService->getStarHistory($user->id),
         ]);
     }

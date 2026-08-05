@@ -59,6 +59,16 @@ beforeEach(function () {
         'lesson_id' => $lesson->id,
     ]);
 
+    // Open question — similar answer 'Azerbaijan'
+    $this->similarQuestion = Question::create([
+        'question' => ['en' => [['type' => 'text', 'content' => 'Country of Baku?']]],
+        'type' => 'open',
+        'answer_type' => 'similar',
+        'open_answer' => ['en' => [['type' => 'text', 'content' => 'Azerbaijan']]],
+        'difficulty_level' => DifficultyLevel::Beginner->value,
+        'lesson_id' => $lesson->id,
+    ]);
+
     $grade = Grade::create(['name' => 'Grade 1']);
     $city = City::create(['name' => 'Baku']);
 
@@ -151,16 +161,72 @@ it('evaluates wrong, skipped, and correct answers', function () {
         ->and($result['skipped'])->toBe(1);
 });
 
+it('accepts a similar open answer that matches exactly', function () {
+    $questions = collect([$this->similarQuestion])->keyBy('id');
+
+    $result = $this->service->evaluateAnswers([
+        ['question_id' => $this->similarQuestion->id, 'answer' => 'Azerbaijan'],
+    ], $questions, 'en');
+
+    expect($result['score'])->toEqual(100)
+        ->and($result['correct'])->toBe(1)
+        ->and($result['wrong'])->toBe(0);
+});
+
+it('accepts a similar open answer with light typos or formatting noise', function () {
+    $questions = collect([$this->similarQuestion])->keyBy('id');
+
+    $result = $this->service->evaluateAnswers([
+        ['question_id' => $this->similarQuestion->id, 'answer' => ' azerbaijan! '],
+    ], $questions, 'en');
+
+    expect($result['score'])->toEqual(100)
+        ->and($result['correct'])->toBe(1)
+        ->and($result['wrong'])->toBe(0);
+});
+
+it('rejects a clearly unrelated similar answer', function () {
+    $questions = collect([$this->similarQuestion])->keyBy('id');
+
+    $result = $this->service->evaluateAnswers([
+        ['question_id' => $this->similarQuestion->id, 'answer' => 'Brazil'],
+    ], $questions, 'en');
+
+    expect($result['score'])->toEqual(0)
+        ->and($result['correct'])->toBe(0)
+        ->and($result['wrong'])->toBe(1);
+});
+
 it('handles empty answers array', function () {
     $questions = collect([$this->regularQuestion])->keyBy('id');
 
     $result = $this->service->evaluateAnswers([], $questions, 'en');
 
+    // Every question without a submitted answer counts as skipped, and a
+    // per-question record is still produced so persisted scores stay consistent.
     expect($result['score'])->toEqual(0)
         ->and($result['total'])->toBe(1)
         ->and($result['correct'])->toBe(0)
         ->and($result['wrong'])->toBe(0)
-        ->and($result['skipped'])->toBe(0);
+        ->and($result['skipped'])->toBe(1)
+        ->and($result['answers'])->toHaveCount(1);
+});
+
+it('persists skipped questions when submission is partial', function () {
+    $questions = collect([$this->regularQuestion, $this->openQuestion])->keyBy('id');
+
+    // Only one of the two questions is submitted.
+    $result = $this->service->evaluateAnswers([
+        ['question_id' => $this->regularQuestion->id, 'answer' => 'b'],
+    ], $questions, 'en');
+
+    expect($result['total'])->toBe(2)
+        ->and($result['correct'])->toBe(1)
+        ->and($result['skipped'])->toBe(1)
+        ->and($result['answers'])->toHaveCount(2);
+
+    $qids = collect($result['answers'])->pluck('question_id')->sort()->values()->all();
+    expect($qids)->toBe([$this->regularQuestion->id, $this->openQuestion->id]);
 });
 
 it('ignores answers for unknown questions', function () {

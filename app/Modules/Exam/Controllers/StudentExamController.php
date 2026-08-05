@@ -6,17 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Modules\Exam\Models\Exam;
 use App\Modules\Exam\Models\StudentExam;
 use App\Modules\Exam\Requests\SubmitExamRequest;
-use App\Modules\Star\Models\Star;
-use App\Modules\Star\Models\UserStar;
-use App\Modules\Star\Services\StarService;
+use App\Services\AssessmentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
 class StudentExamController extends Controller
 {
     public function __construct(
-        private readonly StarService $starService,
+        private readonly AssessmentService $assessmentService,
     ) {}
 
     #[OA\Post(path: '/exams/{exam}/start', summary: 'Start an exam attempt (get questions)',
@@ -31,6 +28,10 @@ class StudentExamController extends Controller
     {
         $student = auth()->user()->student;
         abort_unless($student, 403, 'Only students can start exams');
+
+        if ($exam->grade_id && $student->grade_id && $student->grade_id !== $exam->grade_id) {
+            abort(403, 'This exam is not available for your grade.');
+        }
 
         $exam->load('questions');
         $locale = app()->getLocale();
@@ -81,119 +82,34 @@ class StudentExamController extends Controller
         $student = auth()->user()->student;
         abort_unless($student, 403, 'Only students can submit exams');
 
-        $exam->load('questions');
-        $questions = $exam->questions->keyBy('id');
-        $answers = $request->input('answers', []);
-        $locale = app()->getLocale();
-        $user = auth()->user();
+        if ($exam->grade_id && $student->grade_id && $student->grade_id !== $exam->grade_id) {
+            abort(403, 'This exam is not available for your grade.');
+        }
 
-        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
-        $alreadyAwardedPassed = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'exam_passed')->pluck('id'))
-            ->where('reference_type', 'exam')
-            ->where('reference_id', $exam->id)
-            ->exists();
-        $alreadyAwardedExcellent = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'exam_excellent')->pluck('id'))
-            ->where('reference_type', 'exam')
-            ->where('reference_id', $exam->id)
-            ->exists();
+        $result = $this->assessmentService->submitExam(
+            auth()->user(),
+            $student,
+            $exam,
+            $request->input('answers', []),
+            app()->getLocale(),
+        );
 
-        return DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user, $alreadyAwardedPassed, $alreadyAwardedExcellent) {
-            // Delete old attempts atomically with new insert
-            StudentExam::where('student_id', $student->id)
-                ->where('exam_id', $exam->id)
-                ->delete();
+        $answerDetails = collect($result['answers'])->map(fn($a) => [
+            'question_id' => $a['question_id'],
+            'type' => $a['type'],
+            'answer' => $a['answer'],
+            'correct_answer' => $a['correct_answer'],
+            'is_correct' => $a['is_correct'],
+        ])->values()->all();
 
-            $correctCount = 0;
-            $wrongCount = 0;
-            $skippedCount = 0;
-            $total = $questions->count();
-
-            $answerDetails = [];
-
-            foreach ($answers as $item) {
-                $questionId = $item['question_id'];
-                $answer = $item['answer'] ?? null;
-
-                $question = $questions->get($questionId);
-                if (!$question) continue;
-
-                $isCorrect = false;
-                $correctAnswer = null;
-
-                if ($answer === null || trim($answer) === '') {
-                    $skippedCount++;
-                    $answer = null;
-                    if ($question->type === 'regular') {
-                        $rawRight = $question->right_answer ?? '';
-                        $correctAnswer = str_replace('variant_', '', strtolower(trim($rawRight)));
-                    } else {
-                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-                    }
-                } elseif ($question->type === 'regular') {
-                    $rawRight = $question->right_answer ?? '';
-                    $correctAnswer = str_replace('variant_', '', strtolower(trim($rawRight)));
-                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
-
-                    $isCorrect = ($userAnswerNorm === $correctAnswer);
-                    $isCorrect ? $correctCount++ : $wrongCount++;
-                } else {
-                    // Open question
-                    $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-
-                    if ($question->answer_type === 'exact') {
-                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
-                        $isCorrect ? $correctCount++ : $wrongCount++;
-                    } else {
-                        // similar — set is_correct = false for now, awaiting admin review
-                        $isCorrect = false;
-                        $wrongCount++;
-                    }
-                }
-
-                StudentExam::create([
-                    'student_id' => $student->id,
-                    'exam_id' => $exam->id,
-                    'question_id' => $questionId,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                    'type' => $question->type,
-                ]);
-
-                $answerDetails[] = [
-                    'question_id' => $questionId,
-                    'type' => $question->type,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                ];
-            }
-
-            $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
-
-            // Award stars only on first completion
-            if ($score >= $exam->passing_score && !$alreadyAwardedPassed) {
-                $this->starService->awardExamPassed($user->id, $exam->id);
-            }
-            if ($score >= 90 && !$alreadyAwardedExcellent) {
-                $this->starService->awardExamExcellent($user->id, $exam->id);
-            }
-
-            return apiResponse(data: [
-                'score' => $score,
-                'total_questions' => $total,
-                'correct_count' => $correctCount,
-                'wrong_count' => $wrongCount,
-                'skipped_count' => $skippedCount,
-                'answers' => $answerDetails,
-            ]);
-        });
+        return apiResponse(data: [
+            'score' => $result['score'],
+            'total_questions' => $result['total'],
+            'correct_count' => $result['correct'],
+            'wrong_count' => $result['wrong'],
+            'skipped_count' => $result['skipped'],
+            'answers' => $answerDetails,
+        ]);
     }
 
     #[OA\Get(path: '/exams/{exam}/result', summary: 'Get latest exam result',

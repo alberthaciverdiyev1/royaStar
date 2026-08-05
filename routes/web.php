@@ -9,9 +9,9 @@ Route::redirect('/welcome', '/')->name('welcome');
 
 // Auth
 Route::get('/login', [PageController::class, 'login'])->name('login');
-Route::post('/login', [PageController::class, 'loginPost'])->name('login.post');
+Route::post('/login', [PageController::class, 'loginPost'])->name('login.post')->middleware('throttle:10,1');
 Route::get('/signup', [PageController::class, 'signup'])->name('signup');
-Route::post('/signup', [PageController::class, 'signupPost'])->name('signup.post');
+Route::post('/signup', [PageController::class, 'signupPost'])->name('signup.post')->middleware('throttle:5,1');
 Route::get('/pending', [PageController::class, 'pending'])->name('pending');
 Route::post('/logout', [PageController::class, 'logout'])->name('logout');
 

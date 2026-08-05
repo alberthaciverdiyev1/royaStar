@@ -31,4 +31,17 @@ class Exam extends Model
             ->orderBy('exam_question.order')
             ->withTimestamps();
     }
+
+    /**
+     * Whether a student of the given grade may view/take this exam.
+     * An exam with no grade or a student with no grade is always allowed.
+     */
+    public function isAvailableForGrade(?int $gradeId): bool
+    {
+        if (!$this->grade_id || !$gradeId) {
+            return true;
+        }
+
+        return $this->grade_id === $gradeId;
+    }
 }

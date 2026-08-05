@@ -53,14 +53,7 @@ class AssessmentService
             $varData = $question->$varKey ?? null;
             if (!$varData) continue;
 
-            $varText = is_array($varData)
-                ? collect($varData[$locale] ?? $varData['az'] ?? $varData)->map(function ($block) {
-                    if (is_array($block)) {
-                        return $block['content'] ?? '';
-                    }
-                    return (string) $block;
-                })->join(' ')
-                : (string) $varData;
+            $varText = $this->variantText($varData, $locale);
 
             if (mb_strtolower(trim($varText)) === mb_strtolower($rawRight)) {
                 return $letter;
@@ -68,6 +61,99 @@ class AssessmentService
         }
 
         return $normRaw;
+    }
+
+    /**
+     * Normalize a variant value (translatable block array, locale-scoped array,
+     * or plain string) into its display text.
+     */
+    private function variantText(mixed $varData, string $locale): string
+    {
+        if (is_array($varData)) {
+            $locData = $varData[$locale] ?? $varData['az'] ?? $varData;
+
+            if (is_string($locData)) {
+                return $locData;
+            }
+
+            if (is_array($locData)) {
+                return collect($locData)->map(function ($block) {
+                    if (is_array($block)) {
+                        return $block['content'] ?? '';
+                    }
+                    return (string) $block;
+                })->join(' ');
+            }
+        }
+
+        return (string) $varData;
+    }
+
+    /**
+     * Normalize a free-text answer for comparison: lowercase, trim, strip
+     * diacritics, collapse punctuation and whitespace.
+     */
+    private function normalizeAnswerText(string $text): string
+    {
+        $text = mb_strtolower($text);
+        $text = preg_replace('/[\x{0300}-\x{036f}]/u', '', \Normalizer::normalize($text, \Normalizer::FORM_D));
+        $text = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $text);
+        $text = preg_replace('/\s+/u', ' ', $text);
+
+        return trim($text);
+    }
+
+    /**
+     * Decide whether a free-text answer is "similar enough" to the expected
+     * answer for open questions with answer_type = similar.
+     *
+     * Rules:
+     *  - Identical after normalization → correct.
+     *  - One contains the other (whole word, e.g. "Baku" inside "Baku city") → correct.
+     *  - Otherwise fall back to a similarity ratio (Levenshtein-based) ≥ 0.75.
+     */
+    private function isSimilarAnswer(string $answer, string $correctAnswer): bool
+    {
+        $a = $this->normalizeAnswerText($answer);
+        $b = $this->normalizeAnswerText($correctAnswer);
+
+        if ($a === '' || $b === '') {
+            return false;
+        }
+        if ($a === $b) {
+            return true;
+        }
+
+        // Whole-word containment in either direction.
+        $wordsA = preg_split('/\s+/u', $a);
+        $wordsB = preg_split('/\s+/u', $b);
+        if (count($wordsA) > 1 || count($wordsB) > 1) {
+            if ($this->arrayWordsContain($wordsA, $b)) {
+                return true;
+            }
+            if ($this->arrayWordsContain($wordsB, $a)) {
+                return true;
+            }
+        }
+
+        // Levenshtein similarity on the shortest string length.
+        $maxLen = max(mb_strlen($a), mb_strlen($b));
+        if ($maxLen === 0) {
+            return false;
+        }
+
+        $distance = levenshtein($a, $b, 1, 1, 1);
+
+        return 1 - ($distance / $maxLen) >= 0.75;
+    }
+
+    /**
+     * True when the single phrase is present as a contiguous word sequence
+     * inside the tokenized multi-word list.
+     */
+    private function arrayWordsContain(array $words, string $phrase): bool
+    {
+        return in_array($phrase, $words, true);
     }
 
     /**
@@ -83,12 +169,14 @@ class AssessmentService
         $total = $questions->count();
         $answerDetails = [];
 
-        foreach ($answers as $item) {
-            $questionId = $item['question_id'] ?? null;
-            $answer = $item['answer'] ?? null;
+        // Index submitted answers by question_id so we can evaluate every
+        // question in the quiz/exam — even ones the client omitted. This keeps
+        // persisted attempts complete and the score consistent with the result page.
+        $answersByQuestion = collect($answers)->keyBy('question_id');
 
-            $question = $questions->get($questionId);
-            if (!$question) continue;
+        foreach ($questions as $question) {
+            $item = $answersByQuestion->get($question->id);
+            $answer = $item['answer'] ?? null;
 
             $isCorrect = false;
             $correctAnswer = null;
@@ -116,13 +204,14 @@ class AssessmentService
                     $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
                     $isCorrect ? $correctCount++ : $wrongCount++;
                 } else {
-                    $isCorrect = false;
-                    $wrongCount++;
+                    // "similar" — accept when the answer is close enough to the expected one.
+                    $isCorrect = $this->isSimilarAnswer((string) $answer, (string) $correctAnswer);
+                    $isCorrect ? $correctCount++ : $wrongCount++;
                 }
             }
 
             $answerDetails[] = [
-                'question_id' => $questionId,
+                'question_id' => $question->id,
                 'type' => $question->type,
                 'answer' => $answer,
                 'correct_answer' => $correctAnswer,

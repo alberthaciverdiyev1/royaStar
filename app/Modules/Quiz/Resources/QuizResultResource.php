@@ -11,14 +11,19 @@ class QuizResultResource extends BaseResource
     public function toArray(Request $request): array
     {
         $answers = $this->relationLoaded('answers')
-            ? $this->answers->map(fn($a) => [
-                'question_id' => $a->question_id,
-                'question' => $a->question?->translate('question'),
-                'type' => $a->type,
-                'answer' => $a->answer,
-                'correct_answer' => $a->correct_answer,
-                'is_correct' => $a->is_correct,
-            ])->values()
+            ? $this->answers->map(function ($a) {
+                $locale = app()->getLocale();
+                $q = $a->question;
+                $questionContent = $q?->question[$locale] ?? $q?->question['az'] ?? [];
+                return [
+                    'question_id' => $a->question_id,
+                    'question' => $questionContent,
+                    'type' => $a->type,
+                    'answer' => $a->answer,
+                    'correct_answer' => $a->correct_answer,
+                    'is_correct' => $a->is_correct,
+                ];
+            })->values()
             : [];
 
         return [

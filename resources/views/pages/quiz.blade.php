@@ -45,11 +45,7 @@
         @csrf
 
         @foreach($questions as $index => $q)
-        @php
-            $rightAnswer = strtolower(trim($q['right_answer'] ?? ''));
-            $correctAnswerText = $q['correct_answer'] ?? '';
-        @endphp
-        <section class="quiz-question" data-index="{{ $index }}" data-right-answer="{{ $rightAnswer }}" data-correct-text="{{ $correctAnswerText }}" data-type="{{ $q['type'] }}" style="{{ $index > 0 ? 'display:none' : '' }}">
+        <section class="quiz-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}" style="{{ $index > 0 ? 'display:none' : '' }}">
             <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 sm:p-6 shadow-md space-y-4">
 
                 <!-- Question Header & Text -->
@@ -77,7 +73,7 @@
                             $variantText = renderContentBlocks($variant);
                             if (empty(trim($variantText))) continue;
                         @endphp
-                        <button type="button" class="quiz-option-btn option-btn-item" data-question="{{ $q['id'] }}" data-answer="{{ $letter }}" onclick="selectAnswer(this, {{ $q['id'] }}, '{{ $letter }}', '{{ $rightAnswer }}')">
+                        <button type="button" class="quiz-option-btn option-btn-item" data-question="{{ $q['id'] }}" data-answer="{{ $letter }}" onclick="selectAnswer(this, {{ $q['id'] }}, '{{ $letter }}')">
                             <span class="letter-badge">{{ strtoupper($letter) }}</span>
                             <span class="font-semibold text-sm sm:text-base flex-1 tracking-wide">{!! $variantText !!}</span>
                             <span class="material-symbols-outlined !text-xl opacity-0 icon-status transition-opacity duration-300">check_circle</span>
@@ -88,15 +84,8 @@
                 <!-- Open Ended Question -->
                 <div class="space-y-3">
                     <textarea name="open_answer_{{ $q['id'] }}" id="open_input_{{ $q['id'] }}" class="w-full min-h-[100px] rounded-xl p-3.5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.4] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.6] transition-all" placeholder="Type your answer here..." oninput="setOpenAnswer({{ $q['id'] }}, this.value)"></textarea>
-                    <button type="button" onclick="checkOpenAnswer({{ $q['id'] }}, '{{ addslashes($correctAnswerText) }}')" class="px-5 py-2.5 rounded-full bg-[rgb(var(--primary))] text-white font-black text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all inline-flex items-center gap-1.5 shadow">
-                        <span class="material-symbols-outlined !text-base">verified</span>
-                        Check Answer
-                    </button>
                 </div>
                 @endif
-
-                <!-- Feedback Alert Container -->
-                <div id="feedback_{{ $q['id'] }}" class="hidden"></div>
 
                 <!-- Hidden inputs for backend submission -->
                 <input type="hidden" name="answers[{{ $index }}][question_id]" value="{{ $q['id'] }}">

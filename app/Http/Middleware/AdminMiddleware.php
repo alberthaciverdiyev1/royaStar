@@ -13,7 +13,7 @@ class AdminMiddleware
     {
         $user = $request->user();
 
-        if (!$user || !($user->hasAnyRole(['super-admin', 'admin']) || $user->type === 'admin')) {
+        if (!$user || !$user->is_approved || !($user->hasAnyRole(['super-admin', 'admin']) || $user->type === 'admin')) {
             throw new AuthorizationException('Admin access required.');
         }
 

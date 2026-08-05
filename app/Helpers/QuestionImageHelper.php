@@ -16,12 +16,13 @@ if (!function_exists('processQuestionMedia')) {
             'image' => [
                 'pattern' => '/^data:image\/(\w+);base64,(.+)$/',
                 'dir' => 'questions',
-                'extMap' => ['jpeg' => 'jpg'],
+                // Allowlist of safe raster formats. SVG is intentionally excluded (XSS risk).
+                'extMap' => ['jpeg' => 'jpg', 'jpg' => 'jpg', 'png' => 'png', 'gif' => 'gif', 'webp' => 'webp'],
             ],
             'audio' => [
                 'pattern' => '/^data:audio\/(\w+);base64,(.+)$/',
                 'dir' => 'questions/audio',
-                'extMap' => ['mpeg' => 'mp3', 'x-m4a' => 'm4a', 'x-wav' => 'wav', 'x-flac' => 'flac'],
+                'extMap' => ['mpeg' => 'mp3', 'mp3' => 'mp3', 'x-m4a' => 'm4a', 'x-wav' => 'wav', 'wav' => 'wav', 'x-flac' => 'flac', 'flac' => 'flac'],
             ],
         ];
 
@@ -40,8 +41,17 @@ if (!function_exists('processQuestionMedia')) {
                 $content = $value['content'] ?? '';
 
                 if (preg_match($config['pattern'], $content, $matches)) {
-                    $extension = $config['extMap'][$matches[1]] ?? $matches[1];
-                    $fileData = base64_decode($matches[2]);
+                    // Only allow known MIME types — never trust raw user input as extension.
+                    $mime = strtolower($matches[1]);
+                    $extension = $config['extMap'][$mime] ?? null;
+                    if ($extension === null) {
+                        continue;
+                    }
+
+                    $fileData = base64_decode($matches[2], true);
+                    if ($fileData === false || $fileData === '') {
+                        continue;
+                    }
 
                     $filename = $config['dir'] . '/' . Illuminate\Support\Str::uuid() . '.' . $extension;
 

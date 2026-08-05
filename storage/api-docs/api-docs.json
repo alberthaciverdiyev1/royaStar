@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "RoyaStar Backend API",
-        "description": "LMS platform for managing students, teachers, schools, and curriculum.",
+        "description": "LMS platform for managing students and curriculum.",
         "version": "1.0.0"
     },
     "servers": [
@@ -1009,304 +1009,6 @@
                 }
             }
         },
-        "/plans": {
-            "get": {
-                "tags": [
-                    "Plans"
-                ],
-                "summary": "List all subscription plans",
-                "operationId": "57817bedaf78a8bd085cfe0f7960678c",
-                "parameters": [
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. name, price, created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of plans"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Plans"
-                ],
-                "summary": "Create subscription plan",
-                "operationId": "0baf36b066ebad1fc7f0ee539c7994dc",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "price",
-                                    "duration"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "description": "Translated name",
-                                        "type": "object"
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "format": "float"
-                                    },
-                                    "duration": {
-                                        "description": "Duration in days",
-                                        "type": "integer"
-                                    },
-                                    "old_price": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Plan created"
-                    }
-                }
-            }
-        },
-        "/plans/{plan}": {
-            "get": {
-                "tags": [
-                    "Plans"
-                ],
-                "summary": "Get subscription plan by ID",
-                "operationId": "a17afa3f588379c9664cf6947c9a684f",
-                "parameters": [
-                    {
-                        "name": "plan",
-                        "in": "path",
-                        "description": "Plan ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Plan data"
-                    }
-                },
-                "security": [
-                    {}
-                ]
-            },
-            "put": {
-                "tags": [
-                    "Plans"
-                ],
-                "summary": "Update subscription plan",
-                "operationId": "56b54b3787c0edf8ec3e299df04e63e7",
-                "responses": {
-                    "200": {
-                        "description": "Plan updated"
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Plans"
-                ],
-                "summary": "Delete subscription plan",
-                "operationId": "662351fae909bcf2231f1d3bd9f2667f",
-                "responses": {
-                    "200": {
-                        "description": "Plan deleted"
-                    }
-                }
-            }
-        },
-        "/subscriptions": {
-            "get": {
-                "tags": [
-                    "Subscriptions"
-                ],
-                "summary": "List all subscriptions",
-                "operationId": "441d98192b26b3ce926e5a1733fbb763",
-                "parameters": [
-                    {
-                        "name": "school_id",
-                        "in": "query",
-                        "description": "Filter by school ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "teacher_id",
-                        "in": "query",
-                        "description": "Filter by teacher ID",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter by status",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_by",
-                        "in": "query",
-                        "description": "Sort column (e.g. created_at)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order_type",
-                        "in": "query",
-                        "description": "Sort direction (asc or desc)",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page (default 20)",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of subscriptions"
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "Subscriptions"
-                ],
-                "summary": "Create subscription",
-                "operationId": "e47d2f6a6ae5c9973af2f332aa637150",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "subscription_plan_id",
-                                    "start_date",
-                                    "expires_at",
-                                    "status"
-                                ],
-                                "properties": {
-                                    "subscription_plan_id": {
-                                        "type": "integer"
-                                    },
-                                    "start_date": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "expires_at": {
-                                        "type": "string",
-                                        "format": "date"
-                                    },
-                                    "status": {
-                                        "type": "string"
-                                    },
-                                    "school_id": {
-                                        "type": "integer",
-                                        "nullable": true
-                                    },
-                                    "teacher_id": {
-                                        "type": "integer",
-                                        "nullable": true
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Subscription created"
-                    }
-                }
-            }
-        },
-        "/subscriptions/{subscription}": {
-            "get": {
-                "tags": [
-                    "Subscriptions"
-                ],
-                "summary": "Get subscription by ID",
-                "operationId": "1a077e8b5fa3898aa55b34d33edade2d",
-                "parameters": [
-                    {
-                        "name": "subscription",
-                        "in": "path",
-                        "description": "Subscription ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Subscription data"
-                    }
-                }
-            }
-        },
         "/admin/questions": {
             "get": {
                 "tags": [
@@ -2275,7 +1977,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "User registered / School request pending"
+                        "description": "User registered"
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationError"
@@ -2603,12 +2305,14 @@
             },
             "RegisterRequest": {
                 "required": [
+                    "name",
+                    "phone",
                     "email",
+                    "password",
                     "type"
                 ],
                 "properties": {
                     "name": {
-                        "description": "Required for non-school types",
                         "type": "string"
                     },
                     "surname": {
@@ -2616,7 +2320,6 @@
                         "nullable": true
                     },
                     "phone": {
-                        "description": "Required for non-school types",
                         "type": "string"
                     },
                     "email": {
@@ -2624,7 +2327,6 @@
                         "format": "email"
                     },
                     "password": {
-                        "description": "Required for non-school types",
                         "type": "string",
                         "minLength": 8
                     },
@@ -2636,42 +2338,17 @@
                         "type": "string",
                         "default": "student",
                         "enum": [
-                            "student",
-                            "teacher",
-                            "parent",
-                            "school",
-                            "admin"
+                            "student"
                         ]
                     },
-                    "teacher": {
-                        "properties": {
-                            "city_id": {
-                                "type": "integer"
-                            }
-                        },
-                        "type": "object",
-                        "nullable": true
-                    },
                     "student": {
+                        "required": [
+                            "grade_id",
+                            "city_id"
+                        ],
                         "properties": {
                             "grade_id": {
                                 "type": "integer"
-                            },
-                            "city_id": {
-                                "type": "integer"
-                            }
-                        },
-                        "type": "object",
-                        "nullable": true
-                    },
-                    "school": {
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "no": {
-                                "type": "string",
-                                "nullable": true
                             },
                             "city_id": {
                                 "type": "integer"
@@ -2733,14 +2410,6 @@
         {
             "name": "Videos",
             "description": "Videos"
-        },
-        {
-            "name": "Plans",
-            "description": "Plans"
-        },
-        {
-            "name": "Subscriptions",
-            "description": "Subscriptions"
         },
         {
             "name": "Questions",

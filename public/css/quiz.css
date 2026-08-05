@@ -92,6 +92,15 @@
 }
 .quiz-option-btn.is-disabled { cursor: default; }
 
+.quiz-option-btn.is-selected {
+    border-color: rgba(var(--primary), 1) !important;
+    background-color: rgba(var(--primary), 0.08) !important;
+    box-shadow: 0 6px 18px -4px rgba(var(--primary), 0.2) !important;
+}
+.quiz-option-btn.is-selected .letter-badge {
+    background-color: rgba(var(--primary), 1) !important; color: #ffffff !important;
+}
+
 .feedback-box {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
