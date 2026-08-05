@@ -14,7 +14,7 @@ class ShowLessonAction extends BaseShowAction
 
     protected function defaultWith(): array
     {
-        $with = ['topic', 'videos', 'quiz', 'view'];
+        $with = ['topic', 'videos', 'quizzes', 'view'];
 
         if ($student = auth()->user()?->student) {
             $with['studentLessons'] = fn($q) => $q->where('student_id', $student->id);

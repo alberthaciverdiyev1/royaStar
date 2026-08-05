@@ -33,7 +33,7 @@ class CurriculumController extends Controller
 
     public function lesson($id)
     {
-        $lesson = Lesson::with(['topic', 'videos', 'quiz.questions'])->findOrFail($id);
+        $lesson = Lesson::with(['topic', 'videos', 'quizzes.questions'])->findOrFail($id);
 
         // NOTE:
         // - Lesson view counting lives in UpdateLessonProgressAction (first

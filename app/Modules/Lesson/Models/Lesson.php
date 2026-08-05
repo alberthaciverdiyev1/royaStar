@@ -19,7 +19,7 @@ class Lesson extends Model
 
     public function topic() { return $this->belongsTo(Topic::class); }
     public function videos() { return $this->hasMany(Video::class); }
-    public function quiz() { return $this->hasOne(Quiz::class); }
+    public function quizzes() { return $this->hasMany(Quiz::class); }
     public function questions() { return $this->hasMany(Question::class); }
     public function studentLessons() { return $this->hasMany(StudentLesson::class); }
     public function view() { return $this->hasOne(LessonView::class); }

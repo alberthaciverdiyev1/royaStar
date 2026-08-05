@@ -49,10 +49,10 @@
                     {{ $lesson->videos->count() }} {{ Str::plural('Video', $lesson->videos->count()) }}
                 </span>
                 @endif
-                @if($lesson->quiz)
+                @if($lesson->quizzes->isNotEmpty())
                 <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400/30 text-amber-200 text-xs font-black">
                     <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">stars</span>
-                    {{ $lesson->quiz->questions->count() }} Quiz Questions
+                    {{ $lesson->quizzes->sum(fn($qz) => $qz->questions->count()) }} Quiz Questions
                 </span>
                 @endif
             </div>
@@ -130,7 +130,7 @@
             @endif
 
             <!-- Empty State if no videos or quiz -->
-            @if($lesson->videos->isEmpty() && !$lesson->quiz)
+            @if($lesson->videos->isEmpty() && $lesson->quizzes->isEmpty())
             <section class="bg-[rgb(var(--surface-container-lowest))] border-2 border-dashed border-[rgb(var(--surface-container-high))] rounded-3xl p-12 text-center space-y-3">
                 <span class="material-symbols-outlined !text-6xl text-[rgb(var(--on-surface))/0.15]">menu_book</span>
                 <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">No Media Content Available</h4>
@@ -212,38 +212,42 @@
         <!-- SIDEBAR COLUMN (4 cols): Quiz CTA & Navigation -->
         <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
 
-            <!-- Knowledge Check Quiz Card -->
-            @if($lesson->quiz)
+            <!-- Knowledge Check Quiz Cards -->
+            @if($lesson->quizzes->isNotEmpty())
             <div class="sidebar-widget-card space-y-4">
                 <div class="flex items-center gap-2 text-[rgb(var(--secondary))]">
                     <span class="material-symbols-outlined !text-2xl">quiz</span>
                     <h4 class="font-black text-sm uppercase tracking-wide">Knowledge Check</h4>
                 </div>
 
-                <div class="lesson-quiz-banner space-y-3">
-                    <div class="w-12 h-12 rounded-2xl bg-[rgb(var(--secondary))] text-white flex items-center justify-center shadow-lg shadow-[rgb(var(--secondary))/0.3]">
-                        <span class="material-symbols-outlined !text-2xl">psychology</span>
-                    </div>
-                    <div>
-                        <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase tracking-tight">
-                            {{ $lesson->quiz->name }}
-                        </h4>
-                        <div class="flex items-center gap-3 mt-1 text-xs font-bold text-[rgb(var(--on-surface))/0.6]">
-                            <span class="flex items-center gap-1">
-                                <span class="material-symbols-outlined !text-sm text-[rgb(var(--secondary))]">help</span>
-                                {{ $lesson->quiz->questions->count() }} Questions
-                            </span>
-                            <span class="flex items-center gap-1 text-amber-600 font-black">
-                                <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
-                                Earn XP
-                            </span>
+                <div class="space-y-3">
+                    @foreach($lesson->quizzes as $lq)
+                    <div class="lesson-quiz-banner space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-[rgb(var(--secondary))] text-white flex items-center justify-center shadow-lg shadow-[rgb(var(--secondary))/0.3]">
+                            <span class="material-symbols-outlined !text-2xl">psychology</span>
                         </div>
-                    </div>
+                        <div>
+                            <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase tracking-tight">
+                                {{ $lq->name }}
+                            </h4>
+                            <div class="flex items-center gap-3 mt-1 text-xs font-bold text-[rgb(var(--on-surface))/0.6]">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined !text-sm text-[rgb(var(--secondary))]">help</span>
+                                    {{ $lq->questions->count() }} Questions
+                                </span>
+                                <span class="flex items-center gap-1 text-amber-600 font-black">
+                                    <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
+                                    Earn XP
+                                </span>
+                            </div>
+                        </div>
 
-                    <a href="{{ route('quiz', $lesson->quiz->id) }}" class="w-full py-3 bg-[rgb(var(--secondary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md shadow-[rgb(var(--secondary))/0.2]">
-                        <span>Start Quiz</span>
-                        <span class="material-symbols-outlined !text-lg">arrow_forward</span>
-                    </a>
+                        <a href="{{ route('quiz', $lq->id) }}" class="w-full py-3 bg-[rgb(var(--secondary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md shadow-[rgb(var(--secondary))/0.2]">
+                            <span>Start Quiz</span>
+                            <span class="material-symbols-outlined !text-lg">arrow_forward</span>
+                        </a>
+                    </div>
+                    @endforeach
                 </div>
             </div>
             @endif
