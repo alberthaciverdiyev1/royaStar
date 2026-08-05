@@ -55,12 +55,12 @@ return new class extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
 
-            $table->json('app_name');
+            $table->string('app_name');
 
             $table->string('logo')->nullable();
             $table->string('favicon')->nullable();
 
-            $table->json('address')->nullable();
+            $table->string('address', 1000)->nullable();
 
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
@@ -72,9 +72,9 @@ return new class extends Migration
             $table->string('telegram')->nullable();
             $table->string('whatsapp')->nullable();
 
-            $table->json('about_text')->nullable();
-            $table->json('terms_text')->nullable();
-            $table->json('privacy_text')->nullable();
+            $table->text('about_text')->nullable();
+            $table->text('terms_text')->nullable();
+            $table->text('privacy_text')->nullable();
 
             $table->boolean('maintenance_mode')->default(false);
 
@@ -93,19 +93,13 @@ return new class extends Migration
 
     private function insertSettingsRow(array $rows): void
     {
-        $appName = $this->parseJsonField($rows['app_name'] ?? null);
-
-        if (empty($appName)) {
-            $appName = 'RoyaStar';
-        }
-
-        $data = [
-            'app_name' => $appName,
+        DB::table('settings')->insert([
+            'app_name' => $this->plainValue($rows['app_name'] ?? null) ?? 'RoyaStar',
 
             'logo' => $this->nullableString($rows['logo'] ?? null),
             'favicon' => $this->nullableString($rows['favicon'] ?? null),
 
-            'address' => $this->parseJsonField($rows['address'] ?? null),
+            'address' => $this->plainValue($rows['address'] ?? null),
 
             'email' => $this->nullableString($rows['email'] ?? null),
             'phone' => $this->nullableString($rows['phone'] ?? null),
@@ -117,9 +111,9 @@ return new class extends Migration
             'telegram' => $this->nullableString($rows['telegram'] ?? null),
             'whatsapp' => $this->nullableString($rows['whatsapp'] ?? null),
 
-            'about_text' => $this->parseJsonField($rows['about_text'] ?? null),
-            'terms_text' => $this->parseJsonField($rows['terms_text'] ?? null),
-            'privacy_text' => $this->parseJsonField($rows['privacy_text'] ?? null),
+            'about_text' => $this->plainValue($rows['about_text'] ?? null),
+            'terms_text' => $this->plainValue($rows['terms_text'] ?? null),
+            'privacy_text' => $this->plainValue($rows['privacy_text'] ?? null),
 
             'maintenance_mode' => $this->parseBoolean(
                 $rows['maintenance_mode'] ?? null
@@ -127,43 +121,26 @@ return new class extends Migration
 
             'created_at' => now(),
             'updated_at' => now(),
-        ];
-
-        foreach (
-            [
-                'app_name',
-                'address',
-                'about_text',
-                'terms_text',
-                'privacy_text',
-            ] as $jsonField
-        ) {
-            if ($data[$jsonField] !== null) {
-                $data[$jsonField] = json_encode(
-                    $data[$jsonField],
-                    JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE
-                );
-            }
-        }
-
-        DB::table('settings')->insert($data);
+        ]);
     }
 
-    private function parseJsonField(?string $value): ?array
+    /**
+     * Normalize a legacy settings value to a plain single-language string.
+     * Handles a plain string or a legacy multi-locale JSON object (takes 'az').
+     */
+    private function plainValue(mixed $value): ?string
     {
-        if ($value === null || trim($value) === '') {
+        if ($value === null || trim((string) $value) === '') {
             return null;
         }
 
-        $decoded = json_decode($value, true);
+        $decoded = json_decode((string) $value, true);
 
         if (is_array($decoded)) {
-            // Legacy multi-locale object from an older database; the later
-            // single-language migration extracts the primary value.
-            return $decoded;
+            return $decoded['az'] ?? $decoded[array_key_first($decoded)] ?? null;
         }
 
-        return $value;
+        return trim((string) $value);
     }
 
     private function nullableString(mixed $value): ?string

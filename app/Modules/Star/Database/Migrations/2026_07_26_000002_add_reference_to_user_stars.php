@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::table('user_stars', function (Blueprint $table) {
             $table->string('reference_type')->nullable()->after('star_id');
             $table->unsignedBigInteger('reference_id')->nullable()->after('reference_type');
-            $table->json('metadata')->nullable()->after('reference_id');
+            $table->text('metadata')->nullable()->after('reference_id');
 
             $table->unique(['user_id', 'star_id', 'reference_type', 'reference_id'], 'user_star_ref_unique');
         });

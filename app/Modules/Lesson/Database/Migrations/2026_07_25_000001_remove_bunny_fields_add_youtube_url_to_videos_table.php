@@ -25,7 +25,7 @@ return new class extends Migration
     {
         if (DB::connection()->getDriverName() === 'sqlite') {
             Schema::table('videos', function (Blueprint $table) {
-                $table->string('bunny_stream_video_id')->nullable()->after('lang');
+                $table->string('bunny_stream_video_id')->nullable()->after('youtube_url');
             });
         }
 

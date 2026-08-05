@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('url')->comment('Video url');
             $table->string('duration')->comment('Video duration');
             $table->string('thumbnail')->comment('Video thumbnail');
-            $table->string('lang')->comment('Video lang')->index();
             $table->timestamps();
         });
     }

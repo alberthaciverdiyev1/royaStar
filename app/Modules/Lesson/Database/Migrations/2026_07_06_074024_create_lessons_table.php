@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
+            $table->string('name');
             $table->foreignId('topic_id')->constrained()->nullOnDelete();
-            $table->json('description')->nullable()->comment('Lesson description');
+            $table->text('description')->nullable()->comment('Lesson description');
             $table->timestamps();
             $table->softDeletes();
         });

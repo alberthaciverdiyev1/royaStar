@@ -11,7 +11,6 @@ return new class extends Migration
     {
         Schema::table('quizzes', function (Blueprint $table) {
             $table->string('type')->default('topic_based')->after('name');
-            $table->foreignId('topic_id')->nullable()->constrained()->cascadeOnDelete()->after('type');
             $table->foreignId('lesson_id')->nullable()->change();
         });
     }
@@ -20,9 +19,7 @@ return new class extends Migration
     {
         Schema::table('quizzes', function (Blueprint $table) {
             $table->foreignId('lesson_id')->change();
-
-            $table->dropForeign(['topic_id']);
-            $table->dropColumn(['type', 'topic_id']);
+            $table->dropColumn('type');
         });
     }
 };

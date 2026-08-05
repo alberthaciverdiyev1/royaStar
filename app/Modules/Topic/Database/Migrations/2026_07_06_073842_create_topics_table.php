@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
-            $table->json('name')->comment('Topic name');
+            $table->string('name')->comment('Topic name');
             $table->integer('difficulty_level')->comment('Topic difficulty');
             $table->timestamps();
             $table->softDeletes();

@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('stars', function (Blueprint $table) {
-            $table->json('name')->nullable()->after('type');
-            $table->json('description')->nullable()->after('name');
+            $table->string('name', 500)->nullable()->after('type');
+            $table->string('description', 1000)->nullable()->after('name');
             $table->string('icon', 50)->nullable()->after('description');
             $table->string('category', 50)->nullable()->after('icon');
             $table->string('group', 50)->nullable()->after('category');
