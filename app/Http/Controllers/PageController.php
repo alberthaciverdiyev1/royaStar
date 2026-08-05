@@ -15,6 +15,7 @@ use App\Modules\Lesson\Models\LessonReview;
 use App\Modules\Star\Models\Star;
 use App\Modules\Star\Models\UserStar;
 use App\Modules\Star\Services\StarService;
+use App\Services\AssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class PageController extends Controller
 {
     public function __construct(
         private readonly StarService $starService,
+        private readonly AssessmentService $assessmentService,
     ) {}
 
     public function welcome()
@@ -223,40 +225,7 @@ class PageController extends Controller
 
     private function resolveRightAnswerLetter($question, string $locale = 'az'): string
     {
-        if (!$question || $question->type !== 'regular') {
-            return '';
-        }
-
-        $rawRight = trim($question->right_answer ?? '');
-        if ($rawRight === '') {
-            return '';
-        }
-
-        $normRaw = str_replace('variant_', '', strtolower($rawRight));
-        if (in_array($normRaw, ['a', 'b', 'c', 'd', 'e'], true)) {
-            return $normRaw;
-        }
-
-        foreach (['a', 'b', 'c', 'd', 'e'] as $letter) {
-            $varKey = 'variant_' . $letter;
-            $varData = $question->$varKey ?? null;
-            if (!$varData) continue;
-
-            $varText = is_array($varData)
-                ? collect($varData[$locale] ?? $varData['az'] ?? $varData)->map(function ($block) {
-                    if (is_array($block)) {
-                        return $block['content'] ?? '';
-                    }
-                    return (string) $block;
-                })->join(' ')
-                : (string) $varData;
-
-            if (mb_strtolower(trim($varText)) === mb_strtolower($rawRight)) {
-                return $letter;
-            }
-        }
-
-        return $normRaw;
+        return $this->assessmentService->resolveRightAnswerLetter($question, $locale);
     }
 
     public function quiz($id)
@@ -294,7 +263,6 @@ class PageController extends Controller
     public function quizSubmit(Request $request, $id)
     {
         $quiz = Quiz::with('questions')->findOrFail($id);
-        $questions = $quiz->questions->keyBy('id');
         $answers = $request->input('answers', []);
         $locale = app()->getLocale();
         $user = Auth::user();
@@ -302,115 +270,7 @@ class PageController extends Controller
 
         abort_unless($student, 403, 'Only students can submit quizzes');
 
-        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
-        $alreadyAwardedCompleted = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'quiz_completed')->pluck('id'))
-            ->where('reference_type', 'quiz')
-            ->where('reference_id', $quiz->id)
-            ->exists();
-        $alreadyAwardedPerfect = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'quiz_perfect')->pluck('id'))
-            ->where('reference_type', 'quiz')
-            ->where('reference_id', $quiz->id)
-            ->exists();
-
-        $result = DB::transaction(function () use ($student, $quiz, $questions, $answers, $locale, $user, $alreadyAwardedCompleted, $alreadyAwardedPerfect) {
-            // Delete old attempts atomically with new insert
-            StudentQuiz::where('student_id', $student->id)
-                ->where('quiz_id', $quiz->id)
-                ->delete();
-            $correctCount = 0;
-            $wrongCount = 0;
-            $skippedCount = 0;
-            $total = $questions->count();
-            $answerDetails = [];
-
-            foreach ($answers as $item) {
-                $questionId = $item['question_id'] ?? null;
-                $answer = $item['answer'] ?? null;
-
-                $question = $questions->get($questionId);
-                if (!$question) continue;
-
-                $isCorrect = false;
-                $correctAnswer = null;
-
-                if ($answer === null || trim($answer) === '') {
-                    $skippedCount++;
-                    $answer = null;
-                    if ($question->type === 'regular') {
-                        $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
-                    } else {
-                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-                    }
-                } elseif ($question->type === 'regular') {
-                    $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
-                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
-
-                    $isCorrect = ($userAnswerNorm === $correctAnswer);
-                    $isCorrect ? $correctCount++ : $wrongCount++;
-                } else {
-                    $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-
-                    if ($question->answer_type === 'exact') {
-                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
-                        $isCorrect ? $correctCount++ : $wrongCount++;
-                    } else {
-                        $isCorrect = false;
-                        $wrongCount++;
-                    }
-                }
-
-                StudentQuiz::create([
-                    'student_id' => $student->id,
-                    'quiz_id' => $quiz->id,
-                    'question_id' => $questionId,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                    'type' => $question->type,
-                ]);
-
-                $answerDetails[] = [
-                    'question_id' => $questionId,
-                    'type' => $question->type,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                    'question_text' => $question->question[$locale] ?? $question->question['az'] ?? [],
-                    'variants' => [
-                        'a' => $question->variant_a[$locale] ?? $question->variant_a['az'] ?? [],
-                        'b' => $question->variant_b[$locale] ?? $question->variant_b['az'] ?? [],
-                        'c' => $question->variant_c[$locale] ?? $question->variant_c['az'] ?? [],
-                        'd' => $question->variant_d[$locale] ?? $question->variant_d['az'] ?? [],
-                        'e' => $question->variant_e[$locale] ?? $question->variant_e['az'] ?? [],
-                    ]
-                ];
-            }
-
-            $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
-
-            // Award stars only on first completion
-            if (!$alreadyAwardedCompleted) {
-                $this->starService->awardQuizCompleted($user->id, $quiz->id);
-            }
-            if ($score === 100 && !$alreadyAwardedPerfect) {
-                $this->starService->awardQuizPerfect($user->id, $quiz->id);
-            }
-
-            return [
-                'score' => $score,
-                'total' => $total,
-                'correct' => $correctCount,
-                'wrong' => $wrongCount,
-                'skipped' => $skippedCount,
-                'answers' => $answerDetails,
-            ];
-        });
+        $result = $this->assessmentService->submitQuiz($user, $student, $quiz, $answers, $locale);
 
         return redirect()->route('quiz.result', $id)
             ->with('quiz_result', $result);
@@ -432,37 +292,7 @@ class PageController extends Controller
                 ->get();
 
             if ($attempts->isNotEmpty()) {
-                $total = $attempts->count();
-                $correct = $attempts->where('is_correct', true)->count();
-                $wrong = $attempts->where('is_correct', false)->whereNotNull('answer')->where('answer', '!=', '')->count();
-                $skipped = $attempts->filter(fn($a) => empty($a->answer))->count();
-
-                $locale = app()->getLocale();
-                $result = [
-                    'score' => $total > 0 ? round(($correct / $total) * 100) : 0,
-                    'total' => $total,
-                    'correct' => $correct,
-                    'wrong' => $wrong,
-                    'skipped' => $skipped,
-                    'answers' => $attempts->map(function($a) use ($locale) {
-                        $q = $a->question;
-                        return [
-                            'question_id' => $a->question_id,
-                            'type' => $a->type,
-                            'answer' => $a->answer,
-                            'correct_answer' => $a->correct_answer,
-                            'is_correct' => $a->is_correct,
-                            'question_text' => $q?->question[$locale] ?? $q?->question['az'] ?? [],
-                            'variants' => [
-                                'a' => $q?->variant_a[$locale] ?? $q?->variant_a['az'] ?? [],
-                                'b' => $q?->variant_b[$locale] ?? $q?->variant_b['az'] ?? [],
-                                'c' => $q?->variant_c[$locale] ?? $q?->variant_c['az'] ?? [],
-                                'd' => $q?->variant_d[$locale] ?? $q?->variant_d['az'] ?? [],
-                                'e' => $q?->variant_e[$locale] ?? $q?->variant_e['az'] ?? [],
-                            ]
-                        ];
-                    })->toArray(),
-                ];
+                $result = $this->assessmentService->buildResultFromAttempts($attempts, app()->getLocale());
             }
         }
 
@@ -575,7 +405,6 @@ class PageController extends Controller
     public function examSubmit(Request $request, Exam $exam)
     {
         $exam->load('questions');
-        $questions = $exam->questions->keyBy('id');
         $answers = $request->input('answers', []);
         $locale = app()->getLocale();
         $user = Auth::user();
@@ -583,116 +412,7 @@ class PageController extends Controller
 
         abort_unless($student, 403, 'Only students can submit exams');
 
-        // Pre-check star awards BEFORE transaction (existing UserStar records are visible here)
-        $alreadyAwardedPassed = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'exam_passed')->pluck('id'))
-            ->where('reference_type', 'exam')
-            ->where('reference_id', $exam->id)
-            ->exists();
-        $alreadyAwardedExcellent = UserStar::withTrashed()
-            ->where('user_id', $user->id)
-            ->whereIn('star_id', Star::where('type', 'exam_excellent')->pluck('id'))
-            ->where('reference_type', 'exam')
-            ->where('reference_id', $exam->id)
-            ->exists();
-
-        $result = DB::transaction(function () use ($student, $exam, $questions, $answers, $locale, $user, $alreadyAwardedPassed, $alreadyAwardedExcellent) {
-            // Delete old attempts atomically with new insert
-            StudentExam::where('student_id', $student->id)
-                ->where('exam_id', $exam->id)
-                ->delete();
-            $correctCount = 0;
-            $wrongCount = 0;
-            $skippedCount = 0;
-            $total = $questions->count();
-            $answerDetails = [];
-
-            foreach ($answers as $item) {
-                $questionId = $item['question_id'] ?? null;
-                $answer = $item['answer'] ?? null;
-
-                $question = $questions->get($questionId);
-                if (!$question) continue;
-
-                $isCorrect = false;
-                $correctAnswer = null;
-
-                if ($answer === null || trim($answer) === '') {
-                    $skippedCount++;
-                    $answer = null;
-                    if ($question->type === 'regular') {
-                        $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
-                    } else {
-                        $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                        $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-                    }
-                } elseif ($question->type === 'regular') {
-                    $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
-                    $userAnswerNorm = str_replace('variant_', '', strtolower(trim($answer)));
-
-                    $isCorrect = ($userAnswerNorm === $correctAnswer);
-                    $isCorrect ? $correctCount++ : $wrongCount++;
-                } else {
-                    $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
-                    $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
-
-                    if ($question->answer_type === 'exact') {
-                        $isCorrect = (mb_strtolower(trim($answer)) === mb_strtolower(trim($correctAnswer)));
-                        $isCorrect ? $correctCount++ : $wrongCount++;
-                    } else {
-                        $isCorrect = false;
-                        $wrongCount++;
-                    }
-                }
-
-                StudentExam::create([
-                    'student_id' => $student->id,
-                    'exam_id' => $exam->id,
-                    'question_id' => $questionId,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                    'type' => $question->type,
-                ]);
-
-                $answerDetails[] = [
-                    'question_id' => $questionId,
-                    'type' => $question->type,
-                    'answer' => $answer,
-                    'correct_answer' => $correctAnswer,
-                    'is_correct' => $isCorrect,
-                    'question_text' => $question->question[$locale] ?? $question->question['az'] ?? [],
-                    'variants' => [
-                        'a' => $question->variant_a[$locale] ?? $question->variant_a['az'] ?? [],
-                        'b' => $question->variant_b[$locale] ?? $question->variant_b['az'] ?? [],
-                        'c' => $question->variant_c[$locale] ?? $question->variant_c['az'] ?? [],
-                        'd' => $question->variant_d[$locale] ?? $question->variant_d['az'] ?? [],
-                        'e' => $question->variant_e[$locale] ?? $question->variant_e['az'] ?? [],
-                    ]
-                ];
-            }
-
-            $score = $total > 0 ? round(($correctCount / $total) * 100) : 0;
-
-            // Award stars only on first completion
-            $passingScore = $exam->passing_score ?? 60;
-            if ($score >= $passingScore && !$alreadyAwardedPassed) {
-                $this->starService->awardExamPassed($user->id, $exam->id);
-            }
-            if ($score >= 90 && !$alreadyAwardedExcellent) {
-                $this->starService->awardExamExcellent($user->id, $exam->id);
-            }
-
-            return [
-                'score' => $score,
-                'total' => $total,
-                'correct' => $correctCount,
-                'wrong' => $wrongCount,
-                'skipped' => $skippedCount,
-                'answers' => $answerDetails,
-            ];
-        });
+        $result = $this->assessmentService->submitExam($user, $student, $exam, $answers, $locale);
 
         return redirect()->route('exam.result', $exam)
             ->with('exam_result', $result);
@@ -713,37 +433,7 @@ class PageController extends Controller
                 ->get();
 
             if ($attempts->isNotEmpty()) {
-                $total = $attempts->count();
-                $correct = $attempts->where('is_correct', true)->count();
-                $wrong = $attempts->where('is_correct', false)->whereNotNull('answer')->where('answer', '!=', '')->count();
-                $skipped = $attempts->filter(fn($a) => empty($a->answer))->count();
-
-                $locale = app()->getLocale();
-                $result = [
-                    'score' => $total > 0 ? round(($correct / $total) * 100) : 0,
-                    'total' => $total,
-                    'correct' => $correct,
-                    'wrong' => $wrong,
-                    'skipped' => $skipped,
-                    'answers' => $attempts->map(function($a) use ($locale) {
-                        $q = $a->question;
-                        return [
-                            'question_id' => $a->question_id,
-                            'type' => $a->type,
-                            'answer' => $a->answer,
-                            'correct_answer' => $a->correct_answer,
-                            'is_correct' => $a->is_correct,
-                            'question_text' => $q?->question[$locale] ?? $q?->question['az'] ?? [],
-                            'variants' => [
-                                'a' => $q?->variant_a[$locale] ?? $q?->variant_a['az'] ?? [],
-                                'b' => $q?->variant_b[$locale] ?? $q?->variant_b['az'] ?? [],
-                                'c' => $q?->variant_c[$locale] ?? $q?->variant_c['az'] ?? [],
-                                'd' => $q?->variant_d[$locale] ?? $q?->variant_d['az'] ?? [],
-                                'e' => $q?->variant_e[$locale] ?? $q?->variant_e['az'] ?? [],
-                            ]
-                        ];
-                    })->toArray(),
-                ];
+                $result = $this->assessmentService->buildResultFromAttempts($attempts, app()->getLocale());
             }
         }
 
