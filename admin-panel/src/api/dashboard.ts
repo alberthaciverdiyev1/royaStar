@@ -36,7 +36,6 @@ export interface DashboardStats {
   quizzes: number;
   exams: number;
   students: number;
-  teachers: number;
   users: number;
   pending_users: number;
   total_quiz_attempts: number;

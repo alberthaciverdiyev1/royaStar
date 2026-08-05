@@ -31,6 +31,7 @@ const routes = [
       { path: 'exams', name: 'Exams', component: () => import('../pages/exams/ExamList.vue') },
       { path: 'exams/:id', name: 'ExamDetail', component: () => import('../pages/exams/ExamDetail.vue') },
       { path: 'stars', name: 'Stars', component: () => import('../pages/stars/StarList.vue') },
+      { path: 'students', name: 'Students', component: () => import('../pages/students/StudentList.vue') },
       { path: 'users', name: 'Users', component: () => import('../pages/users/UserList.vue') },
       { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/UserList.vue') },
     ],

@@ -32,18 +32,12 @@ const totalActivity = computed(() => {
 
 const userTypeColors: Record<string, string> = {
   student: '#6366f1',
-  teacher: '#8b5cf6',
   admin: '#f59e0b',
-  school: '#06b6d4',
-  parent: '#10b981',
 }
 
 const userTypeLabels: Record<string, string> = {
   student: 'Tələbə',
-  teacher: 'Müəllim',
   admin: 'Admin',
-  school: 'Məktəb',
-  parent: 'Valideyn',
 }
 
 const userTypeTotal = computed(() => {
@@ -71,7 +65,6 @@ const maxSignup = computed(() => {
 
 const userTypeIcon: Record<string, string> = {
   student: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z',
-  teacher: 'M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.905 59.905 0 0 1 12 3.493a59.902 59.902 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342',
   admin: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
 }
 
@@ -209,18 +202,6 @@ function formatDate(iso: string) {
         <template v-else>
           <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Tələbələr</p>
           <p class="mt-1 text-2xl font-bold text-gray-900 tabular-nums">{{ data?.students?.toLocaleString() || '0' }}</p>
-        </template>
-      </div>
-
-      <div class="relative rounded-2xl border border-gray-200 bg-white p-4 shadow-sm overflow-hidden">
-        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-500 to-orange-600" />
-        <div v-if="loading" class="space-y-2">
-          <div class="h-3 w-16 animate-pulse rounded bg-gray-100" />
-          <div class="h-7 w-12 animate-pulse rounded bg-gray-100" />
-        </div>
-        <template v-else>
-          <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Müəllimlər</p>
-          <p class="mt-1 text-2xl font-bold text-gray-900 tabular-nums">{{ data?.teachers?.toLocaleString() || '0' }}</p>
         </template>
       </div>
 
@@ -441,10 +422,7 @@ function formatDate(iso: string) {
             class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
             :class="{
               'bg-indigo-500': u.type === 'student',
-              'bg-violet-500': u.type === 'teacher',
               'bg-amber-500': u.type === 'admin',
-              'bg-cyan-500': u.type === 'school',
-              'bg-emerald-500': u.type === 'parent',
             }"
           >
             {{ (u.name?.charAt(0) || '?').toUpperCase() }}
@@ -458,10 +436,7 @@ function formatDate(iso: string) {
               class="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
               :class="{
                 'bg-indigo-50 text-indigo-700': u.type === 'student',
-                'bg-violet-50 text-violet-700': u.type === 'teacher',
                 'bg-amber-50 text-amber-700': u.type === 'admin',
-                'bg-cyan-50 text-cyan-700': u.type === 'school',
-                'bg-emerald-50 text-emerald-700': u.type === 'parent',
               }"
             >
               {{ userTypeLabels[u.type] || u.type }}
