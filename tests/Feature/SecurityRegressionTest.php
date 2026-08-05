@@ -353,11 +353,11 @@ it('allows students to view exam details of their own grade on the web', functio
         ->assertStatus(200);
 });
 
-// ─── Inline feedback must not leak answers on the web solve pages ──────
+// ─── Solve pages must never leak answers to students ────────────────────
 //
-// The correct answer and the explanation video are NEVER embedded in the solve
-// page HTML. Instead the browser POSTs the single selected answer to a
-// server-side check endpoint and only receives right/wrong + the video.
+// The correct answer and the explanation video are NOT rendered on the solve
+// page. Feedback (right/wrong + video) is shown only on the result page after
+// the student submits the whole quiz/exam.
 
 it('does not leak the correct answer or video into the quiz solve page', function () {
     [$quiz, $question] = makeSecureQuiz();
@@ -369,8 +369,7 @@ it('does not leak the correct answer or video into the quiz solve page', functio
         ->assertStatus(200)
         ->assertDontSee('data-correct')
         ->assertDontSee('data-video')
-        ->assertDontSee('dQw4w9WgXcQ')
-        ->assertSee("/quiz/{$quiz->id}/check-answer");
+        ->assertDontSee('dQw4w9WgXcQ');
 });
 
 it('does not leak the open-question model answer into the quiz solve page', function () {
@@ -418,78 +417,4 @@ it('does not leak the correct answer or video into the exam solve page', functio
         ->assertDontSee('data-correct')
         ->assertDontSee('data-video')
         ->assertDontSee('abcdEFGH123');
-});
-
-it('evaluates a single quiz answer server-side via check-answer', function () {
-    [$quiz, $question] = makeSecureQuiz(); // right_answer = variant_b
-    [$user, $grade] = makeGradeStudent('Grade 1');
-
-    $this->actingAs($user)
-        ->postJson("/quiz/{$quiz->id}/check-answer", [
-            'question_id' => $question->id,
-            'answer' => 'b',
-        ])
-        ->assertStatus(200)
-        ->assertJson([
-            'type' => 'regular',
-            'correct' => true,
-            'correct_answer' => 'b',
-        ]);
-
-    $this->actingAs($user)
-        ->postJson("/quiz/{$quiz->id}/check-answer", [
-            'question_id' => $question->id,
-            'answer' => 'c',
-        ])
-        ->assertStatus(200)
-        ->assertJson([
-            'type' => 'regular',
-            'correct' => false,
-            'correct_answer' => 'b',
-        ]);
-});
-
-it('never leaks the model answer for open questions via check-answer', function () {
-    [$quiz, $question] = makeSecureQuiz();
-    $openQuestion = Question::create([
-        'question' => [['type' => 'text', 'content' => 'Capital of France?']],
-        'open_answer' => [['type' => 'text', 'content' => 'Paris']],
-        'type' => 'open',
-        'answer_type' => 'exact',
-        'difficulty_level' => DifficultyLevel::Beginner->value,
-        'explanation_video_url' => 'https://youtu.be/openVid12345',
-    ]);
-    $quiz->questions()->attach($openQuestion->id);
-    [$user, $grade] = makeGradeStudent('Grade 1');
-
-    $this->actingAs($user)
-        ->postJson("/quiz/{$quiz->id}/check-answer", [
-            'question_id' => $openQuestion->id,
-            'answer' => 'Paris',
-        ])
-        ->assertStatus(200)
-        ->assertJsonPath('type', 'open')
-        ->assertJsonPath('correct', false)
-        ->assertJsonPath('correct_answer', null)
-        ->assertJsonPath('explanation_video_url', 'https://youtu.be/openVid12345');
-});
-
-it('rejects check-answer for a question that is not part of the quiz', function () {
-    [$quiz, $question] = makeSecureQuiz();
-    $foreignQuestion = Question::create([
-        'question' => [['type' => 'text', 'content' => 'Foreign?']],
-        'variant_a' => [['type' => 'text', 'content' => 'x']],
-        'variant_b' => [['type' => 'text', 'content' => 'y']],
-        'right_answer' => 'variant_a',
-        'type' => 'regular',
-        'difficulty_level' => DifficultyLevel::Beginner->value,
-    ]);
-    [$user, $grade] = makeGradeStudent('Grade 1');
-
-    $this->actingAs($user)
-        ->postJson("/quiz/{$quiz->id}/check-answer", [
-            'question_id' => $foreignQuestion->id,
-            'answer' => 'a',
-        ])
-        ->assertStatus(404);
 });
