@@ -239,6 +239,55 @@ it('creates an open question as admin', function () {
     expect($response->json('data.right_answer'))->toBeNull();
 });
 
+it('normalizes plain content blocks from the admin panel into all locales', function () {
+    $admin = User::factory()->create(['type' => 'admin']);
+    $admin->assignRole('admin');
+
+    // This is exactly what the admin panel sends: plain content-block arrays,
+    // not locale-keyed objects.
+    $response = $this->actingAs($admin)->postJson('/api/admin/questions', [
+        'question' => [['type' => 'text', 'content' => 'salammm']],
+        'type' => 'regular',
+        'variant_a' => [['type' => 'text', 'content' => 'A']],
+        'variant_b' => [['type' => 'text', 'content' => 'B']],
+        'variant_c' => [['type' => 'text', 'content' => 'C']],
+        'right_answer' => 'a',
+        'difficulty_level' => DifficultyLevel::Beginner->value,
+        'lesson_id' => $this->lesson->id,
+    ]);
+
+    $response->assertStatus(201);
+    $id = $response->json('data.id');
+
+    // Stored shape is locale-keyed so web/API reads work.
+    $stored = Question::find($id);
+    expect($stored->question)->toHaveKeys(['az', 'en', 'ru'])
+        ->and($stored->question['az'][0]['content'])->toBe('salammm')
+        ->and($stored->question['en'][0]['content'])->toBe('salammm');
+
+    // The read path resolves plain content for any locale (what web + API use).
+    expect(contentForLocale($stored->question, 'en'))->toBe([['type' => 'text', 'content' => 'salammm']])
+        ->and(contentForLocale($stored->question, 'az'))->toBe([['type' => 'text', 'content' => 'salammm']]);
+});
+
+it('reads plain content-block arrays stored before normalization', function () {
+    $question = Question::create([
+        'question' => [['type' => 'text', 'content' => 'legacy plain']],
+        'type' => 'regular',
+        'variant_a' => [['type' => 'text', 'content' => 'A']],
+        'variant_b' => [['type' => 'text', 'content' => 'B']],
+        'variant_c' => [['type' => 'text', 'content' => 'C']],
+        'right_answer' => 'a',
+        'difficulty_level' => DifficultyLevel::Beginner->value,
+        'lesson_id' => $this->lesson->id,
+    ]);
+
+    // Old rows that were never normalized still render through the read helper.
+    expect(contentForLocale($question->question, 'en'))->toBe([['type' => 'text', 'content' => 'legacy plain']])
+        ->and(contentForLocale($question->variant_a, 'az'))->toBe([['type' => 'text', 'content' => 'A']])
+        ->and(contentForLocale(null, 'en'))->toBe([]);
+});
+
 it('fails to create question without admin role', function () {
     $user = User::factory()->create(['type' => 'student']);
 

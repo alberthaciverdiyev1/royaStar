@@ -187,7 +187,7 @@ class AssessmentService
                 if ($question->type === 'regular') {
                     $correctAnswer = $this->resolveRightAnswerLetter($question, $locale);
                 } else {
-                    $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
+                    $openAnswerBlocks = contentForLocale($question->open_answer, $locale);
                     $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
                 }
             } elseif ($question->type === 'regular') {
@@ -197,7 +197,7 @@ class AssessmentService
                 $isCorrect = ($userAnswerNorm === $correctAnswer);
                 $isCorrect ? $correctCount++ : $wrongCount++;
             } else {
-                $openAnswerBlocks = $question->open_answer[$locale] ?? $question->open_answer['az'] ?? [];
+                $openAnswerBlocks = contentForLocale($question->open_answer, $locale);
                 $correctAnswer = is_array($openAnswerBlocks) ? ($openAnswerBlocks[0]['content'] ?? '') : $openAnswerBlocks;
 
                 if ($question->answer_type === 'exact') {
@@ -216,14 +216,14 @@ class AssessmentService
                 'answer' => $answer,
                 'correct_answer' => $correctAnswer,
                 'is_correct' => $isCorrect,
-                'question_text' => $question->question[$locale] ?? $question->question['az'] ?? [],
+                'question_text' => contentForLocale($question->question, $locale),
                 'explanation_video_url' => $question->explanation_video_url,
                 'variants' => [
-                    'a' => $question->variant_a[$locale] ?? $question->variant_a['az'] ?? [],
-                    'b' => $question->variant_b[$locale] ?? $question->variant_b['az'] ?? [],
-                    'c' => $question->variant_c[$locale] ?? $question->variant_c['az'] ?? [],
-                    'd' => $question->variant_d[$locale] ?? $question->variant_d['az'] ?? [],
-                    'e' => $question->variant_e[$locale] ?? $question->variant_e['az'] ?? [],
+                    'a' => contentForLocale($question->variant_a, $locale),
+                    'b' => contentForLocale($question->variant_b, $locale),
+                    'c' => contentForLocale($question->variant_c, $locale),
+                    'd' => contentForLocale($question->variant_d, $locale),
+                    'e' => contentForLocale($question->variant_e, $locale),
                 ],
             ];
         }
@@ -268,14 +268,14 @@ class AssessmentService
                     'answer' => $a->answer,
                     'correct_answer' => $a->correct_answer,
                     'is_correct' => $a->is_correct,
-                    'question_text' => $q?->question[$locale] ?? $q?->question['az'] ?? [],
+                    'question_text' => contentForLocale($q?->question, $locale),
                     'explanation_video_url' => $q?->explanation_video_url,
                     'variants' => [
-                        'a' => $q?->variant_a[$locale] ?? $q?->variant_a['az'] ?? [],
-                        'b' => $q?->variant_b[$locale] ?? $q?->variant_b['az'] ?? [],
-                        'c' => $q?->variant_c[$locale] ?? $q?->variant_c['az'] ?? [],
-                        'd' => $q?->variant_d[$locale] ?? $q?->variant_d['az'] ?? [],
-                        'e' => $q?->variant_e[$locale] ?? $q?->variant_e['az'] ?? [],
+                        'a' => contentForLocale($q?->variant_a, $locale),
+                        'b' => contentForLocale($q?->variant_b, $locale),
+                        'c' => contentForLocale($q?->variant_c, $locale),
+                        'd' => contentForLocale($q?->variant_d, $locale),
+                        'e' => contentForLocale($q?->variant_e, $locale),
                     ],
                 ];
             })->toArray(),

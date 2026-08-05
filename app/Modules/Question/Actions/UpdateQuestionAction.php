@@ -15,6 +15,7 @@ class UpdateQuestionAction extends BaseUpdateAction
     protected function beforeUpdate(array $data): array
     {
         processQuestionMedia($data);
+        normalizeQuestionLocales($data);
 
         return $data;
     }

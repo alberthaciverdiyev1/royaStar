@@ -65,6 +65,78 @@ if (!function_exists('processQuestionMedia')) {
     }
 }
 
+if (!function_exists('contentForLocale')) {
+
+    /**
+     * Read question content for the given locale.
+     *
+     * Question content can be stored either as a locale-keyed structure
+     * (["az" => [...], "en" => [...]]) — produced by seeders — or as a plain
+     * content-block array ([["type" => "text", "content" => ...]]) — produced
+     * by the admin panel. This helper returns the right block array for both.
+     */
+    function contentForLocale(array|string|null $content, string $locale): array
+    {
+        if (!is_array($content) || empty($content)) {
+            return [];
+        }
+
+        // Locale-keyed structure → pick the requested locale, falling back to az.
+        if (isset($content[$locale]) || isset($content['az']) || isset($content['en']) || isset($content['ru'])) {
+            return $content[$locale] ?? $content['az'] ?? $content['en'] ?? $content['ru'] ?? [];
+        }
+
+        // Plain content-block array → use it directly.
+        return $content;
+    }
+}
+
+if (!function_exists('localizeContentBlocks')) {
+
+    /**
+     * Replicate a plain content-block array into all supported locales so the
+     * rest of the app (web + API) can read it consistently. Locale-keyed input
+     * is returned unchanged.
+     */
+    function localizeContentBlocks(array|string|null $content, array $locales = ['az', 'en', 'ru']): array|string|null
+    {
+        if (!is_array($content) || empty($content)) {
+            return $content;
+        }
+
+        // Already locale-keyed.
+        if (isset($content['az']) || isset($content['en']) || isset($content['ru'])) {
+            return $content;
+        }
+
+        $localized = [];
+        foreach ($locales as $locale) {
+            $localized[$locale] = $content;
+        }
+
+        return $localized;
+    }
+}
+
+if (!function_exists('normalizeQuestionLocales')) {
+
+    /**
+     * Normalize every translatable content field on a question payload so
+     * admin-created questions (plain block arrays) are stored in the same
+     * locale-keyed shape the web + API expect.
+     */
+    function normalizeQuestionLocales(array &$data): void
+    {
+        $localeFields = ['question', 'variant_a', 'variant_b', 'variant_c', 'variant_d', 'variant_e', 'open_answer', 'explanation'];
+
+        foreach ($localeFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $data[$field] = localizeContentBlocks($data[$field] ?? null);
+            }
+        }
+    }
+}
+
 if (!function_exists('renderVideoEmbed')) {
 
     /**

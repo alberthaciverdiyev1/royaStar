@@ -46,12 +46,12 @@ class StudentQuizController extends Controller
                     'id' => $q->id,
                     'type' => $q->type,
                     'answer_type' => $q->answer_type,
-                    'question' => $q->question[$locale] ?? $q->question['az'] ?? [],
-                    'variant_a' => $q->variant_a[$locale] ?? $q->variant_a['az'] ?? [],
-                    'variant_b' => $q->variant_b[$locale] ?? $q->variant_b['az'] ?? [],
-                    'variant_c' => $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [],
-                    'variant_d' => $q->variant_d[$locale] ?? $q->variant_d['az'] ?? [],
-                    'variant_e' => $q->variant_e[$locale] ?? $q->variant_e['az'] ?? [],
+                    'question' => contentForLocale($q->question, $locale),
+                    'variant_a' => contentForLocale($q->variant_a, $locale),
+                    'variant_b' => contentForLocale($q->variant_b, $locale),
+                    'variant_c' => contentForLocale($q->variant_c, $locale),
+                    'variant_d' => contentForLocale($q->variant_d, $locale),
+                    'variant_e' => contentForLocale($q->variant_e, $locale),
                     'difficulty_level' => $q->difficulty_level,
                 ];
             }),
@@ -147,7 +147,7 @@ class StudentQuizController extends Controller
             'answers' => $answers->map(function($a) use ($locale) {
                 return [
                     'question_id' => $a->question_id,
-                    'question' => $a->question?->question[$locale] ?? $a->question?->question['az'] ?? [],
+                    'question' => contentForLocale($a->question?->question, $locale),
                     'type' => $a->type,
                     'answer' => $a->answer,
                     'correct_answer' => $a->correct_answer,

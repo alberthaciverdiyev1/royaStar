@@ -11,15 +11,25 @@ export interface Question {
   right_answer: string | null;
   difficulty_level: number;
   created_at: string;
-  question: { type: string; content: string }[] | null;
-  variant_a: { type: string; content: string }[] | null;
-  variant_b: { type: string; content: string }[] | null;
-  variant_c: { type: string; content: string }[] | null;
-  variant_d: { type: string; content: string }[] | null;
-  variant_e: { type: string; content: string }[] | null;
-  open_answer: { type: string; content: string }[] | null;
-  explanation: { type: string; content: string }[] | null;
+  question: ContentBlocks | null;
+  variant_a: ContentBlocks | null;
+  variant_b: ContentBlocks | null;
+  variant_c: ContentBlocks | null;
+  variant_d: ContentBlocks | null;
+  variant_e: ContentBlocks | null;
+  open_answer: ContentBlocks | null;
+  explanation: ContentBlocks | null;
   explanation_video_url: string | null;
+}
+
+/** A content-block array, or a locale-keyed map of them (e.g. { az: [...], en: [...] }). */
+export type ContentBlocks = { type: string; content: string }[] | Record<string, { type: string; content: string }[]>;
+
+/** Flatten content to a plain block array regardless of storage shape. */
+export function flattenBlocks(blocks: ContentBlocks | null | undefined): { type: string; content: string }[] {
+  if (!blocks) return [];
+  if (Array.isArray(blocks)) return blocks;
+  return blocks.az ?? blocks.en ?? blocks.ru ?? [];
 }
 
 export interface QuestionFormData {

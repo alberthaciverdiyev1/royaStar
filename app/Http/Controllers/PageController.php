@@ -239,16 +239,16 @@ class PageController extends Controller
                 'id' => $q->id,
                 'type' => $q->type,
                 'answer_type' => $q->answer_type,
-                'question' => $q->question[$locale] ?? $q->question['az'] ?? [],
+                'question' => contentForLocale($q->question, $locale),
                 'difficulty_level' => $q->difficulty_level,
             ];
 
             if ($q->type === 'regular') {
-                $data['variant_a'] = $q->variant_a[$locale] ?? $q->variant_a['az'] ?? [];
-                $data['variant_b'] = $q->variant_b[$locale] ?? $q->variant_b['az'] ?? [];
-                $data['variant_c'] = $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [];
-                $data['variant_d'] = $q->variant_d[$locale] ?? $q->variant_d['az'] ?? [];
-                $data['variant_e'] = $q->variant_e[$locale] ?? $q->variant_e['az'] ?? [];
+                $data['variant_a'] = contentForLocale($q->variant_a, $locale);
+                $data['variant_b'] = contentForLocale($q->variant_b, $locale);
+                $data['variant_c'] = contentForLocale($q->variant_c, $locale);
+                $data['variant_d'] = contentForLocale($q->variant_d, $locale);
+                $data['variant_e'] = contentForLocale($q->variant_e, $locale);
             }
 
             return $data;
@@ -404,16 +404,16 @@ class PageController extends Controller
                 'id' => $q->id,
                 'type' => $q->type,
                 'answer_type' => $q->answer_type,
-                'question' => $q->question[$locale] ?? $q->question['az'] ?? [],
+                'question' => contentForLocale($q->question, $locale),
                 'difficulty_level' => $q->difficulty_level,
             ];
 
             if ($q->type === 'regular') {
-                $data['variant_a'] = $q->variant_a[$locale] ?? $q->variant_a['az'] ?? [];
-                $data['variant_b'] = $q->variant_b[$locale] ?? $q->variant_b['az'] ?? [];
-                $data['variant_c'] = $q->variant_c[$locale] ?? $q->variant_c['az'] ?? [];
-                $data['variant_d'] = $q->variant_d[$locale] ?? $q->variant_d['az'] ?? [];
-                $data['variant_e'] = $q->variant_e[$locale] ?? $q->variant_e['az'] ?? [];
+                $data['variant_a'] = contentForLocale($q->variant_a, $locale);
+                $data['variant_b'] = contentForLocale($q->variant_b, $locale);
+                $data['variant_c'] = contentForLocale($q->variant_c, $locale);
+                $data['variant_d'] = contentForLocale($q->variant_d, $locale);
+                $data['variant_e'] = contentForLocale($q->variant_e, $locale);
             }
 
             return $data;

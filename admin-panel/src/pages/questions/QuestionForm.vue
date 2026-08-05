@@ -5,6 +5,7 @@ import { topicsApi, type Topic } from '../../api/topics'
 import { lessonsApi, type Lesson } from '../../api/lessons'
 import {
   questionsApi,
+  flattenBlocks,
   type Question,
 } from '../../api/questions'
 import Toast from '../../components/Toast.vue'
@@ -135,19 +136,25 @@ function resetForm() {
 }
 
 function populateForm(q: Question) {
-  questionBlocks.value = q.question ?? [{ type: 'text', content: '' }]
+  questionBlocks.value = flattenBlocks(q.question)
+  if (!questionBlocks.value.length) questionBlocks.value = [{ type: 'text', content: '' }]
   questionType.value = q.type
-  variantABlocks.value = q.variant_a ?? []
-  variantBBlocks.value = q.variant_b ?? []
-  variantCBlocks.value = q.variant_c ?? []
-  const vt = (q.variant_a?.[0]?.type || 'text') as ContentBlock['type']
+  const flatA = flattenBlocks(q.variant_a)
+  const flatB = flattenBlocks(q.variant_b)
+  const flatC = flattenBlocks(q.variant_c)
+  const flatD = flattenBlocks(q.variant_d)
+  const flatE = flattenBlocks(q.variant_e)
+  variantABlocks.value = flatA.length ? flatA : [{ type: 'text', content: '' }]
+  variantBBlocks.value = flatB.length ? flatB : [{ type: 'text', content: '' }]
+  variantCBlocks.value = flatC.length ? flatC : [{ type: 'text', content: '' }]
+  const vt = (variantABlocks.value[0]?.type || 'text') as ContentBlock['type']
   variantType.value = vt
-  variantDBlocks.value = q.variant_d?.length ? q.variant_d : [{ type: vt, content: '' }]
-  variantEBlocks.value = q.variant_e?.length ? q.variant_e : [{ type: vt, content: '' }]
+  variantDBlocks.value = flatD.length ? flatD : [{ type: vt, content: '' }]
+  variantEBlocks.value = flatE.length ? flatE : [{ type: vt, content: '' }]
   rightAnswer.value = q.right_answer || ''
-  openAnswerBlocks.value = q.open_answer ?? []
+  openAnswerBlocks.value = flattenBlocks(q.open_answer)
   answerType.value = q.answer_type || ''
-  explanationBlocks.value = q.explanation ?? []
+  explanationBlocks.value = flattenBlocks(q.explanation)
   explanationVideoUrl.value = q.explanation_video_url || ''
   difficulty.value = q.difficulty_level
 }

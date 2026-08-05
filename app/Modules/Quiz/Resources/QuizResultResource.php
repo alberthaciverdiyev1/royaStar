@@ -14,7 +14,7 @@ class QuizResultResource extends BaseResource
             ? $this->answers->map(function ($a) {
                 $locale = app()->getLocale();
                 $q = $a->question;
-                $questionContent = $q?->question[$locale] ?? $q?->question['az'] ?? [];
+                $questionContent = contentForLocale($q?->question, $locale);
                 return [
                     'question_id' => $a->question_id,
                     'question' => $questionContent,
