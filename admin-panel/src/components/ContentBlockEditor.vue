@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 export interface ContentBlock {
   type: 'text' | 'image' | 'audio'
   content: string
@@ -14,8 +12,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [blocks: ContentBlock[]]
 }>()
-
-const inputRef = ref<HTMLInputElement>()
 
 function updateBlock(index: number, block: ContentBlock) {
   const next = [...props.modelValue]
@@ -33,10 +29,10 @@ function addBlock(type: ContentBlock['type']) {
     ? { type: 'text', content: '' }
     : { type, content: '' }
   emit('update:modelValue', [...props.modelValue, block])
-
-  if (type === 'image' || type === 'audio') {
-    setTimeout(() => inputRef.value?.click(), 50)
-  }
+  // No programmatic input.click() here: browsers block file dialogs that are
+  // not triggered by a trusted user gesture. Each image/audio block instead
+  // wraps its own <input type="file"> inside a <label>, so clicking the
+  // label opens the native picker directly.
 }
 
 function handleFileUpload(event: Event, blockIndex: number) {
@@ -115,62 +111,73 @@ const typeLabelColors: Record<ContentBlock['type'], string> = {
             alt="uploaded"
             class="max-h-40 w-full rounded-lg object-contain bg-white border border-inherit"
           />
-          <button
-            type="button"
-            @click="inputRef?.click()"
-            class="mt-1.5 text-xs text-indigo-600 hover:text-indigo-800"
-          >
-            Şəkili dəyiş
-          </button>
-        </div>
-        <div v-else>
+          <!-- Input is wrapped inside the label → native file picker on click. -->
           <label
-            class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-inherit bg-white/60 px-4 py-6 text-sm text-gray-500 hover:bg-white/90 transition-colors"
+            class="mt-1.5 inline-flex cursor-pointer items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800"
           >
-            <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            Şəkil seçin
+            Şəkili dəyiş
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleFileUpload($event, i)"
+            />
           </label>
+        </div>
+        <label
+          v-else
+          class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-inherit bg-white/60 px-4 py-6 text-sm text-gray-500 hover:bg-white/90 transition-colors"
+        >
+          <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Şəkil seçin
           <input
-            ref="inputRef"
             type="file"
             accept="image/*"
             class="hidden"
             @change="handleFileUpload($event, i)"
           />
-        </div>
+        </label>
       </div>
 
       <!-- Audio upload -->
       <div v-else-if="block.type === 'audio'">
         <div v-if="block.content" class="space-y-1.5">
           <audio :src="block.content" controls class="w-full h-9 rounded-lg" />
-          <button
-            type="button"
-            @click="inputRef?.click()"
-            class="text-xs text-indigo-600 hover:text-indigo-800"
-          >
-            Səsi dəyiş
-          </button>
-        </div>
-        <div v-else>
           <label
-            class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-inherit bg-white/60 px-4 py-6 text-sm text-gray-500 hover:bg-white/90 transition-colors"
+            class="inline-flex cursor-pointer items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800"
           >
-            <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
-            Səs faylı seçin
+            Səsi dəyiş
+            <input
+              type="file"
+              accept="audio/*"
+              class="hidden"
+              @change="handleFileUpload($event, i)"
+            />
           </label>
+        </div>
+        <label
+          v-else
+          class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-inherit bg-white/60 px-4 py-6 text-sm text-gray-500 hover:bg-white/90 transition-colors"
+        >
+          <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+          Səs faylı seçin
           <input
-            ref="inputRef"
             type="file"
             accept="audio/*"
             class="hidden"
             @change="handleFileUpload($event, i)"
           />
-        </div>
+        </label>
       </div>
     </div>
 
