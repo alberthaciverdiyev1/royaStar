@@ -11,7 +11,6 @@ use App\Modules\Star\Models\UserStar;
 use App\Modules\Star\Services\StarService;
 use App\Modules\Student\Models\Student;
 use App\Modules\User\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\DB;
 
@@ -155,10 +154,10 @@ class AssessmentService
      * Rebuild a result payload from previously persisted attempts (used as a
      * fallback when the fresh-submission session payload is unavailable).
      *
-     * @param  Collection<int, StudentQuiz|StudentExam>  $attempts
+     * @param  BaseCollection<int, StudentQuiz|StudentExam>  $attempts
      * @return array{score: int, total: int, correct: int, wrong: int, skipped: int, answers: array}
      */
-    public function buildResultFromAttempts(Collection $attempts, string $locale): array
+    public function buildResultFromAttempts(BaseCollection $attempts, string $locale): array
     {
         $total = $attempts->count();
         $correct = $attempts->where('is_correct', true)->count();
@@ -237,7 +236,7 @@ class AssessmentService
             if (!$alreadyAwardedCompleted) {
                 $this->starService->awardQuizCompleted($user->id, $quiz->id);
             }
-            if ($result['score'] === 100 && !$alreadyAwardedPerfect) {
+            if ($result['score'] >= 100 && !$alreadyAwardedPerfect) {
                 $this->starService->awardQuizPerfect($user->id, $quiz->id);
             }
 
