@@ -212,6 +212,30 @@
     object-fit: contain;
 }
 
+/* Plyr player — same theme as the lesson page. The player sits inside the
+   .fb-video-frame (16:9), so we match Plyr's intrinsic aspect ratio to it
+   and let the frame's overflow:hidden clip the rounded corners. */
+.fb-video-frame .plyr {
+    --plyr-color-main: rgb(var(--primary));
+    --plyr-video-control-color: #ffffff;
+    --plyr-video-control-color-hover: #ffffff;
+    --plyr-video-control-background-hover: rgb(var(--primary));
+    --plyr-badge-border-radius: 9999px;
+    width: 100%;
+    height: 100%;
+}
+.fb-video-frame .plyr__video-embed {
+    width: 100%;
+    height: 100%;
+}
+.fb-video-frame .plyr__video-wrapper {
+    height: 100%;
+}
+.fb-video-frame .plyr__video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+}
+
 .confirm-wrap {
     margin-top: 0.875rem;
     display: flex;

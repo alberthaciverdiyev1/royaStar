@@ -58,18 +58,25 @@
             + '</div>';
     }
 
-    // Video card: "İzah Videosu" header + a 16:9 frame with the player.
+    // Video card: "İzah Videosu" header + the same Plyr player used on the
+    // lesson page (cdn.plyr.io is loaded by quiz.blade.php). Dynamically
+    // injected players are set up by initPlayer() after the feedback renders.
     function videoEmbedHtml(url) {
         if (!url) return '';
         var m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
         var media;
         if (m) {
-            media = '<iframe class="fb-media" src="https://www.youtube.com/embed/' + m[1] + '?rel=0" '
-                + 'title="Explanation video" frameborder="0" '
-                + 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" '
-                + 'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+            // Plyr video-embed wrapper (YouTube), same as the lesson player.
+            media = '<div class="plyr__video-embed js-plyr-player">'
+                + '<iframe src="https://www.youtube-nocookie.com/embed/' + m[1]
+                + '?origin=' + encodeURIComponent(window.location.origin)
+                + '&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"'
+                + ' allowfullscreen allowtransparency allow="autoplay"></iframe>'
+                + '</div>';
         } else {
-            media = '<video class="fb-media" src="' + escapeHtml(url) + '" controls preload="none"></video>';
+            media = '<video class="js-plyr-player" controls playsinline>'
+                + '<source src="' + escapeHtml(url) + '">'
+                + '</video>';
         }
         return '<div class="fb-video">'
             + '<div class="fb-video-head">'
@@ -78,6 +85,35 @@
             + '</div>'
             + '<div class="fb-video-frame">' + media + '</div>'
             + '</div>';
+    }
+
+    // Initialize the Plyr player for a just-injected feedback box.
+    // NOTE: this Plyr build only sets up players when given a selector string,
+    // NodeList or array — a bare element is ignored — so we collect the fresh
+    // players into an array and pass them in one call.
+    function initPlayer(scope) {
+        if (!window.Plyr || !scope) return;
+        var playerEls = scope.querySelectorAll('.js-plyr-player');
+        if (!playerEls.length) return;
+        var fresh = [];
+        playerEls.forEach(function(el) {
+            if (!el.getAttribute('data-plyr')) {
+                el.setAttribute('data-plyr', '1');
+                fresh.push(el);
+            }
+        });
+        if (fresh.length) {
+            Plyr.setup(fresh, {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                youtube: {
+                    noCookie: true,
+                    rel: 0,
+                    showinfo: 0,
+                    iv_load_policy: 3,
+                    modestbranding: 1
+                }
+            });
+        }
     }
 
     function setPendingFeedback(fb, message) {
@@ -100,6 +136,7 @@
             : fbStatusHtml(false, 'Incorrect!', 'The correct answer is highlighted in green.');
 
         fb.innerHTML = status + videoEmbedHtml(result.explanation_video_url || '');
+        initPlayer(fb);
     }
 
     function showOpenFeedback(container, result) {
@@ -115,6 +152,7 @@
             : fbStatusHtml(false, 'Incorrect!', 'The expected answer is shown on the result page.');
 
         fb.innerHTML = status + videoEmbedHtml(result.explanation_video_url || '');
+        initPlayer(fb);
     }
 
     // Reveal the correct option + the picked one using the SERVER response

@@ -1,7 +1,10 @@
 @extends('layouts.app')
 @section('title', $quiz->name . ' - Quiz')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <link href="{{ asset('css/quiz.css') }}?v={{ filemtime(public_path('css/quiz.css')) }}" rel="stylesheet">
+@endpush
 
 @section('content')
 <div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}">
@@ -136,5 +139,6 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script src="{{ asset('js/quiz.js') }}?v={{ filemtime(public_path('js/quiz.js')) }}"></script>
 @endpush
