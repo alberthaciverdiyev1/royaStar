@@ -53,12 +53,12 @@
     transition: all 0.2s ease;
 }
 .exam-option-btn.is-correct {
-    border-color: #10b981 !important;
-    background-color: #ecfdf5 !important;
-    color: #065f46 !important;
+    border-color: #4DAE51 !important;
+    background-color: #F0FAF1 !important;
+    color: #2D6B31 !important;
     box-shadow: 0 6px 18px -4px rgba(16,185,129,.25) !important;
 }
-.exam-option-btn.is-correct .letter-badge { background-color: #10b981 !important; color: #ffffff !important; }
+.exam-option-btn.is-correct .letter-badge { background-color: #4DAE51 !important; color: #ffffff !important; }
 .exam-option-btn.is-wrong {
     border-color: #ef4444 !important;
     background-color: #fef2f2 !important;
@@ -67,12 +67,12 @@
 }
 .exam-option-btn.is-wrong .letter-badge { background-color: #ef4444 !important; color: #ffffff !important; }
 .exam-option-btn.is-correct-target {
-    border-color: #10b981 !important;
+    border-color: #4DAE51 !important;
     background-color: #f0fdf4 !important;
     color: #166534 !important;
     animation: pulse-border 1.5s infinite;
 }
-.exam-option-btn.is-correct-target .letter-badge { background-color: #10b981 !important; color: #ffffff !important; }
+.exam-option-btn.is-correct-target .letter-badge { background-color: #4DAE51 !important; color: #ffffff !important; }
 .exam-option-btn.is-disabled { cursor: default; }
 
 .exam-option-btn.is-selected {
@@ -95,7 +95,7 @@
     from { opacity: 0; transform: translateY(-6px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.feedback-box.correct { background-color: #ecfdf5; border: 1.5px solid #a7f3d0; color: #065f46; }
+.feedback-box.correct { background-color: #F0FAF1; border: 1.5px solid #BCE5BD; color: #2D6B31; }
 .feedback-box.wrong { background-color: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
 
 .options-list { display: flex; flex-direction: column; gap: 0.625rem; margin-top: 1rem; }
