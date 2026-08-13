@@ -11,23 +11,23 @@
     $status = (int) $status;
 
     $config = [
-        403 => ['icon' => 'lock',            'title' => 'Access Denied',          'desc' => 'You don\'t have permission to view this page. If you believe this is a mistake, please contact your teacher.', 'accent' => '--secondary', 'cta' => 'exam'],
-        404 => ['icon' => 'explore_off',     'title' => 'Page Not Found',         'desc' => 'The page you are looking for doesn\'t exist or has been moved.', 'accent' => '--primary', 'cta' => 'home'],
-        419 => ['icon' => 'hourglass_empty', 'title' => 'Session Expired',        'desc' => 'Your session has expired. Refresh the page and try again.', 'accent' => '--tertiary', 'cta' => 'home'],
-        429 => ['icon' => 'speed',           'title' => 'Too Many Requests',      'desc' => 'You\'ve been moving too fast! Please wait a moment and try again.', 'accent' => '--secondary', 'cta' => 'home'],
-        500 => ['icon' => 'error',           'title' => 'Something Went Wrong',   'desc' => 'An unexpected error occurred on our side. Please try again later.', 'accent' => '--error', 'cta' => 'home'],
-        503 => ['icon' => 'construction',    'title' => 'Service Unavailable',    'desc' => 'We\'re doing some quick maintenance right now. Please check back soon.', 'accent' => '--primary', 'cta' => 'home'],
+        403 => ['icon' => 'lock',            'title' => text('error.403_title'),           'desc' => text('error.403_desc'), 'accent' => '--secondary', 'cta' => 'exam'],
+        404 => ['icon' => 'explore_off',     'title' => text('error.404_title'),           'desc' => text('error.404_desc'), 'accent' => '--primary', 'cta' => 'home'],
+        419 => ['icon' => 'hourglass_empty', 'title' => text('error.419_title'),           'desc' => text('error.419_desc'), 'accent' => '--tertiary', 'cta' => 'home'],
+        429 => ['icon' => 'speed',           'title' => text('error.429_title'),           'desc' => text('error.429_desc'), 'accent' => '--secondary', 'cta' => 'home'],
+        500 => ['icon' => 'error',           'title' => text('error.500_title'),           'desc' => text('error.500_desc'), 'accent' => '--error', 'cta' => 'home'],
+        503 => ['icon' => 'construction',    'title' => text('error.503_title'),           'desc' => text('error.503_desc'), 'accent' => '--primary', 'cta' => 'home'],
     ];
-    $cfg = $config[$status] ?? ['icon' => 'error', 'title' => 'Something Went Wrong', 'desc' => 'An unexpected error occurred. Please try again.', 'accent' => '--error', 'cta' => 'home'];
+    $cfg = $config[$status] ?? ['icon' => 'error', 'title' => text('error.500_fallback_title'), 'desc' => text('error.500_fallback_desc'), 'accent' => '--error', 'cta' => 'home'];
 
     $exceptionMessage = (($exception ?? null) instanceof \Throwable) ? trim((string) $exception->getMessage()) : '';
     // Never leak raw exception details on 5xx responses outside of debug mode.
     $showMessage = ($status < 500 || config('app.debug')) && $exceptionMessage !== '';
     $message = $message ?? ($showMessage ? $exceptionMessage : null);
 
-    $primaryLabel = $cfg['cta'] === 'exam' ? 'Back to Exams' : 'Go Home';
+    $primaryLabel = $cfg['cta'] === 'exam' ? text('error.back_exams') : text('error.go_home');
     $primaryHref  = $cfg['cta'] === 'exam' ? url('/exam') : url('/');
-    $secondaryLabel = $cfg['cta'] === 'exam' ? 'Go Home' : 'Back to Exams';
+    $secondaryLabel = $cfg['cta'] === 'exam' ? text('error.go_home') : text('error.back_exams');
     $secondaryHref  = $cfg['cta'] === 'exam' ? url('/') : url('/exam');
 @endphp
 <!DOCTYPE html>
@@ -35,7 +35,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>{{ $cfg['title'] }} · Teacher Roya's Stars</title>
+    <title>{{ $cfg['title'] }} · {{ text('brand.prefix') }} {{ text('brand.name') }} {{ text('brand.suffix') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $quiz->name . ' - Quiz')
+@section('title', text('quiz.page_title', ['name' => $quiz->name]))
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -7,7 +7,15 @@
 @endpush
 
 @section('content')
-<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}">
+<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}" data-i18n='@json([
+    'checking' => text('quiz.checking'),
+    'correct_title' => text('quiz.correct_title'),
+    'correct_sub' => text('quiz.correct_sub'),
+    'incorrect_title' => text('quiz.incorrect_title'),
+    'incorrect_sub' => text('quiz.incorrect_sub'),
+    'incorrect_open_sub' => text('quiz.incorrect_open_sub'),
+    'explanation_video' => text('quiz.explanation_video'),
+])'>
 
     <!-- Compact Header Banner -->
     <section class="quiz-hero-banner group">
@@ -16,12 +24,12 @@
                 <div class="flex items-center gap-2">
                     <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-black uppercase tracking-wider text-white">
                         <span class="material-symbols-outlined !text-xs">quiz</span>
-                        Practice Quiz
+                        {{ text('quiz.badge') }}
                     </span>
                     @if($quiz->lesson)
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-black uppercase tracking-wider text-white/90">
                         <span class="material-symbols-outlined !text-xs">menu_book</span>
-                        {{ $quiz->lesson->name ?? 'Lesson' }}
+                        {{ $quiz->lesson->name ?? text('quiz.lesson') }}
                     </span>
                     @endif
                 </div>
@@ -33,7 +41,7 @@
             <!-- Progress & Step -->
             <div class="w-full sm:w-48 space-y-1">
                 <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-white/90">
-                    <span>Progress</span>
+                    <span>{{ text('quiz.progress') }}</span>
                     <span><span id="currentStep">1</span> / {{ $totalSteps }}</span>
                 </div>
                 <div class="h-2.5 w-full bg-black/20 rounded-full overflow-hidden border border-white/20 p-0.5">
@@ -55,7 +63,7 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[rgb(var(--primary))]">
                         <span class="w-1.5 h-1.5 rounded-full bg-[rgb(var(--primary))]"></span>
-                        <span>Question {{ $index + 1 }}</span>
+                        <span>{{ text('quiz.question', ['num' => $index + 1]) }}</span>
                     </div>
                     @php
                         $questionContent = renderContentBlocks($q['question'] ?? null);
@@ -88,20 +96,20 @@
                 <div class="confirm-wrap">
                     <button type="button" class="confirm-btn" id="confirm_{{ $q['id'] }}" data-question="{{ $q['id'] }}" data-answer="" onclick="confirmAnswer(this)">
                         <span class="material-symbols-outlined !text-lg">task_alt</span>
-                        Confirm Answer
+                        {{ text('quiz.confirm') }}
                     </button>
                 </div>
                 @else
                 <!-- Open Ended Question -->
                 <div class="space-y-3">
-                    <textarea name="open_answer_{{ $q['id'] }}" id="open_input_{{ $q['id'] }}" class="w-full min-h-[100px] rounded-xl p-3.5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.4] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.6] transition-all" placeholder="Type your answer here..." oninput="setOpenAnswer({{ $q['id'] }}, this.value)"></textarea>
+                    <textarea name="open_answer_{{ $q['id'] }}" id="open_input_{{ $q['id'] }}" class="w-full min-h-[100px] rounded-xl p-3.5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.4] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.6] transition-all" placeholder="{{ text('quiz.open_placeholder') }}" oninput="setOpenAnswer({{ $q['id'] }}, this.value)"></textarea>
                 </div>
 
                 <!-- Confirm step for open answers -->
                 <div class="confirm-wrap">
                     <button type="button" class="confirm-btn" id="confirm_open_{{ $q['id'] }}" data-question="{{ $q['id'] }}" onclick="confirmOpenAnswer(this)">
                         <span class="material-symbols-outlined !text-lg">task_alt</span>
-                        Confirm Answer
+                        {{ text('quiz.confirm') }}
                     </button>
                 </div>
                 @endif
@@ -121,14 +129,14 @@
             <div class="flex items-center gap-3">
                 <button type="button" id="prevBtn" onclick="navigateQuestion(-1)" style="display:none" class="flex-1 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] hover:bg-[rgb(var(--surface-container-high))/0.8] rounded-full font-black uppercase tracking-widest py-3 px-5 active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
                     <span class="material-symbols-outlined !text-lg">arrow_back</span>
-                    Previous
+                    {{ text('quiz.previous') }}
                 </button>
                 <button type="button" id="nextBtn" onclick="navigateQuestion(1)" class="flex-1 bg-[rgb(var(--primary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-3 px-5 shadow-lg shadow-[rgb(var(--primary))/0.2] active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    Next Question
+                    {{ text('quiz.next') }}
                     <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                 </button>
                 <button type="submit" id="submitBtn" style="display:none" class="flex-1 bg-[rgb(var(--secondary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-3 px-5 shadow-lg shadow-[rgb(var(--secondary))/0.2] active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    Submit & Finish
+                    {{ text('quiz.submit') }}
                     <span class="material-symbols-outlined !text-lg">rocket_launch</span>
                 </button>
             </div>

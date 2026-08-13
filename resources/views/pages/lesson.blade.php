@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $lesson->name . ' - Lesson')
+@section('title', text('lesson.page_title', ['name' => $lesson->name]))
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -7,7 +7,13 @@
 @endpush
 
 @section('content')
-<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8">
+<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8" data-i18n='@json([
+    'rate_thanks' => text('lesson.rate_thanks'),
+    'rate_success_desc' => text('lesson.rate_success_desc'),
+    'rate_submit' => text('lesson.rate_submit'),
+    'rate_error_generic' => text('lesson.rate_error_generic'),
+    'rate_error_retry' => text('lesson.rate_error_retry'),
+])'>
 
     <!-- Celestial Hero Cover -->
     <section class="lesson-hero-cover group">
@@ -23,13 +29,13 @@
             @if($lesson->topic)
             <a href="{{ route('topics.detail', $lesson->topic) }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white hover:bg-white/30 transition-all no-underline">
                 <span class="material-symbols-outlined !text-sm">arrow_back</span>
-                <span>Back to {{ $lesson->topic->name }}</span>
+                <span>{{ text('lesson.back_to', ['topic' => $lesson->topic->name]) }}</span>
             </a>
             @endif
 
             <!-- Breadcrumbs -->
             <div class="flex items-center gap-2 text-3xs font-black uppercase tracking-widest text-white/80">
-                <span>{{ $lesson->topic?->name ?? 'Lesson' }}</span>
+                <span>{{ $lesson->topic?->name ?? text('lesson.breadcrumb_default') }}</span>
                 <span class="material-symbols-outlined !text-xs">chevron_right</span>
                 <span class="text-amber-300 font-extrabold">{{ $lesson->name }}</span>
             </div>
@@ -46,13 +52,13 @@
                 @if($lesson->videos->isNotEmpty())
                 <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-xs font-black text-white">
                     <span class="material-symbols-outlined !text-sm">video_library</span>
-                    {{ $lesson->videos->count() }} {{ Str::plural('Video', $lesson->videos->count()) }}
+                    {{ text('lesson.video_count', ['count' => $lesson->videos->count()]) }}
                 </span>
                 @endif
                 @if($lesson->quizzes->isNotEmpty())
                 <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400/30 text-amber-200 text-xs font-black">
                     <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">stars</span>
-                    {{ $lesson->quizzes->sum(fn($qz) => $qz->questions->count()) }} Quiz Questions
+                    {{ text('lesson.quiz_questions', ['count' => $lesson->quizzes->sum(fn($qz) => $qz->questions->count())]) }}
                 </span>
                 @endif
             </div>
@@ -71,7 +77,7 @@
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">smart_display</span>
                     <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Interactive Lesson Player
+                        {{ text('lesson.player_title') }}
                     </h3>
                 </div>
 
@@ -83,11 +89,11 @@
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <h4 class="font-black text-sm text-[rgb(var(--on-surface))] truncate">
-                                    {{ $video->name ?: 'Lesson Video' }}
+                                    {{ $video->name ?: text('lesson.video_default') }}
                                 </h4>
                             </div>
                             <span class="inline-flex items-center gap-1 text-4xs font-black uppercase tracking-widest text-[rgb(var(--primary))] bg-[rgb(var(--primary))/0.1] px-2.5 py-0.5 rounded-full">
-                                HD 1080p
+                                {{ text('lesson.player_hd') }}
                             </span>
                         </div>
 
@@ -112,7 +118,7 @@
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined !text-2xl text-[rgb(var(--tertiary))]">sticky_note_2</span>
                     <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Lesson Notes
+                        {{ text('lesson.notes_title') }}
                     </h3>
                 </div>
 
@@ -133,9 +139,9 @@
             @if($lesson->videos->isEmpty() && $lesson->quizzes->isEmpty())
             <section class="bg-[rgb(var(--surface-container-lowest))] border-2 border-dashed border-[rgb(var(--surface-container-high))] rounded-3xl p-12 text-center space-y-3">
                 <span class="material-symbols-outlined !text-6xl text-[rgb(var(--on-surface))/0.15]">menu_book</span>
-                <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">No Media Content Available</h4>
+                <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">{{ text('lesson.empty_title') }}</h4>
                 <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.5] max-w-sm mx-auto">
-                    Content is being prepared for this lesson. Check back soon!
+                    {{ text('lesson.empty_desc') }}
                 </p>
             </section>
             @endif
@@ -145,7 +151,7 @@
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined !text-2xl text-[rgb(var(--tertiary))]">feedback</span>
                     <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Rate This Lesson
+                        {{ text('lesson.rate_title') }}
                     </h3>
                 </div>
 
@@ -153,7 +159,7 @@
                 <!-- Already rated — read-only display -->
                 <div class="sidebar-widget-card space-y-4 text-center">
                     <span class="material-symbols-outlined !text-4xl text-emerald-500" style="font-variation-settings:'FILL' 1">check_circle</span>
-                    <p class="text-sm font-bold text-[rgb(var(--on-surface))/0.7]">Siz artıq bu dərsə rəy vermisiniz</p>
+                    <p class="text-sm font-bold text-[rgb(var(--on-surface))/0.7]">{{ text('lesson.rate_already') }}</p>
                     <div class="flex justify-center items-center gap-2">
                         @for($i = 1; $i <= 5; $i++)
                         <span class="lesson-star-btn active" style="cursor: default; color: {{ ($existingReview->rating ?? 0) >= $i ? 'rgb(var(--tertiary))' : 'rgba(var(--on-surface), 0.15)' }}">
@@ -173,7 +179,7 @@
 
                     <div class="text-center space-y-2">
                         <p class="text-xs font-bold text-[rgb(var(--on-surface))/0.6] uppercase tracking-widest">
-                            How was your learning experience?
+                            {{ text('lesson.rate_prompt') }}
                         </p>
                         <div class="flex justify-center items-center gap-2">
                             @for($i = 1; $i <= 5; $i++)
@@ -185,12 +191,12 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">Your Feedback (Optional)</label>
-                        <textarea name="review" id="reviewInput" rows="3" class="w-full bg-[rgb(var(--surface-container-high))] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))] text-[rgb(var(--on-surface))] text-xs sm:text-sm font-semibold rounded-2xl p-4 focus:outline-none transition-all placeholder-[rgb(var(--on-surface))/0.4]" placeholder="Share your thoughts about this lesson..."></textarea>
+                        <label class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">{{ text('lesson.rate_feedback_label') }}</label>
+                        <textarea name="review" id="reviewInput" rows="3" class="w-full bg-[rgb(var(--surface-container-high))] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))] text-[rgb(var(--on-surface))] text-xs sm:text-sm font-semibold rounded-2xl p-4 focus:outline-none transition-all placeholder-[rgb(var(--on-surface))/0.4]" placeholder="{{ text('lesson.rate_feedback_placeholder') }}"></textarea>
                     </div>
 
                     <button id="rateSubmitBtn" type="submit" class="w-full py-3.5 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs sm:text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-[rgb(var(--primary))/0.2]">
-                        <span>Submit Feedback</span>
+                        <span>{{ text('lesson.rate_submit') }}</span>
                         <span class="material-symbols-outlined !text-lg">rocket_launch</span>
                     </button>
                 </form>
@@ -217,7 +223,7 @@
             <div class="sidebar-widget-card space-y-4">
                 <div class="flex items-center gap-2 text-[rgb(var(--secondary))]">
                     <span class="material-symbols-outlined !text-2xl">quiz</span>
-                    <h4 class="font-black text-sm uppercase tracking-wide">Knowledge Check</h4>
+                    <h4 class="font-black text-sm uppercase tracking-wide">{{ text('lesson.quiz_title') }}</h4>
                 </div>
 
                 <div class="space-y-3">
@@ -233,17 +239,17 @@
                             <div class="flex items-center gap-3 mt-1 text-xs font-bold text-[rgb(var(--on-surface))/0.6]">
                                 <span class="flex items-center gap-1">
                                     <span class="material-symbols-outlined !text-sm text-[rgb(var(--secondary))]">help</span>
-                                    {{ $lq->questions->count() }} Questions
+                                    {{ $lq->questions->count() }} {{ text('lesson.quiz_questions_count') }}
                                 </span>
                                 <span class="flex items-center gap-1 text-amber-600 font-black">
                                     <span class="material-symbols-outlined !text-sm" style="font-variation-settings:'FILL' 1">star</span>
-                                    Earn XP
+                                    {{ text('lesson.quiz_earn') }}
                                 </span>
                             </div>
                         </div>
 
                         <a href="{{ route('quiz', $lq->id) }}" class="w-full py-3 bg-[rgb(var(--secondary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md shadow-[rgb(var(--secondary))/0.2]">
-                            <span>Start Quiz</span>
+                            <span>{{ text('lesson.quiz_start') }}</span>
                             <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                         </a>
                     </div>
@@ -258,8 +264,8 @@
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))] group-hover:-translate-x-1 transition-transform">arrow_back</span>
                     <div>
-                        <h4 class="font-black text-xs uppercase tracking-wide">Back to {{ $lesson->topic->name }}</h4>
-                        <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">See all lessons in this topic</p>
+                        <h4 class="font-black text-xs uppercase tracking-wide">{{ text('lesson.back_to', ['topic' => $lesson->topic->name]) }}</h4>
+                        <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">{{ text('lesson.back_topic_desc') }}</p>
                     </div>
                 </div>
                 <span class="material-symbols-outlined !text-lg text-[rgb(var(--on-surface))/0.4]">chevron_right</span>

@@ -31,7 +31,8 @@
             "app/Helpers/ApiResponse.php",
             "app/Helpers/QueryHelper.php",
             "app/Helpers/QuestionImageHelper.php",
-            "app/Helpers/BrowserRequest.php"
+            "app/Helpers/BrowserRequest.php",
+            "app/Helpers/TextHelper.php"
         ],
         "psr-4": {
             "App\\": "app/",

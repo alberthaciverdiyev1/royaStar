@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Admin-editable UI strings injected from the lesson Blade view.
+    var i18n = (function() {
+        var base = {
+            rate_thanks: 'Thank You!',
+            rate_success_desc: 'Your feedback has been saved successfully.',
+            rate_submit: 'Submit Feedback',
+            rate_error_generic: 'Something went wrong.',
+            rate_error_retry: 'Something went wrong. Please try again.'
+        };
+        var root = document.querySelector('[data-i18n]');
+        if (!root) return base;
+        try {
+            var parsed = JSON.parse(root.getAttribute('data-i18n') || '{}');
+            for (var k in parsed) { if (parsed.hasOwnProperty(k)) base[k] = parsed[k]; }
+        } catch (e) {}
+        return base;
+    })();
+
     Plyr.setup('.js-plyr-player', {
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
         youtube: {
@@ -101,8 +119,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     card.innerHTML =
                         '<div class="text-center space-y-3 py-4">' +
                             '<span class="material-symbols-outlined !text-5xl text-emerald-500" style="font-variation-settings:\'FILL\' 1">check_circle</span>' +
-                            '<p class="text-lg font-black text-[rgb(var(--on-surface))]">Thank You!</p>' +
-                            '<p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6]">Your feedback has been saved successfully.</p>' +
+                            '<p class="text-lg font-black text-[rgb(var(--on-surface))]">' + i18n.rate_thanks + '</p>' +
+                            '<p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6]">' + i18n.rate_success_desc + '</p>' +
                             '<div class="flex justify-center items-center gap-1 pt-2">' +
                                 Array.from({length: parseInt(rating)}, function() {
                                     return '<span class="material-symbols-outlined !text-3xl text-[rgb(var(--tertiary))]" style="font-variation-settings:\'FILL\' 1">star</span>';
@@ -111,14 +129,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         '</div>';
                 } else {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<span>Submit Feedback</span><span class="material-symbols-outlined !text-lg">rocket_launch</span>';
-                    alert(data.message || 'Something went wrong.');
+                    submitBtn.innerHTML = '<span>' + i18n.rate_submit + '</span><span class="material-symbols-outlined !text-lg">rocket_launch</span>';
+                    alert(data.message || i18n.rate_error_generic);
                 }
             })
             .catch(function() {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>Submit Feedback</span><span class="material-symbols-outlined !text-lg">rocket_launch</span>';
-                alert('Something went wrong. Please try again.');
+                submitBtn.innerHTML = '<span>' + i18n.rate_submit + '</span><span class="material-symbols-outlined !text-lg">rocket_launch</span>';
+                alert(i18n.rate_error_retry);
             });
         });
     }

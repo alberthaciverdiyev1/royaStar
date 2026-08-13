@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>@yield('title', 'Welcome') | Teacher Roya's Stars</title>
+    <title>@yield('title', text('brand.prefix') . ' ' . text('brand.name') . ' ' . text('brand.suffix')) | {{ text('brand.prefix') }} {{ text('brand.name') }} {{ text('brand.suffix') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,7 +65,7 @@
             <a href="{{ route('home') }}" class="flex items-center gap-1 group no-underline whitespace-nowrap flex-shrink-0 cursor-pointer">
                 <span class="material-symbols-outlined text-[rgb(var(--secondary))] logo-icon md:!text-2xl transition-transform group-hover:rotate-12">auto_awesome</span>
                 <h1 class="logo-text md:text-lg font-black tracking-tighter uppercase leading-none">
-                    <span class="text-[rgb(var(--primary))]">Teacher </span><span class="text-[rgb(var(--secondary))]">Roya's</span> <span class="text-[rgb(var(--primary))]">Stars</span>
+                    <span class="text-[rgb(var(--primary))]">{{ text('brand.prefix') }} </span><span class="text-[rgb(var(--secondary))]">{{ text('brand.name') }}</span> <span class="text-[rgb(var(--primary))]">{{ text('brand.suffix') }}</span>
                 </h1>
             </a>
 
@@ -78,25 +78,25 @@
                 <a href="{{ route('home') }}" class="no-underline">
                     <div class="{{ $currentPath === '/' ? $desktopActive : $desktopInactive }}">
                         <span class="material-symbols-outlined !text-lg">home</span>
-                        <span>Home</span>
+                        <span>{{ text('nav.home') }}</span>
                     </div>
                 </a>
                 <a href="{{ route('topics') }}" class="no-underline">
                     <div class="{{ $currentPath === 'topics' ? $desktopActive : $desktopInactive }}">
                         <span class="material-symbols-outlined !text-lg">rocket_launch</span>
-                        <span>Topics</span>
+                        <span>{{ text('nav.topics') }}</span>
                     </div>
                 </a>
                 <a href="{{ route('exam') }}" class="no-underline">
                     <div class="{{ $currentPath === 'exam' ? $desktopActive : $desktopInactive }}">
                         <span class="material-symbols-outlined !text-lg">quiz</span>
-                        <span>Exam</span>
+                        <span>{{ text('nav.exam') }}</span>
                     </div>
                 </a>
                 <a href="{{ route('achievements') }}" class="no-underline">
                     <div class="{{ $currentPath === 'achievements' ? $desktopActive : $desktopInactive }}">
                         <span class="material-symbols-outlined !text-lg">military_tech</span>
-                        <span>Achievements</span>
+                        <span>{{ text('nav.achievements') }}</span>
                     </div>
                 </a>
             </nav>
@@ -119,10 +119,10 @@
                 </a>
                 @else
                 <a href="{{ route('login') }}" class="text-[rgb(var(--on-surface))] opacity-50 hover:opacity-100 font-bold text-xs uppercase tracking-widest no-underline px-3 py-2 transition-all">
-                    Log In
+                    {{ text('nav.login') }}
                 </a>
                 <a href="{{ route('signup') }}" class="bg-[rgb(var(--secondary))] text-white px-5 py-2 rounded-full font-bold text-xs shadow-lg shadow-[rgb(var(--secondary))/0.1] active:scale-95 transition-all uppercase tracking-widest no-underline inline-block">
-                    Sign Up
+                    {{ text('nav.signup') }}
                 </a>
                 @endauth
             </div>
@@ -143,31 +143,31 @@
         <a href="{{ route('home') }}" class="no-underline">
             <div class="{{ $currentPath === '/' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-2xl">home</span>
-                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Home</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.home') }}</span>
             </div>
         </a>
         <a href="{{ route('topics') }}" class="no-underline">
             <div class="{{ $currentPath === 'topics' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-2xl">rocket_launch</span>
-                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Topics</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.topics') }}</span>
             </div>
         </a>
         <a href="{{ route('exam') }}" class="no-underline">
             <div class="{{ $currentPath === 'exam' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-2xl">quiz</span>
-                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Exam</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.exam') }}</span>
             </div>
         </a>
         <a href="{{ route('achievements') }}" class="no-underline">
             <div class="{{ $currentPath === 'achievements' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-2xl">military_tech</span>
-                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Badges</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.badges') }}</span>
             </div>
         </a>
         <a href="{{ route('profile') }}" class="no-underline">
             <div class="{{ $currentPath === 'profile' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-2xl">person</span>
-                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">Profile</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.profile') }}</span>
             </div>
         </a>
     </nav>

@@ -27,6 +27,7 @@ class UpdateSettingRequest extends FormRequest
             'terms_text' => 'sometimes|string',
             'privacy_text' => 'sometimes|string',
             'maintenance_mode' => 'boolean',
+            'texts' => 'sometimes|array',
         ];
     }
 }

@@ -10,13 +10,13 @@
             </div>
         </div>
 
-        <h2 class="text-3xl font-black text-[rgb(var(--on-surface))] uppercase tracking-tighter mb-4">Feedback Received!</h2>
+        <h2 class="text-3xl font-black text-[rgb(var(--on-surface))] uppercase tracking-tighter mb-4">{{ text('success.title') }}</h2>
         <p class="text-[rgb(var(--on-surface))/0.5] font-medium mb-10 leading-relaxed text-sm md:text-base">
-            Your review has been successfully sent to Teacher Roya. Thank you for helping us improve our galaxy!
+            {{ text('success.desc') }}
         </p>
 
         <button id="close-modal" class="w-full py-5 bg-[rgb(var(--primary))] rounded-full font-black uppercase text-xs tracking-widest shadow-xl shadow-[rgb(var(--primary))/0.2] active:scale-95 transition-all text-white">
-            Continue Journey
+            {{ text('success.continue') }}
         </button>
     </div>
 </div>

@@ -7,4 +7,6 @@ Route::get('settings', [SettingController::class, 'show'])->withoutMiddleware('a
 
 Route::prefix('admin')->middleware('admin')->group(function () {
     Route::put('settings', [SettingController::class, 'update']);
+    Route::get('website-texts', [SettingController::class, 'texts']);
+    Route::put('website-texts', [SettingController::class, 'updateTexts']);
 });

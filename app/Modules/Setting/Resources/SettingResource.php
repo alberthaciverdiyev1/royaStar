@@ -26,6 +26,7 @@ class SettingResource extends BaseResource
             'terms_text' => $this->terms_text,
             'privacy_text' => $this->privacy_text,
             'maintenance_mode' => $this->maintenance_mode,
+            'texts' => $this->texts,
         ];
     }
 }

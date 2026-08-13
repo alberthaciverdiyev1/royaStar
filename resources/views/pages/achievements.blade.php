@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Achievements & Star Leaderboard')
+@section('title', text('achieve.page_title'))
 
 <link href="{{ asset('css/achievements.css') }}?v={{ filemtime(public_path('css/achievements.css')) }}" rel="stylesheet">
 
@@ -22,19 +22,19 @@
                 @endphp
                 <div class="level-disc-badge flex-shrink-0 mx-auto md:mx-0">
                     <span class="text-2xl sm:text-3xl font-black text-white leading-none">LVL {{ $level }}</span>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 mt-1">Explorer</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-amber-300 mt-1">{{ text('achieve.level_label') }}</span>
                 </div>
 
                 <div class="space-y-1">
                     <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white">
                         <span class="material-symbols-outlined !text-xs">military_tech</span>
-                        Star Rewards Hub
+                        {{ text('achieve.badge') }}
                     </div>
                     <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white leading-tight">
-                        Achievements & Rankings 🌟
+                        {{ text('achieve.title') }}
                     </h1>
                     <p class="text-xs sm:text-sm font-semibold text-white/80 max-w-md">
-                        Earn Star points by completing quizzes and lessons. Monthly stars reset on the last day at 23:59!
+                        {{ text('achieve.desc') }}
                     </p>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <span class="material-symbols-outlined !text-3xl text-amber-300 mb-1" style="font-variation-settings:'FILL' 1">stars</span>
                 <div class="text-2xl sm:text-3xl font-black text-white tracking-tight">{{ $totalStars }}</div>
                 <div class="text-3xs font-black uppercase tracking-widest text-white/70">
-                    {{ $selectedMonth === 'all' ? 'All-Time Stars' : 'Monthly Stars' }}
+                    {{ $selectedMonth === 'all' ? text('achieve.all_time') : text('achieve.monthly') }}
                 </div>
             </div>
         </div>
@@ -57,13 +57,13 @@
                 <span class="material-symbols-outlined !text-2xl">calendar_month</span>
             </div>
             <div>
-                <h4 class="font-black text-xs sm:text-sm uppercase tracking-wide text-[rgb(var(--on-surface))]">Monthly Cycle & Historical Rankings</h4>
-                <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">Monthly stars reset on the last day of each month at 23:59</p>
+                <h4 class="font-black text-xs sm:text-sm uppercase tracking-wide text-[rgb(var(--on-surface))]">{{ text('achieve.filter_title') }}</h4>
+                <p class="text-3xs font-bold text-[rgb(var(--on-surface))/0.5]">{{ text('achieve.filter_desc') }}</p>
             </div>
         </div>
 
         <form method="GET" action="{{ route('achievements') }}" class="flex items-center gap-2 w-full sm:w-auto">
-            <label for="month-select" class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.6] whitespace-nowrap">Period:</label>
+            <label for="month-select" class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.6] whitespace-nowrap">{{ text('achieve.filter_period') }}</label>
             <select id="month-select" name="month" onchange="this.form.submit()" class="bg-[rgb(var(--surface-container-high))] border-2 border-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] text-xs font-black rounded-full px-4 py-2.5 focus:outline-none focus:border-[rgb(var(--primary))] transition-all cursor-pointer w-full sm:w-auto uppercase tracking-wide">
                 @foreach($availableMonths as $val => $label)
                 <option value="{{ $val }}" {{ $selectedMonth === $val ? 'selected' : '' }}>
@@ -78,11 +78,11 @@
     <section class="flex items-center justify-center gap-3">
         <button type="button" id="tab-btn-achievements" class="main-nav-tab active flex items-center gap-2" onclick="switchMainTab('achievements')">
             <span class="material-symbols-outlined !text-lg">workspace_premium</span>
-            <span>My Achievements</span>
+            <span>{{ text('achieve.tab_achievements') }}</span>
         </button>
         <button type="button" id="tab-btn-leaderboard" class="main-nav-tab flex items-center gap-2" onclick="switchMainTab('leaderboard')">
             <span class="material-symbols-outlined !text-lg">leaderboard</span>
-            <span>Star Leaderboard 🏆</span>
+            <span>{{ text('achieve.tab_leaderboard') }}</span>
         </button>
     </section>
 
@@ -100,10 +100,10 @@
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">history</span>
                             <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                                Recent Activity Timeline
+                                {{ text('achieve.timeline_title') }}
                             </h3>
                         </div>
-                        <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">Latest Unlocks</span>
+                        <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">{{ text('achieve.timeline_latest') }}</span>
                     </div>
 
                     @if($earnedUserStars->isNotEmpty())
@@ -111,7 +111,7 @@
                         @foreach($earnedUserStars->take(5) as $userStar)
                         @php
                             $starObj = $userStar->star;
-                            $starName = $starObj?->name ?? 'Star Award';
+                            $starName = $starObj?->name ?? text('achieve.star_default_name');
                             $starDesc = $starObj?->description ?? '';
                         @endphp
                         <div class="sidebar-widget-card p-4 flex items-center justify-between gap-4 transition-all">
@@ -124,10 +124,10 @@
                                         {{ $starName }}
                                     </h4>
                                     <p class="text-xs text-[rgb(var(--on-surface))/0.6] font-semibold">
-                                        {{ $starDesc ?: 'Awarded for exceptional learning progress!' }}
+                                        {{ $starDesc ?: text('achieve.star_default_desc') }}
                                     </p>
                                     <span class="text-4xs font-bold text-[rgb(var(--on-surface))/0.4] block mt-0.5">
-                                        Unlocked {{ $userStar->created_at ? $userStar->created_at->diffForHumans() : 'Recently' }}
+                                        {{ text('achieve.unlocked') }} {{ $userStar->created_at ? $userStar->created_at->diffForHumans() : text('achieve.recently') }}
                                     </span>
                                 </div>
                             </div>
@@ -142,9 +142,9 @@
                     @else
                     <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-dashed border-[rgb(var(--surface-container-high))] rounded-2xl p-8 text-center space-y-3">
                         <span class="material-symbols-outlined !text-5xl text-[rgb(var(--primary))/0.3]">emoji_events</span>
-                        <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">No Achievements For Selected Period</h4>
+                        <h4 class="font-black text-base text-[rgb(var(--on-surface))] uppercase">{{ text('achieve.empty_title') }}</h4>
                         <p class="text-xs font-bold text-[rgb(var(--on-surface))/0.5] max-w-sm mx-auto">
-                            Solve quizzes and exams in this period to claim your Star Badges!
+                            {{ text('achieve.empty_desc') }}
                         </p>
                     </div>
                     @endif
@@ -156,13 +156,13 @@
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">grid_view</span>
                             <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                                Badges & Trophies Gallery
+                                {{ text('achieve.gallery_title') }}
                             </h3>
                         </div>
                         <div class="flex items-center gap-1.5 flex-wrap">
-                            <button type="button" class="achieve-tab-btn active" onclick="filterBadges('all', this)">All ({{ $allStars->count() }})</button>
-                            <button type="button" class="achieve-tab-btn" onclick="filterBadges('unlocked', this)">Unlocked ({{ count($earnedStarIds) }})</button>
-                            <button type="button" class="achieve-tab-btn" onclick="filterBadges('locked', this)">Locked ({{ $allStars->count() - count($earnedStarIds) }})</button>
+                            <button type="button" class="achieve-tab-btn active" onclick="filterBadges('all', this)">{{ text('achieve.filter_all') }} ({{ $allStars->count() }})</button>
+                            <button type="button" class="achieve-tab-btn" onclick="filterBadges('unlocked', this)">{{ text('achieve.filter_unlocked') }} ({{ count($earnedStarIds) }})</button>
+                            <button type="button" class="achieve-tab-btn" onclick="filterBadges('locked', this)">{{ text('achieve.filter_locked') }} ({{ $allStars->count() - count($earnedStarIds) }})</button>
                         </div>
                     </div>
 
@@ -187,7 +187,7 @@
                                     @endif
                                 </div>
                                 <span class="text-3xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full {{ $isUnlocked ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500' }}">
-                                    {{ $isUnlocked ? 'Unlocked ✓' : 'Locked' }}
+                                    {{ $isUnlocked ? text('achieve.badge_unlocked') : text('achieve.badge_locked') }}
                                 </span>
                             </div>
 
@@ -195,13 +195,13 @@
                                 {{ $starTitle }}
                             </h4>
                             <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6] leading-relaxed mb-4">
-                                {{ $starDetails ?: 'Complete learning milestones to claim this badge.' }}
+                                {{ $starDetails ?: text('achieve.badge_default_desc') }}
                             </p>
 
                             <div class="flex items-center justify-between pt-3 border-t border-[rgb(var(--surface-container-high))/0.6] text-xs font-bold">
                                 <span class="text-amber-600 flex items-center gap-1 font-black">
                                     <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
-                                    +{{ $star->point }} Stars
+                                    +{{ $star->point }} {{ text('achieve.stars') }}
                                 </span>
                                 <span class="text-3xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.4]">
                                     {{ strtoupper(str_replace('_', ' ', $star->type)) }}
@@ -233,7 +233,7 @@
                             @endif
                         </div>
                         <div class="inline-flex items-center gap-1 bg-slate-200 text-slate-800 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
-                            🥈 2nd Place
+                            🥈 {{ text('achieve.place_2') }}
                         </div>
                         <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))] truncate px-1">
                             {{ $rank2->name }}
@@ -263,7 +263,7 @@
                             @endif
                         </div>
                         <div class="inline-flex items-center gap-1 bg-amber-400/30 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
-                            👑 Champion
+                            👑 {{ text('achieve.champion') }}
                         </div>
                         <h4 class="font-black text-sm sm:text-base text-[rgb(var(--on-surface))] truncate px-1">
                             {{ $rank1->name }}
@@ -290,7 +290,7 @@
                             @endif
                         </div>
                         <div class="inline-flex items-center gap-1 bg-amber-700/20 text-amber-900 text-4xs font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">
-                            🥉 3rd Place
+                            🥉 {{ text('achieve.place_3') }}
                         </div>
                         <h4 class="font-black text-xs sm:text-sm text-[rgb(var(--on-surface))] truncate px-1">
                             {{ $rank3->name }}
@@ -341,19 +341,19 @@
                                         </h4>
                                         @if($isMe)
                                         <span class="bg-[rgb(var(--secondary))] text-white text-4xs font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
-                                            YOU
+                                            {{ text('achieve.you') }}
                                         </span>
                                         @endif
                                     </div>
                                     <span class="text-4xs font-bold text-[rgb(var(--on-surface))/0.5] uppercase tracking-wider">
-                                        Level {{ $userLvl }} Explorer
+                                        {{ text('achieve.level_explorer', ['level' => $userLvl]) }}
                                     </span>
                                 </div>
                             </div>
 
                             <div class="flex items-center gap-1.5 bg-amber-400/15 text-amber-700 px-3 py-1 rounded-full font-black text-xs">
                                 <span class="material-symbols-outlined !text-base" style="font-variation-settings:'FILL' 1">star</span>
-                                <span>{{ $u->total_stars }} Stars</span>
+                                <span>{{ $u->total_stars }} {{ text('achieve.stars') }}</span>
                             </div>
                         </div>
                         @endforeach
@@ -368,23 +368,23 @@
 
             <!-- Quick Stats Bar -->
             <div class="sidebar-widget-card space-y-4">
-                <h4 class="font-black text-xs uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">Quick Explorer Stats</h4>
+                <h4 class="font-black text-xs uppercase tracking-widest text-[rgb(var(--on-surface))/0.6]">{{ text('achieve.sidebar_title') }}</h4>
                 <div class="grid grid-cols-2 gap-3 text-center">
                     <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
                         <div class="text-xl font-black text-[rgb(var(--primary))]">{{ $earnedUserStars->count() }}</div>
-                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Badges Unlocked</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">{{ text('achieve.sidebar_badges') }}</div>
                     </div>
                     <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
                         <div class="text-xl font-black text-amber-600">{{ $totalStars }}</div>
-                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Period Stars</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">{{ text('achieve.sidebar_period') }}</div>
                     </div>
                     <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
                         <div class="text-xl font-black text-emerald-600">{{ $quizCount }}</div>
-                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Quizzes Done</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">{{ text('achieve.sidebar_quizzes') }}</div>
                     </div>
                     <div class="bg-[rgb(var(--surface-container-high))/0.4] rounded-2xl p-3">
                         <div class="text-xl font-black text-indigo-600">{{ $examCount }}</div>
-                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">Exams Taken</div>
+                        <div class="text-4xs font-black uppercase text-[rgb(var(--on-surface))/0.5]">{{ text('achieve.sidebar_exams') }}</div>
                     </div>
                 </div>
             </div>
@@ -392,11 +392,11 @@
             <!-- Start Practice Callout -->
             <div class="sidebar-widget-card bg-gradient-to-br from-[rgb(var(--primary))] to-[rgb(var(--secondary))] text-white border-none space-y-4 shadow-xl">
                 <div class="space-y-1">
-                    <h4 class="font-black text-base uppercase tracking-tight">Earn More Stars!</h4>
-                    <p class="text-xs font-semibold text-white/80">Complete quizzes and lessons to climb up the leaderboards.</p>
+                    <h4 class="font-black text-base uppercase tracking-tight">{{ text('achieve.cta_title') }}</h4>
+                    <p class="text-xs font-semibold text-white/80">{{ text('achieve.cta_desc') }}</p>
                 </div>
                 <a href="{{ route('topics') }}" class="w-full py-3 bg-white text-[rgb(var(--primary))] rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md">
-                    <span>Explore Topics</span>
+                    <span>{{ text('achieve.cta_btn') }}</span>
                     <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                 </a>
             </div>

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Quiz Result - ' . ($quiz->name ?? 'Quiz'))
+@section('title', text('quiz_result.page_title', ['name' => $quiz->name ?? 'Quiz']))
 
 <link href="{{ asset('css/quiz-result.css') }}?v={{ filemtime(public_path('css/quiz-result.css')) }}" rel="stylesheet">
 
@@ -77,13 +77,13 @@
                 @endauth
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-3xs font-black uppercase tracking-widest text-white">
                     <span class="material-symbols-outlined !text-xs">quiz</span>
-                    Quiz Summary & Assessment
+                    {{ text('quiz_result.badge') }}
                 </div>
                 <h1 class="text-3xl sm:text-5xl font-black italic uppercase tracking-tight text-white leading-tight">
-                    {{ $quiz->name ?? 'Quiz Completed' }}
+                    {{ $quiz->name ?? text('quiz_result.title_fallback') }}
                 </h1>
                 <p class="text-xs sm:text-sm font-semibold text-white/80">
-                    Awesome effort! Review your answers below to strengthen your grammar mastery.
+                    {{ text('quiz_result.desc') }}
                 </p>
             </div>
 
@@ -96,11 +96,11 @@
                     </svg>
                     <div class="absolute flex flex-col items-center">
                         <span class="text-2xl font-black text-white">{{ $scorePercent }}%</span>
-                        <span class="text-4xs font-black uppercase tracking-widest text-amber-200">Score</span>
+                        <span class="text-4xs font-black uppercase tracking-widest text-amber-200">{{ text('quiz_result.score') }}</span>
                     </div>
                 </div>
                 <div class="text-xs font-black uppercase tracking-widest text-white mt-2">
-                    {{ $correctCount }} of {{ $totalCount }} Correct
+                    {{ text('quiz_result.correct_of', ['count' => $correctCount, 'total' => $totalCount]) }}
                 </div>
             </div>
         </div>
@@ -117,13 +117,13 @@
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined !text-2xl text-[rgb(var(--primary))]">fact_check</span>
                     <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[rgb(var(--on-surface))]">
-                        Question Breakdown
+                        {{ text('quiz_result.breakdown') }}
                     </h3>
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap">
-                    <button type="button" class="filter-tab-btn active" onclick="filterQuestions('all', this)">All ({{ $totalCount }})</button>
-                    <button type="button" class="filter-tab-btn" onclick="filterQuestions('correct', this)">Correct ({{ $correctCount }})</button>
-                    <button type="button" class="filter-tab-btn" onclick="filterQuestions('wrong', this)">Wrong ({{ $wrongCount }})</button>
+                    <button type="button" class="filter-tab-btn active" onclick="filterQuestions('all', this)">{{ text('quiz_result.filter_all') }} ({{ $totalCount }})</button>
+                    <button type="button" class="filter-tab-btn" onclick="filterQuestions('correct', this)">{{ text('quiz_result.filter_correct') }} ({{ $correctCount }})</button>
+                    <button type="button" class="filter-tab-btn" onclick="filterQuestions('wrong', this)">{{ text('quiz_result.filter_wrong') }} ({{ $wrongCount }})</button>
                 </div>
             </div>
 
@@ -141,33 +141,33 @@
                 <div class="question-review-card {{ $statusClass }} q-item-card" data-status="{{ $isCorrect ? 'correct' : 'wrong' }}">
                     <div class="flex items-center justify-between gap-3 mb-3">
                         <span class="text-xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5]">
-                            Question #{{ $index + 1 }}
+                            {{ text('quiz_result.question', ['num' => $index + 1]) }}
                         </span>
                         <span class="inline-flex items-center gap-1 text-3xs font-black uppercase tracking-widest px-3 py-1 rounded-full {{ $isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
                             @if($isCorrect)
-                            <span class="material-symbols-outlined !text-sm">check_circle</span> Correct
+                            <span class="material-symbols-outlined !text-sm">check_circle</span> {{ text('quiz_result.correct_badge') }}
                             @else
-                            <span class="material-symbols-outlined !text-sm">cancel</span> Incorrect
+                            <span class="material-symbols-outlined !text-sm">cancel</span> {{ text('quiz_result.incorrect_badge') }}
                             @endif
                         </span>
                     </div>
 
                     <h4 class="font-bold text-sm sm:text-base text-[rgb(var(--on-surface))] mb-4 leading-relaxed">
-                        {!! $res['question_text'] ?: 'Question Content' !!}
+                        {!! $res['question_text'] ?: text('quiz_result.question_content') !!}
                     </h4>
 
                     <!-- Answer Options Comparison -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-[rgb(var(--surface-container-high))/0.6] text-xs font-semibold">
                         <div class="p-3 rounded-xl {{ $isCorrect ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200' }}">
-                            <span class="text-4xs font-black uppercase tracking-widest block opacity-70 mb-0.5">Your Answer:</span>
-                            <span class="font-black text-sm uppercase">{{ $userLetter ? strtoupper($userLetter) : 'No Answer' }}</span>
+                            <span class="text-4xs font-black uppercase tracking-widest block opacity-70 mb-0.5">{{ text('quiz_result.your_answer') }}</span>
+                            <span class="font-black text-sm uppercase">{{ $userLetter ? strtoupper($userLetter) : text('quiz_result.no_answer') }}</span>
                             @if($userAnswerText && $userLetter)
                             <span class="block text-xs mt-0.5 font-bold">{!! $userAnswerText !!}</span>
                             @endif
                         </div>
 
                         <div class="p-3 rounded-xl bg-emerald-50 text-emerald-900 border border-emerald-200">
-                            <span class="text-4xs font-black uppercase tracking-widest block opacity-70 mb-0.5">Correct Answer:</span>
+                            <span class="text-4xs font-black uppercase tracking-widest block opacity-70 mb-0.5">{{ text('quiz_result.correct_answer') }}</span>
                             <span class="font-black text-sm uppercase">{{ strtoupper($correctLetter) }}</span>
                             @if($correctAnswerText)
                             <span class="block text-xs mt-0.5 font-bold">{!! $correctAnswerText !!}</span>
@@ -179,7 +179,7 @@
                     <div class="mt-3 pt-3 border-t border-[rgb(var(--surface-container-high))/0.6]">
                         <span class="inline-flex items-center gap-1.5 text-4xs font-black uppercase tracking-widest text-[rgb(var(--primary))] mb-1">
                             <span class="material-symbols-outlined !text-sm">play_circle</span>
-                            İzah Videosu
+                            {{ text('quiz_result.explanation_video') }}
                         </span>
                         {!! renderVideoEmbed($res['explanation_video_url']) !!}
                     </div>
@@ -199,10 +199,10 @@
                     <span class="material-symbols-outlined !text-3xl" style="font-variation-settings:'FILL' 1">stars</span>
                 </div>
                 <div>
-                    <span class="text-3xs font-black uppercase tracking-widest text-amber-600">Rewards Earned</span>
-                    <h4 class="font-black text-2xl text-[rgb(var(--on-surface))] mt-0.5">+{{ $starsEarned }} XP Stars</h4>
+                    <span class="text-3xs font-black uppercase tracking-widest text-amber-600">{{ text('quiz_result.rewards') }}</span>
+                    <h4 class="font-black text-2xl text-[rgb(var(--on-surface))] mt-0.5">{{ text('quiz_result.xp_stars', ['count' => $starsEarned]) }}</h4>
                     <p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.5] mt-1">
-                        Great job completing this quiz! Your star score has been updated in your profile.
+                        {{ text('quiz_result.rewards_desc') }}
                     </p>
                 </div>
             </div>
@@ -211,12 +211,12 @@
             <div class="sidebar-widget-card space-y-3">
                 <a href="{{ route('quiz', $quiz->id) }}" class="w-full py-3 bg-[rgb(var(--primary))] text-white rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all shadow-md shadow-[rgb(var(--primary))/0.2]">
                     <span class="material-symbols-outlined !text-lg">refresh</span>
-                    <span>Retake Quiz</span>
+                    <span>{{ text('quiz_result.retake') }}</span>
                 </a>
 
                 @if($quiz->lesson)
                 <a href="{{ route('topics.detail', $quiz->lesson->topic_id) }}" class="w-full py-3 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] hover:bg-[rgb(var(--surface-container-high))/0.8] rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 no-underline active:scale-95 transition-all">
-                    <span>Back to Topic</span>
+                    <span>{{ text('quiz_result.back_topic') }}</span>
                     <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                 </a>
                 @endif

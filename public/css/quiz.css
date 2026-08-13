@@ -60,13 +60,13 @@
 }
 
 .quiz-option-btn.is-correct {
-    border-color: #4DAE51 !important;
-    background-color: #F0FAF1 !important;
-    color: #2D6B31 !important;
+    border-color: #10b981 !important;
+    background-color: #ecfdf5 !important;
+    color: #065f46 !important;
     box-shadow: 0 6px 18px -4px rgba(16, 185, 129, 0.25) !important;
 }
 .quiz-option-btn.is-correct .letter-badge {
-    background-color: #4DAE51 !important; color: #ffffff !important;
+    background-color: #10b981 !important; color: #ffffff !important;
 }
 .quiz-option-btn.is-wrong {
     border-color: #ef4444 !important;
@@ -78,17 +78,17 @@
     background-color: #ef4444 !important; color: #ffffff !important;
 }
 .quiz-option-btn.is-correct-target {
-    border-color: #4DAE51 !important;
+    border-color: #10b981 !important;
     background-color: #f0fdf4 !important;
     color: #166534 !important;
     animation: pulse-border 1.5s infinite;
 }
 .quiz-option-btn.is-correct-target .letter-badge {
-    background-color: #4DAE51 !important; color: #ffffff !important;
+    background-color: #10b981 !important; color: #ffffff !important;
 }
 @keyframes pulse-border {
-    0%, 100% { border-color: #4DAE51; }
-    50% { border-color: #6CC66F; box-shadow: 0 0 12px rgba(52, 211, 153, 0.4); }
+    0%, 100% { border-color: #10b981; }
+    50% { border-color: #34d399; box-shadow: 0 0 12px rgba(52, 211, 153, 0.4); }
 }
 .quiz-option-btn.is-disabled { cursor: default; }
 
@@ -119,8 +119,8 @@
     to { opacity: 1; transform: translateY(0); }
 }
 .feedback-box.correct {
-    background-color: #F0FAF1;
-    border: 2px solid #BCE5BD;
+    background-color: #ecfdf5;
+    border: 2px solid #a7f3d0;
 }
 .feedback-box.wrong {
     background-color: #fef2f2;
@@ -142,7 +142,7 @@
     font-size: 1.75rem;
     flex-shrink: 0;
 }
-.feedback-box.correct .fb-status-icon { color: #3E8E42; }
+.feedback-box.correct .fb-status-icon { color: #059669; }
 .feedback-box.wrong .fb-status-icon { color: #dc2626; }
 .fb-status-text {
     display: flex;
@@ -160,7 +160,7 @@
     opacity: 0.8;
 }
 .feedback-box.correct .fb-status-title,
-.feedback-box.correct .fb-status-sub { color: #2D6B31; }
+.feedback-box.correct .fb-status-sub { color: #065f46; }
 .feedback-box.wrong .fb-status-title,
 .feedback-box.wrong .fb-status-sub { color: #991b1b; }
 .feedback-box.pending .fb-status-icon,

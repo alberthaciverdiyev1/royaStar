@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $exam->name . ' - Exam')
+@section('title', text('exam_solve.page_title', ['name' => $exam->name]))
 
 <link href="{{ asset('css/exam-solve.css') }}?v={{ filemtime(public_path('css/exam-solve.css')) }}" rel="stylesheet">
 
@@ -15,15 +15,15 @@
                         <span class="material-symbols-outlined !text-xs">assignment</span>
                         @if($exam->grade)
                         @php $gradeName = $exam->grade->name ?? ''; @endphp
-                        {{ $gradeName }} Exam
+                        {{ text('exam_solve.badge_grade', ['grade' => $gradeName]) }}
                         @else
-                        Exam
+                        {{ text('exam_solve.badge') }}
                         @endif
                     </span>
                     @if($exam->duration_minutes)
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/15 text-[10px] font-black uppercase tracking-wider text-white/90">
                         <span class="material-symbols-outlined !text-xs">schedule</span>
-                        {{ $exam->duration_minutes }} min
+                        {{ $exam->duration_minutes }} {{ text('exam_solve.min') }}
                     </span>
                     @endif
                 </div>
@@ -35,7 +35,7 @@
             <!-- Progress & Step -->
             <div class="w-full sm:w-48 space-y-1">
                 <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-white/90">
-                    <span>Progress</span>
+                    <span>{{ text('exam_solve.progress') }}</span>
                     <span><span id="currentStep">1</span> / {{ $totalSteps }}</span>
                 </div>
                 <div class="h-2.5 w-full bg-black/20 rounded-full overflow-hidden border border-white/20 p-0.5">
@@ -57,7 +57,7 @@
                 <div class="space-y-1.5">
                     <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[rgb(var(--primary))]">
                         <span class="w-1.5 h-1.5 rounded-full bg-[rgb(var(--primary))]"></span>
-                        <span>Question {{ $index + 1 }}</span>
+                        <span>{{ text('exam_solve.question', ['num' => $index + 1]) }}</span>
                     </div>
                     @php
                         $questionContent = renderContentBlocks($q['question'] ?? null);
@@ -88,7 +88,7 @@
                 @else
                 <!-- Open Ended Question -->
                 <div class="space-y-3">
-                    <textarea name="open_answer_{{ $q['id'] }}" id="open_input_{{ $q['id'] }}" class="w-full min-h-[100px] rounded-xl p-3.5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.4] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.6] transition-all" placeholder="Type your answer here..." oninput="setOpenAnswer({{ $q['id'] }}, this.value)"></textarea>
+                    <textarea name="open_answer_{{ $q['id'] }}" id="open_input_{{ $q['id'] }}" class="w-full min-h-[100px] rounded-xl p-3.5 bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))] font-bold text-sm outline-none placeholder:text-[rgb(var(--on-surface))/0.4] border-2 border-[rgb(var(--surface-container-high))] focus:border-[rgb(var(--primary))/0.6] transition-all" placeholder="{{ text('exam_solve.open_placeholder') }}" oninput="setOpenAnswer({{ $q['id'] }}, this.value)"></textarea>
                 </div>
                 @endif
 
@@ -104,14 +104,14 @@
             <div class="flex items-center gap-3">
                 <button type="button" id="prevBtn" onclick="navigateQuestion(-1)" style="display:none" class="flex-1 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] hover:bg-[rgb(var(--surface-container-high))/0.8] rounded-full font-black uppercase tracking-widest py-3 px-5 active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
                     <span class="material-symbols-outlined !text-lg">arrow_back</span>
-                    Previous
+                    {{ text('exam_solve.previous') }}
                 </button>
                 <button type="button" id="nextBtn" onclick="navigateQuestion(1)" class="flex-1 bg-[rgb(var(--primary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-3 px-5 shadow-lg shadow-[rgb(var(--primary))/0.2] active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    Next Question
+                    {{ text('exam_solve.next') }}
                     <span class="material-symbols-outlined !text-lg">arrow_forward</span>
                 </button>
                 <button type="submit" id="submitBtn" style="display:none" class="flex-1 bg-[rgb(var(--secondary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-3 px-5 shadow-lg shadow-[rgb(var(--secondary))/0.2] active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    Submit & Finish
+                    {{ text('exam_solve.submit') }}
                     <span class="material-symbols-outlined !text-lg">rocket_launch</span>
                 </button>
             </div>

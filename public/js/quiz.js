@@ -9,6 +9,26 @@
     var progressBar = document.getElementById('progressBar');
     var stepLabel = document.getElementById('currentStep');
 
+    // Editable UI strings injected from the Blade view (admin-customizable).
+    // Fallbacks mirror the config defaults if the attribute is missing.
+    var i18n = (function() {
+        var base = {
+            checking: 'Checking...',
+            correct_title: 'Correct!',
+            correct_sub: 'Your answer is right.',
+            incorrect_title: 'Incorrect!',
+            incorrect_sub: 'The correct answer is highlighted in green.',
+            incorrect_open_sub: 'The expected answer is shown on the result page.',
+            explanation_video: 'İzah Videosu'
+        };
+        if (!wrapper) return base;
+        try {
+            var parsed = JSON.parse(wrapper.getAttribute('data-i18n') || '{}');
+            for (var k in parsed) { if (parsed.hasOwnProperty(k)) base[k] = parsed[k]; }
+        } catch (e) {}
+        return base;
+    })();
+
     window.navigateQuestion = function(dir) {
         if (questions[currentIndex]) {
             questions[currentIndex].style.display = 'none';
@@ -81,7 +101,7 @@
         return '<div class="fb-video">'
             + '<div class="fb-video-head">'
             + '<span class="material-symbols-outlined fb-video-head-icon">play_circle</span>'
-            + '<span class="fb-video-head-label">İzah Videosu</span>'
+            + '<span class="fb-video-head-label">' + escapeHtml(i18n.explanation_video) + '</span>'
             + '</div>'
             + '<div class="fb-video-frame">' + media + '</div>'
             + '</div>';
@@ -132,8 +152,8 @@
         fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'wrong');
 
         var status = isCorrect
-            ? fbStatusHtml(true, 'Correct!', 'Your answer is right.')
-            : fbStatusHtml(false, 'Incorrect!', 'The correct answer is highlighted in green.');
+            ? fbStatusHtml(true, i18n.correct_title, i18n.correct_sub)
+            : fbStatusHtml(false, i18n.incorrect_title, i18n.incorrect_sub);
 
         fb.innerHTML = status + videoEmbedHtml(result.explanation_video_url || '');
         initPlayer(fb);
@@ -148,8 +168,8 @@
         fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'wrong');
 
         var status = isCorrect
-            ? fbStatusHtml(true, 'Correct!', 'Your answer is right.')
-            : fbStatusHtml(false, 'Incorrect!', 'The expected answer is shown on the result page.');
+            ? fbStatusHtml(true, i18n.correct_title, i18n.correct_sub)
+            : fbStatusHtml(false, i18n.incorrect_title, i18n.incorrect_open_sub);
 
         fb.innerHTML = status + videoEmbedHtml(result.explanation_video_url || '');
         initPlayer(fb);
@@ -245,7 +265,7 @@
         btn.style.display = 'none';
 
         var fb = container.querySelector('.feedback-box');
-        setPendingFeedback(fb, 'Checking...');
+        setPendingFeedback(fb, i18n.checking);
 
         var checkUrl = document.querySelector('.quiz-wrapper').getAttribute('data-check-url');
         postCheck(checkUrl, { question_id: questionId, answer: chosenAnswer })
@@ -282,7 +302,7 @@
         if (input) { input.disabled = true; }
 
         var fb = container.querySelector('.feedback-box');
-        setPendingFeedback(fb, 'Checking...');
+        setPendingFeedback(fb, i18n.checking);
 
         var checkUrl = document.querySelector('.quiz-wrapper').getAttribute('data-check-url');
         postCheck(checkUrl, { question_id: questionId, answer: value })

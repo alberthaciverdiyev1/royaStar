@@ -1,5 +1,5 @@
 @extends('layouts.app', ['hideHeader' => true, 'hideNavbar' => true, 'isIndex' => true])
-@section('title', 'Registration Pending')
+@section('title', text('pending.page_title'))
 
 @section('content')
 <section class="login-section">
@@ -10,22 +10,22 @@
             </div>
         </div>
         <h1 class="text-2xl md:text-4xl font-black text-[rgb(var(--on-surface))] tracking-tighter uppercase italic">
-            Registration <span class="text-[rgb(var(--tertiary))]">Pending</span>
+            {{ text('pending.title_1') }} <span class="text-[rgb(var(--tertiary))]">{{ text('pending.title_2') }}</span>
         </h1>
-        <p class="text-[rgb(var(--on-surface))/0.5] font-medium mt-2 text-xs md:text-sm italic">Your account is awaiting approval.</p>
+        <p class="text-[rgb(var(--on-surface))/0.5] font-medium mt-2 text-xs md:text-sm italic">{{ text('pending.subtitle') }}</p>
     </div>
 
     <div class="login-card text-center">
         <div class="mb-8">
             <span class="material-symbols-outlined !text-6xl text-[rgb(var(--tertiary))] mb-4">pending_actions</span>
             <h2 class="text-xl md:text-2xl font-black text-[rgb(var(--on-surface))] uppercase tracking-tight italic mb-4">
-                Almost there!
+                {{ text('pending.almost') }}
             </h2>
             <p class="text-[rgb(var(--on-surface))/0.6] text-sm leading-relaxed max-w-sm mx-auto">
-                Your registration has been received. An administrator will review your account and approve it shortly.
+                {{ text('pending.desc_1') }}
             </p>
             <p class="text-[rgb(var(--on-surface))/0.6) text-sm leading-relaxed max-w-sm mx-auto mt-4">
-                You'll be able to log in once your account is approved.
+                {{ text('pending.desc_2') }}
             </p>
         </div>
 
@@ -37,12 +37,12 @@
 
         <a href="{{ route('login') }}" class="btn-login no-underline">
             <span class="material-symbols-outlined !text-xl">arrow_back</span>
-            Back to Login
+            {{ text('pending.back') }}
         </a>
 
         <div class="mt-8 pt-6 border-t border-[rgb(var(--surface-container-high))]">
             <p class="text-xs text-[rgb(var(--on-surface))/0.4) font-medium">
-                Need help? <a href="#" class="text-[rgb(var(--secondary))] font-black hover:underline">Contact Support</a>
+                {{ text('pending.help') }} <a href="#" class="text-[rgb(var(--secondary))] font-black hover:underline">{{ text('pending.contact') }}</a>
             </p>
         </div>
     </div>

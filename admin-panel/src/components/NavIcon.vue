@@ -71,4 +71,9 @@ defineProps<{
   <svg v-else-if="icon === 'pending-users'" class="h-5 w-5" :class="active ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
+
+  <!-- Website texts -->
+  <svg v-else-if="icon === 'text'" class="h-5 w-5" :class="active ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 10h16M4 14h10M4 18h7" />
+  </svg>
 </template>

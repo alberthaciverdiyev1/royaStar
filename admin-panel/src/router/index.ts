@@ -36,6 +36,7 @@ const routes = [
       { path: 'students', name: 'Students', component: () => import('../pages/students/StudentList.vue') },
       { path: 'users', name: 'Users', component: () => import('../pages/users/UserList.vue') },
       { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/UserList.vue') },
+      { path: 'website-texts', name: 'WebsiteTexts', component: () => import('../pages/settings/WebsiteTexts.vue') },
     ],
   },
 ]

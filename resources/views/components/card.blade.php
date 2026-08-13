@@ -25,7 +25,7 @@
     $actionBtnClasses = $variant === 'red'
         ? 'bg-white text-[rgb(var(--secondary))]'
         : 'bg-[rgb(var(--secondary))] text-white';
-    $actionText = 'Details';
+    $actionText = text('card.details');
     // Compact sizing classes
     $cardSizing = $compact
         ? 'p-5 md:p-6 rounded-2xl md:rounded-3xl min-h-[180px] md:min-h-[200px]'
@@ -62,7 +62,7 @@
         @if($progress)
         <div class="{{ $progressSpacing }}">
             <div class="flex justify-between items-end {{ $progressLabelSize }} font-black uppercase tracking-widest opacity-80 italic">
-                <span>{{ $variant === 'red' ? 'Mission Progress' : 'Ready Status' }}</span>
+                <span>{{ $variant === 'red' ? text('card.mission_progress') : text('card.ready_status') }}</span>
                 <span>{{ $progress }}%</span>
             </div>
             <div class="{{ $progressBarSize }} w-full rounded-full overflow-hidden shadow-inner p-0.5 border {{ $variant === 'red' ? 'bg-white/20 border-white/5' : 'bg-[rgb(var(--surface))] border-[rgb(var(--surface-container-high))]' }}">

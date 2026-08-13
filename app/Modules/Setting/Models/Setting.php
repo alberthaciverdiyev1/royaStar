@@ -14,13 +14,14 @@ class Setting extends Model
         'address', 'email', 'phone',
         'facebook', 'instagram', 'youtube', 'twitter', 'telegram', 'whatsapp',
         'about_text', 'terms_text', 'privacy_text',
-        'maintenance_mode',
+        'maintenance_mode', 'texts',
     ];
 
     protected function casts(): array
     {
         return [
             'maintenance_mode' => 'boolean',
+            'texts' => 'array',
         ];
     }
 }

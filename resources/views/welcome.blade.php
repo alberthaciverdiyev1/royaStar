@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Welcome Star Student')
+@section('title', text('welcome.page_title'))
 
 @section('content')
 <section class="welcome-section">
@@ -12,10 +12,10 @@
 
     <div class="space-y-4 px-4">
         <h1 class="welcome-title">
-            You're a <span class="text-[rgb(var(--secondary))]">Star</span> Now!
+            {{ text('welcome.title_1') }} <span class="text-[rgb(var(--secondary))]">{{ text('welcome.title_hl') }}</span> {{ text('welcome.title_2') }}
         </h1>
         <p class="welcome-subtitle">
-            Your registration is successfully completed. Start your first lesson now by choosing an option below!
+            {{ text('welcome.desc') }}
         </p>
     </div>
 
@@ -25,8 +25,8 @@
                 <span class="material-symbols-outlined">auto_stories</span>
             </div>
             <div class="flex-grow">
-                <h4 class="card-title">Start Learning</h4>
-                <p class="card-subtitle">First Topic: Nouns</p>
+                <h4 class="card-title">{{ text('welcome.learn_title') }}</h4>
+                <p class="card-subtitle">{{ text('welcome.learn_desc') }}</p>
             </div>
             <span class="material-symbols-outlined ml-auto text-[rgb(var(--surface-container-high))] group-hover:text-[rgb(var(--secondary))] group-hover:translate-x-1.5 transition-all !text-xl">arrow_forward</span>
         </a>
@@ -36,15 +36,15 @@
                 <span class="material-symbols-outlined">person_pin</span>
             </div>
             <div class="flex-grow">
-                <h4 class="card-title">Setup Profile</h4>
-                <p class="card-subtitle">Set your avatar</p>
+                <h4 class="card-title">{{ text('welcome.profile_title') }}</h4>
+                <p class="card-subtitle">{{ text('welcome.profile_desc') }}</p>
             </div>
             <span class="material-symbols-outlined ml-auto text-[rgb(var(--surface-container-high))] group-hover:text-[rgb(var(--primary))] group-hover:translate-x-1.5 transition-all !text-xl">arrow_forward</span>
         </a>
     </div>
 
     <p class="text-2xs font-black text-[rgb(var(--on-surface-variant))/0.4] uppercase tracking-widest pt-8 px-6">
-        Navigate through the grammar galaxies using the navigation bar below
+        {{ text('welcome.footer_hint') }}
     </p>
 
     <div class="absolute -top-10 -left-10 w-40 h-40 bg-[rgb(var(--surface-container-lowest))/0.5] blur-3xl rounded-full -z-10"></div>

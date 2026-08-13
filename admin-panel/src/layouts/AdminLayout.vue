@@ -29,6 +29,7 @@ const navItems: NavItem[] = [
   { to: '/stars', label: 'Ulduzlar', icon: 'star' },
   { to: '/students', label: 'Şagirdlər', icon: 'student' },
   { to: '/users', label: 'İstifadəçilər', icon: 'users' },
+  { to: '/website-texts', label: 'Sayt Mətnləri', icon: 'text' },
 ]
 
 function isActive(item: NavItem): boolean {

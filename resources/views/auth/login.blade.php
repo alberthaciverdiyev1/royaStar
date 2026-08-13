@@ -1,5 +1,5 @@
 @extends('layouts.app', ['hideHeader' => true, 'hideNavbar' => true, 'isIndex' => true])
-@section('title', 'Login')
+@section('title', text('login.page_title'))
 
 @section('content')
 <div class="login-bg-decor">
@@ -19,28 +19,28 @@
             </div>
         </div>
         <h1 class="text-2xl md:text-4xl font-black text-[rgb(var(--on-surface))] tracking-tighter uppercase italic">
-            Teacher <span class="text-[rgb(var(--secondary))]">Roya's</span> Stars
+            {{ text('login.brand_prefix') }} <span class="text-[rgb(var(--secondary))]">{{ text('login.brand_name') }}</span> {{ text('login.brand_suffix') }}
         </h1>
-        <p class="text-[rgb(var(--on-surface))/0.5] font-medium mt-2 text-xs md:text-sm italic">Your journey to the stars starts here.</p>
+        <p class="text-[rgb(var(--on-surface))/0.5] font-medium mt-2 text-xs md:text-sm italic">{{ text('login.subtitle') }}</p>
     </div>
 
     <div class="login-card">
         <div class="mb-10">
-            <h2 class="text-2xl md:text-3xl font-black text-[rgb(var(--on-surface))] uppercase tracking-tight italic">Welcome Back</h2>
-            <p class="text-[rgb(var(--on-surface))/0.4] text-xs md:text-sm mt-1 font-medium italic">Please enter your credentials</p>
+            <h2 class="text-2xl md:text-3xl font-black text-[rgb(var(--on-surface))] uppercase tracking-tight italic">{{ text('login.welcome') }}</h2>
+            <p class="text-[rgb(var(--on-surface))/0.4] text-xs md:text-sm mt-1 font-medium italic">{{ text('login.credentials') }}</p>
         </div>
 
         <form method="POST" action="{{ route('login.post') }}" class="space-y-6">
             @csrf
             <div class="space-y-3">
-                <label class="text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))] ml-2">Email Address</label>
-                <input name="email" type="email" required value="{{ old('email') }}" class="login-input" placeholder="example@roya.edu" />
+                <label class="text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))] ml-2">{{ text('login.email') }}</label>
+                <input name="email" type="email" required value="{{ old('email') }}" class="login-input" placeholder="{{ text('login.email_placeholder') }}" />
                 @error('email') <span class="text-error text-3xs font-black uppercase tracking-widest">{{ $message }}</span> @enderror
             </div>
             <div class="space-y-3">
                 <div class="flex justify-between items-center px-2">
-                    <label class="text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))]">Password</label>
-                    <a href="#" class="text-2xs font-black text-[rgb(var(--secondary))] uppercase hover:underline tracking-widest">Forgot?</a>
+                    <label class="text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))]">{{ text('login.password') }}</label>
+                    <a href="#" class="text-2xs font-black text-[rgb(var(--secondary))] uppercase hover:underline tracking-widest">{{ text('login.forgot') }}</a>
                 </div>
                 <div class="relative flex items-center">
                     <input name="password" type="password" required class="login-input pr-12" placeholder="••••••••" id="login-password" />
@@ -64,13 +64,13 @@
             @endif
 
             <button type="submit" class="btn-login">
-                Login Now <span class="material-symbols-outlined !text-xl">rocket_launch</span>
+                {{ text('login.login_now') }} <span class="material-symbols-outlined !text-xl">rocket_launch</span>
             </button>
         </form>
 
         <div class="mt-10 pt-8 border-t border-[rgb(var(--surface-container-high))] text-center">
-            <p class="text-xs text-[rgb(var(--on-surface))/0.4] font-black uppercase tracking-widest">Don't have an account?</p>
-            <a class="inline-block mt-3 text-[rgb(var(--secondary))] font-black uppercase text-2xs tracking-widest hover:underline" href="{{ route('signup') }}">Sign up for Teacher Roya's Stars</a>
+            <p class="text-xs text-[rgb(var(--on-surface))/0.4] font-black uppercase tracking-widest">{{ text('login.no_account') }}</p>
+            <a class="inline-block mt-3 text-[rgb(var(--secondary))] font-black uppercase text-2xs tracking-widest hover:underline" href="{{ route('signup') }}">{{ text('login.signup_cta') }}</a>
         </div>
     </div>
 
@@ -79,13 +79,13 @@
             <div class="hub-icon-box bg-[rgb(var(--primary))/0.1] text-[rgb(var(--primary))]">
                 <span class="material-symbols-outlined">school</span>
             </div>
-            <span class="hub-text">Student Hub</span>
+            <span class="hub-text">{{ text('login.hub_student') }}</span>
         </div>
         <div class="hub-card group">
             <div class="hub-icon-box bg-[rgb(var(--tertiary))/0.1] text-[rgb(var(--tertiary))]">
                 <span class="material-symbols-outlined">workspace_premium</span>
             </div>
-            <span class="hub-text">Star Rewards</span>
+            <span class="hub-text">{{ text('login.hub_rewards') }}</span>
         </div>
     </div>
 </section>
