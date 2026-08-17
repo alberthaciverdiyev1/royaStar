@@ -65,6 +65,12 @@
   --primary-fixed: 239,108,108;
   --tertiary-container: 255,138,128;
 }
+/* Red theme: pure white page background (no pink/red tint) */
+[data-theme="red"] .celestial-bg,
+[data-theme="red"] .hero-section,
+[data-theme="red"] .login-bg-decor {
+  background: rgb(var(--surface));
+}
 
 .material-symbols-outlined {
   font-variation-settings: "FILL" 1;
