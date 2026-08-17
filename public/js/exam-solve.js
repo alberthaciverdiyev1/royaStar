@@ -1,40 +1,7 @@
 (function() {
-    var currentIndex = 0;
-    var wrapper = document.querySelector('.exam-wrapper');
-    var total = parseInt(wrapper ? wrapper.getAttribute('data-total-steps') : '0');
-    var questions = document.querySelectorAll('.exam-question');
-    var prevBtn = document.getElementById('prevBtn');
-    var nextBtn = document.getElementById('nextBtn');
-    var submitBtn = document.getElementById('submitBtn');
-    var progressBar = document.getElementById('progressBar');
-    var stepLabel = document.getElementById('currentStep');
-
-    window.navigateQuestion = function(dir) {
-        if (questions[currentIndex]) {
-            questions[currentIndex].style.display = 'none';
-        }
-        currentIndex += dir;
-        if (currentIndex < 0) currentIndex = 0;
-        if (currentIndex >= total) currentIndex = total - 1;
-
-        if (questions[currentIndex]) {
-            questions[currentIndex].style.display = '';
-        }
-
-        prevBtn.style.display = currentIndex > 0 ? '' : 'none';
-        if (currentIndex === total - 1) {
-            nextBtn.style.display = 'none';
-            submitBtn.style.display = '';
-        } else {
-            nextBtn.style.display = '';
-            submitBtn.style.display = 'none';
-        }
-
-        if (total > 0) {
-            progressBar.style.width = ((currentIndex + 1) / total * 100) + '%';
-        }
-        stepLabel.textContent = currentIndex + 1;
-    };
+    // All exam questions are displayed on a single page. The student scrolls
+    // through them, answers each one, then submits at the bottom.
+    // (This is exam-only — quizzes keep their step-by-step flow.)
 
     // Select an answer for regular questions. The student may change their pick
     // until the exam is submitted (no feedback shown mid-exam).
@@ -61,4 +28,12 @@
     window.setOpenAnswer = function(questionId, value) {
         document.getElementById('answer_' + questionId).value = value;
     };
+
+    // Scroll-to-top button for long single-page exams.
+    var scrollTopBtn = document.getElementById('scrollTopBtn');
+    if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 })();

@@ -99,3 +99,27 @@
 .feedback-box.wrong { background-color: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; }
 
 .options-list { display: flex; flex-direction: column; gap: 0.625rem; margin-top: 1rem; }
+
+/* All exam questions are shown on one page — add breathing room between cards */
+.exam-question { margin-bottom: 1.5rem; }
+.exam-question:last-child { margin-bottom: 0; }
+
+.exam-scroll-top {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 40;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    background: rgba(var(--primary), 1);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px -6px rgba(var(--primary), 0.4);
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+}
+.exam-scroll-top:hover { transform: translateY(-2px); }
+.exam-scroll-top:active { transform: scale(0.92); }

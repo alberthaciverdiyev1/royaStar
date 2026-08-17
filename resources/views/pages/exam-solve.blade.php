@@ -32,14 +32,11 @@
                 </h2>
             </div>
 
-            <!-- Progress & Step -->
+            <!-- Question count (all questions shown on one page) -->
             <div class="w-full sm:w-48 space-y-1">
-                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-white/90">
-                    <span>{{ text('exam_solve.progress') }}</span>
-                    <span><span id="currentStep">1</span> / {{ $totalSteps }}</span>
-                </div>
-                <div class="h-2.5 w-full bg-black/20 rounded-full overflow-hidden border border-white/20 p-0.5">
-                    <div id="progressBar" class="h-full rounded-full bg-[rgb(var(--tertiary))] transition-all duration-500" style="width: {{ $totalSteps > 0 ? (1 / $totalSteps * 100) : 0 }}%"></div>
+                <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-white/90 sm:justify-end">
+                    <span class="material-symbols-outlined !text-sm">format_list_numbered</span>
+                    <span>{{ $totalSteps }} {{ text('exam_solve.questions') }}</span>
                 </div>
             </div>
         </div>
@@ -50,7 +47,7 @@
         @csrf
 
         @foreach($questions as $index => $q)
-        <section class="exam-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}" style="{{ $index > 0 ? 'display:none' : '' }}">
+        <section class="exam-question" data-index="{{ $index }}" data-type="{{ $q['type'] }}">
             <div class="bg-[rgb(var(--surface-container-lowest))] border-2 border-[rgb(var(--surface-container-high))] rounded-2xl p-4 sm:p-6 shadow-md space-y-4">
 
                 <!-- Question Header & Text -->
@@ -99,24 +96,22 @@
         </section>
         @endforeach
 
-        <!-- Navigation Buttons -->
-        <section class="pt-2">
-            <div class="flex items-center gap-3">
-                <button type="button" id="prevBtn" onclick="navigateQuestion(-1)" style="display:none" class="flex-1 bg-[rgb(var(--surface-container-high))] text-[rgb(var(--on-surface))] hover:bg-[rgb(var(--surface-container-high))/0.8] rounded-full font-black uppercase tracking-widest py-3 px-5 active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    <span class="material-symbols-outlined !text-lg">arrow_back</span>
-                    {{ text('exam_solve.previous') }}
-                </button>
-                <button type="button" id="nextBtn" onclick="navigateQuestion(1)" class="flex-1 bg-[rgb(var(--primary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-3 px-5 shadow-lg shadow-[rgb(var(--primary))/0.2] active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    {{ text('exam_solve.next') }}
-                    <span class="material-symbols-outlined !text-lg">arrow_forward</span>
-                </button>
-                <button type="submit" id="submitBtn" style="display:none" class="flex-1 bg-[rgb(var(--secondary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-3 px-5 shadow-lg shadow-[rgb(var(--secondary))/0.2] active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 text-xs">
-                    {{ text('exam_solve.submit') }}
-                    <span class="material-symbols-outlined !text-lg">rocket_launch</span>
-                </button>
-            </div>
+        <!-- Submit -->
+        <section class="pt-4 pb-16">
+            <button type="submit" id="submitBtn" class="w-full flex items-center justify-center gap-1.5 bg-[rgb(var(--secondary))] text-white hover:opacity-95 rounded-full font-black uppercase tracking-widest py-4 px-5 shadow-lg shadow-[rgb(var(--secondary))/0.2] active:scale-95 transition-all text-sm">
+                {{ text('exam_solve.submit') }}
+                <span class="material-symbols-outlined !text-xl">rocket_launch</span>
+            </button>
+            <p class="mt-3 text-center text-[11px] font-bold text-[rgb(var(--on-surface-variant))/0.7]">
+                {{ text('exam_solve.all_visible_hint') }}
+            </p>
         </section>
     </form>
+
+    <!-- Scroll to top (long page with all questions) -->
+    <button type="button" id="scrollTopBtn" class="exam-scroll-top" aria-label="Scroll to top">
+        <span class="material-symbols-outlined !text-2xl">arrow_upward</span>
+    </button>
 
 </div>
 @endsection
