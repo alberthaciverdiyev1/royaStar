@@ -27,6 +27,12 @@ class ProfileController extends Controller
         $student = $user?->student;
         $selectedMonth = $request->input('month', now()->format('Y-m'));
 
+        // Guard against malformed month query params that would crash Carbon::parse
+        // further down (e.g. ?month=invalid or ?month=2026-13) and return a 500.
+        if (!is_string($selectedMonth) || !preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $selectedMonth)) {
+            $selectedMonth = 'all';
+        }
+
         // Generate past 6 months list + All Time option
         $availableMonths = [
             'all' => 'All Time (All Stars)',

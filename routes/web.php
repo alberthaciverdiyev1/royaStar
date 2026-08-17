@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     // Lesson
     Route::get('/lesson/{id}', [CurriculumController::class, 'lesson'])->name('lesson');
     Route::post('/lesson/{id}/rate', [CurriculumController::class, 'lessonRate'])->name('lesson.rate');
+    Route::post('/lesson/{id}/progress', [CurriculumController::class, 'lessonProgress'])->name('lesson.progress');
 
     // Quiz
     Route::get('/quiz/{id}', [QuizController::class, 'quiz'])->name('quiz');

@@ -6,6 +6,7 @@ use App\Modules\User\Models\User;
 use App\Modules\Student\Models\Student;
 use App\Modules\Grade\Models\Grade;
 use App\Modules\City\Models\City;
+use App\Modules\Star\Services\StarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,10 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly StarService $starService,
+    ) {}
+
     public function login()
     {
         if (Auth::check()) {
@@ -47,6 +52,12 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
+
+        // Web students earn the daily-login / streak stars too (the API login
+        // flow already does this via LoginAction).
+        if ($user->hasRole('student')) {
+            $this->starService->awardDailyLogin($user->id);
+        }
 
         $request->session()->regenerate();
 

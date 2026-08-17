@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return base;
     })();
 
-    Plyr.setup('.js-plyr-player', {
+    var players = Plyr.setup('.js-plyr-player', {
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
         youtube: {
             noCookie: true,
@@ -27,6 +27,54 @@ document.addEventListener('DOMContentLoaded', function() {
             modestbranding: 1
         }
     });
+
+    // ── Lesson watch-progress tracking ──
+    // The web lesson page reports watch progress so the student earns the
+    // "lesson completed" star (and the lesson view counter) without needing an
+    // API token. Progress is throttled; reaching 100% marks the lesson done.
+    (function() {
+        var lessonId = (document.querySelector('[data-lesson-id]') || {}).getAttribute
+            ? document.querySelector('[data-lesson-id]').getAttribute('data-lesson-id')
+            : null;
+        var progressUrl = (document.querySelector('[data-progress-url]') || {}).getAttribute
+            ? document.querySelector('[data-progress-url]').getAttribute('data-progress-url')
+            : null;
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (!lessonId || !progressUrl || !csrfMeta || !players.length) return;
+
+        var csrfToken = csrfMeta.getAttribute('content');
+        var lastReported = 0;
+
+        function reportProgress(progress) {
+            progress = Math.max(0, Math.min(100, Math.round(progress)));
+            // Don't report the same or a lower value again; throttle non-100 updates.
+            if (progress < lastReported) return;
+            if (progress < 100 && progress - lastReported < 5) return;
+            lastReported = progress;
+
+            fetch(progressUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ progress: progress }),
+            }).catch(function() { /* non-fatal: keep watching */ });
+        }
+
+        players.forEach(function(player) {
+            player.on('timeupdate', function() {
+                var dur = player.duration || 0;
+                if (dur > 0) {
+                    reportProgress((player.currentTime / dur) * 100);
+                }
+            });
+            player.on('ended', function() {
+                reportProgress(100);
+            });
+        });
+    })();
 
     // ── Rating star handler ──
     var stars = document.querySelectorAll('.lesson-star-btn');

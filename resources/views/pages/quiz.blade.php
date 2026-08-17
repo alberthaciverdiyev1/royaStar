@@ -7,15 +7,18 @@
 @endpush
 
 @section('content')
-<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}" data-i18n='@json([
-    'checking' => text('quiz.checking'),
-    'correct_title' => text('quiz.correct_title'),
-    'correct_sub' => text('quiz.correct_sub'),
-    'incorrect_title' => text('quiz.incorrect_title'),
-    'incorrect_sub' => text('quiz.incorrect_sub'),
-    'incorrect_open_sub' => text('quiz.incorrect_open_sub'),
-    'explanation_video' => text('quiz.explanation_video'),
-])'>
+@php
+    $quizI18n = [
+        'checking' => text('quiz.checking'),
+        'correct_title' => text('quiz.correct_title'),
+        'correct_sub' => text('quiz.correct_sub'),
+        'incorrect_title' => text('quiz.incorrect_title'),
+        'incorrect_sub' => text('quiz.incorrect_sub'),
+        'incorrect_open_sub' => text('quiz.incorrect_open_sub'),
+        'explanation_video' => text('quiz.explanation_video'),
+    ];
+@endphp
+<div class="quiz-wrapper space-y-4 sm:space-y-6" data-total-steps="{{ $totalSteps }}" data-check-url="{{ route('quiz.check-answer', $quiz->id) }}" data-i18n='@json($quizI18n)'>
 
     <!-- Compact Header Banner -->
     <section class="quiz-hero-banner group">

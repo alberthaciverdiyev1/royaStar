@@ -7,13 +7,16 @@
 @endpush
 
 @section('content')
-<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8" data-i18n='@json([
-    'rate_thanks' => text('lesson.rate_thanks'),
-    'rate_success_desc' => text('lesson.rate_success_desc'),
-    'rate_submit' => text('lesson.rate_submit'),
-    'rate_error_generic' => text('lesson.rate_error_generic'),
-    'rate_error_retry' => text('lesson.rate_error_retry'),
-])'>
+@php
+    $lessonI18n = [
+        'rate_thanks' => text('lesson.rate_thanks'),
+        'rate_success_desc' => text('lesson.rate_success_desc'),
+        'rate_submit' => text('lesson.rate_submit'),
+        'rate_error_generic' => text('lesson.rate_error_generic'),
+        'rate_error_retry' => text('lesson.rate_error_retry'),
+    ];
+@endphp
+<div class="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-6 space-y-8" data-i18n='@json($lessonI18n)' data-lesson-id="{{ $lesson->id }}" data-progress-url="{{ route('lesson.progress', $lesson->id) }}">
 
     <!-- Celestial Hero Cover -->
     <section class="lesson-hero-cover group">
