@@ -30,7 +30,7 @@
   --tertiary-container: 255,128,171;
 }
 [data-theme="yellow"] {
-  --primary: 212,172,13;
+  --primary: 255,235,60;
   --secondary: 180,130,0;
   --tertiary: 255,202,40;
   --surface: 255,249,230;
@@ -54,14 +54,14 @@
   --tertiary-container: 165,214,167;
 }
 [data-theme="red"] {
-  --primary: 211,47,47;
+  --primary: 219,11,23;
   --secondary: 183,28,28;
   --tertiary: 239,83,80;
-  --surface: 255,235,235;
+  --surface: 255,255,255;
   --on-surface: 50,10,10;
   --on-surface-variant: 110,40,40;
   --surface-container-high: 255,205,205;
-  --surface-container-lowest: 255,245,245;
+  --surface-container-lowest: 255,255,255;
   --primary-fixed: 239,108,108;
   --tertiary-container: 255,138,128;
 }
@@ -1601,9 +1601,9 @@ select.signup-input { appearance: none; background-image: url("data:image/svg+xm
 .profile-theme.active .material-symbols-outlined { opacity: 1; }
 .profile-theme--default { background: linear-gradient(135deg, rgb(72,133,193), rgb(211,47,47)); }
 .profile-theme--pink { background: linear-gradient(135deg, rgb(255,64,129), rgb(233,30,99)); }
-.profile-theme--yellow { background: linear-gradient(135deg, rgb(212,172,13), rgb(180,130,0)); }
+.profile-theme--yellow { background: linear-gradient(135deg, rgb(255,235,60), rgb(180,130,0)); }
 .profile-theme--green { background: linear-gradient(135deg, rgb(46,160,67), rgb(27,128,69)); }
-.profile-theme--red { background: linear-gradient(135deg, rgb(211,47,47), rgb(183,28,28)); }
+.profile-theme--red { background: linear-gradient(135deg, rgb(219,11,23), rgb(183,28,28)); }
 
 /* ─── Logout ─── */
 .profile-btn-logout {
