@@ -171,7 +171,7 @@
                         @php
                             $isUnlocked = in_array($star->id, $earnedStarIds);
                             $starTitle = $star->name->en ?? $star->type;
-                            $starDetails = $star->description ?? '';
+                            $starDetails = $star->description->en ?? '';
                         @endphp
                         <div class="badge-card {{ $isUnlocked ? 'unlocked' : 'locked' }} badge-item-card" data-status="{{ $isUnlocked ? 'unlocked' : 'locked' }}">
                             <div class="flex items-start justify-between gap-3">
