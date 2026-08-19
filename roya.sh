@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
 #  RoyaStar Production Deploy Script
-#  Server: 188.132.197.77  |  Path: /var/www/royaStar
 #  Node:   nvm v20.20.1 (sistem v12 ile Vite build OLMAZ!)
 #  Usage:  sudo bash /root/roya.sh [--skip-backup]
 # ============================================================

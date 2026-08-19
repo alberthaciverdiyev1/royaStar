@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Plyr player setup. If the CDN script fails to load (blocked/slow), the
     // rating + progress features below must still work — so guard it.
+    // NOTE: Plyr.setup() returns `null` (not an empty array, and without
+    // throwing) when there are no .js-plyr-player elements — e.g. a lesson
+    // with no video. Normalize it to an empty array so `players.length`
+    // below never throws.
     var players = [];
     if (typeof Plyr !== 'undefined') {
         try {
@@ -31,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     iv_load_policy: 3,
                     modestbranding: 1
                 }
-            });
+            }) || [];
         } catch (e) {
             players = [];
         }
@@ -49,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ? document.querySelector('[data-progress-url]').getAttribute('data-progress-url')
             : null;
         var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-        if (!lessonId || !progressUrl || !csrfMeta || !players.length) return;
+        if (!lessonId || !progressUrl || !csrfMeta || !players || !players.length) return;
 
         var csrfToken = csrfMeta.getAttribute('content');
         var lastReported = 0;
@@ -86,47 +90,57 @@ document.addEventListener('DOMContentLoaded', function() {
     })();
 
     // ── Rating star handler ──
-    var stars = document.querySelectorAll('.lesson-star-btn');
+    // The selected rating is tracked in `selectedRating` (independent of the
+    // hidden `ratingInput`), and stars are matched by their `data-index`
+    // attribute rather than by position in the NodeList. This keeps the form
+    // working even if the hidden input is missing/renamed, and avoids the
+    // "only the clicked star lights up" symptom if the NodeList order ever
+    // doesn't match the visual order. No optional chaining here so the whole
+    // script still parses on older browsers.
+    var stars = Array.prototype.slice.call(document.querySelectorAll('#rateForm .lesson-star-btn'));
     var input = document.getElementById('ratingInput');
-    if (stars.length && input) {
-        function resetStars(selected) {
-            stars.forEach(function(s, i) {
-                var icon = s.querySelector('.material-symbols-outlined');
-                if (i < selected) {
-                    icon.style.fontVariationSettings = "'FILL' 1";
-                    s.classList.add('active');
-                } else {
-                    icon.style.fontVariationSettings = "'FILL' 0";
-                    s.classList.remove('active');
-                }
-            });
-        }
+    var selectedRating = 0;
 
-        stars.forEach(function(star, idx) {
-            star.addEventListener('click', function() {
-                var val = idx + 1;
-                input.value = val;
-                resetStars(val);
-            });
-            star.addEventListener('mouseenter', function() {
-                stars.forEach(function(s, i) {
-                    var icon = s.querySelector('.material-symbols-outlined');
-                    icon.style.fontVariationSettings = i <= idx ? "'FILL' 1" : "'FILL' 0";
-                });
-            });
-            star.addEventListener('mouseleave', function() {
-                var selected = parseInt(input?.value || 0);
-                stars.forEach(function(s, i) {
-                    var icon = s.querySelector('.material-symbols-outlined');
-                    if (i >= selected) {
-                        icon.style.fontVariationSettings = "'FILL' 0";
-                    } else {
-                        icon.style.fontVariationSettings = "'FILL' 1";
-                    }
-                });
-            });
+    function resetStars(selected) {
+        selectedRating = selected;
+        if (input) { input.value = selected ? String(selected) : ''; }
+        stars.forEach(function(s) {
+            var idx = parseInt(s.getAttribute('data-index'), 10) || 0;
+            var icon = s.querySelector('.material-symbols-outlined');
+            if (!icon) return;
+            if (idx && idx <= selected) {
+                icon.style.fontVariationSettings = "'FILL' 1";
+                s.classList.add('active');
+            } else {
+                icon.style.fontVariationSettings = "'FILL' 0";
+                s.classList.remove('active');
+            }
         });
     }
+
+    stars.forEach(function(star) {
+        star.addEventListener('click', function() {
+            var val = parseInt(star.getAttribute('data-index'), 10) || 0;
+            resetStars(val);
+        });
+        star.addEventListener('mouseenter', function() {
+            var idx = parseInt(star.getAttribute('data-index'), 10) || 0;
+            stars.forEach(function(s) {
+                var sIdx = parseInt(s.getAttribute('data-index'), 10) || 0;
+                var icon = s.querySelector('.material-symbols-outlined');
+                if (!icon) return;
+                icon.style.fontVariationSettings = sIdx && sIdx <= idx ? "'FILL' 1" : "'FILL' 0";
+            });
+        });
+        star.addEventListener('mouseleave', function() {
+            stars.forEach(function(s) {
+                var sIdx = parseInt(s.getAttribute('data-index'), 10) || 0;
+                var icon = s.querySelector('.material-symbols-outlined');
+                if (!icon) return;
+                icon.style.fontVariationSettings = sIdx && sIdx <= selectedRating ? "'FILL' 1" : "'FILL' 0";
+            });
+        });
+    });
 
     // ── JS form submit + rocket animation ──
     var form = document.getElementById('rateForm');
@@ -138,7 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
 
             // A rating OR a written review is enough (the backend allows either).
-            var rating = input ? input.value : '';
+            // `rating` comes from the tracked star clicks, falling back to the
+            // hidden input for safety.
+            var rating = selectedRating || (input ? input.value : '') || '';
             var reviewText = reviewInput ? reviewInput.value.trim() : '';
             if (!rating && !reviewText) {
                 var p = form.querySelector('.lesson-star-btn');
@@ -181,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             '<p class="text-lg font-black text-[rgb(var(--on-surface))]">' + i18n.rate_thanks + '</p>' +
                             '<p class="text-xs font-semibold text-[rgb(var(--on-surface))/0.6]">' + i18n.rate_success_desc + '</p>' +
                             '<div class="flex justify-center items-center gap-1 pt-2">' +
-                                Array.from({length: parseInt(rating)}, function() {
+                                Array.from({length: parseInt(rating, 10) || 0}, function() {
                                     return '<span class="material-symbols-outlined !text-3xl text-[rgb(var(--tertiary))]" style="font-variation-settings:\'FILL\' 1">star</span>';
                                 }).join('') +
                             '</div>' +
@@ -211,6 +227,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('spark4'),
             document.getElementById('spark5'),
         ];
+
+        // Never let a missing element abort the success message below.
+        if (!container || !rocket || !submitBtn) return;
 
         var btnRect = submitBtn.getBoundingClientRect();
         var startX = btnRect.left + btnRect.width / 2;
