@@ -2,7 +2,7 @@
 :root {
   --primary: 72,133,193;
   --secondary: 211,47,47;
-  --tertiary: 255,179,0;
+    --tertiary: 255,235,60;
   --surface: 243,246,255;
   --on-surface: 33,48,65;
   --on-surface-variant: 78,93,111;
@@ -20,7 +20,7 @@
 [data-theme="pink"] {
   --primary: 255,64,129;
   --secondary: 233,30,99;
-  --tertiary: 240,98,146;
+    --tertiary: 255,235,60;
   --surface: 255,240,245;
   --on-surface: 61,0,25;
   --on-surface-variant: 136,14,79;
@@ -30,21 +30,21 @@
   --tertiary-container: 255,128,171;
 }
 [data-theme="yellow"] {
-  --primary: 255,235,60;
-  --secondary: 180,130,0;
-  --tertiary: 255,202,40;
-  --surface: 255,249,230;
-  --on-surface: 46,34,0;
-  --on-surface-variant: 110,85,10;
-  --surface-container-high: 255,236,179;
-  --surface-container-lowest: 255,252,240;
-  --primary-fixed: 255,213,79;
-  --tertiary-container: 255,218,102;
+      --primary: 255,235,60;
+      --secondary: 255,235,60;
+      --tertiary: 255,235,60;
+      --surface: #000000;
+      --on-surface: 46,34,0;
+      --on-surface-variant: 110,85,10;
+      --surface-container-high: 255,236,179;
+      --surface-container-lowest: 255,255,255;
+      --primary-fixed: 255,213,79;
+      --tertiary-container: 255,218,102;
 }
 [data-theme="green"] {
   --primary: 46,160,67;
   --secondary: 27,128,69;
-  --tertiary: 102,187,106;
+    --tertiary: 255,235,60;
   --surface: 235,250,235;
   --on-surface: 0,40,10;
   --on-surface-variant: 46,100,50;
@@ -56,7 +56,7 @@
 [data-theme="red"] {
   --primary: 219,11,23;
   --secondary: 183,28,28;
-  --tertiary: 239,83,80;
+    --tertiary: 255,235,60;
   --surface: 255,255,255;
   --on-surface: 50,10,10;
   --on-surface-variant: 110,40,40;
@@ -69,6 +69,12 @@
 [data-theme="red"] .celestial-bg,
 [data-theme="red"] .hero-section,
 [data-theme="red"] .login-bg-decor {
+  background: rgb(var(--surface));
+}
+/* Yellow theme: pure white page background (no yellow/cream tint) */
+[data-theme="yellow"] .celestial-bg,
+[data-theme="yellow"] .hero-section,
+[data-theme="yellow"] .login-bg-decor {
   background: rgb(var(--surface));
 }
 
