@@ -17,16 +17,25 @@ document.addEventListener('DOMContentLoaded', function() {
         return base;
     })();
 
-    var players = Plyr.setup('.js-plyr-player', {
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
-        youtube: {
-            noCookie: true,
-            rel: 0,
-            showinfo: 0,
-            iv_load_policy: 3,
-            modestbranding: 1
+    // Plyr player setup. If the CDN script fails to load (blocked/slow), the
+    // rating + progress features below must still work — so guard it.
+    var players = [];
+    if (typeof Plyr !== 'undefined') {
+        try {
+            players = Plyr.setup('.js-plyr-player', {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+                youtube: {
+                    noCookie: true,
+                    rel: 0,
+                    showinfo: 0,
+                    iv_load_policy: 3,
+                    modestbranding: 1
+                }
+            });
+        } catch (e) {
+            players = [];
         }
-    });
+    }
 
     // ── Lesson watch-progress tracking ──
     // The web lesson page reports watch progress so the student earns the
@@ -128,8 +137,10 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            var rating = input.value;
-            if (!rating) {
+            // A rating OR a written review is enough (the backend allows either).
+            var rating = input ? input.value : '';
+            var reviewText = reviewInput ? reviewInput.value.trim() : '';
+            if (!rating && !reviewText) {
                 var p = form.querySelector('.lesson-star-btn');
                 if (p) {
                     p.style.animation = 'shake 0.4s ease';
@@ -154,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Accept': 'application/json',
                 },
                 body: JSON.stringify({
-                    rating: parseInt(rating),
+                    rating: rating ? parseInt(rating, 10) : null,
                     review: reviewInput ? reviewInput.value : '',
                 }),
             })
