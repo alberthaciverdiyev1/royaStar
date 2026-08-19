@@ -93,8 +93,11 @@ class CurriculumController extends Controller
         Lesson::findOrFail($id);
 
         $request->validate([
-            'rating' => 'required_without:review|integer|min:1|max:5',
-            'review' => 'required_without:rating|string|max:1000',
+            // A rating OR a written review is accepted. `nullable` lets us send
+            // rating:null when only a comment is given (and review:null when
+            // only stars are given) without tripping integer/string rules.
+            'rating' => 'required_without:review|nullable|integer|min:1|max:5',
+            'review' => 'required_without:rating|nullable|string|max:1000',
         ]);
 
         $user = Auth::user();
