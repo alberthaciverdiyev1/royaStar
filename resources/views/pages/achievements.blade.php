@@ -111,8 +111,8 @@
                         @foreach($earnedUserStars->take(5) as $userStar)
                         @php
                             $starObj = $userStar->star;
-                            $starName = $starObj?->name ?? text('achieve.star_default_name');
-                            $starDesc = $starObj?->description ?? '';
+                            $starName = $starObj?->name->en ?? text('achieve.star_default_name');
+                            $starDesc = $starObj?->description->en ?? '';
                         @endphp
                         <div class="sidebar-widget-card p-4 flex items-center justify-between gap-4 transition-all">
                             <div class="flex items-center gap-3.5">
