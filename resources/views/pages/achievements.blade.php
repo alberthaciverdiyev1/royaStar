@@ -170,7 +170,7 @@
                         @foreach($allStars as $star)
                         @php
                             $isUnlocked = in_array($star->id, $earnedStarIds);
-                            $starTitle = $star->name ?? $star->type;
+                            $starTitle = $star->name->en ?? $star->type;
                             $starDetails = $star->description ?? '';
                         @endphp
                         <div class="badge-card {{ $isUnlocked ? 'unlocked' : 'locked' }} badge-item-card" data-status="{{ $isUnlocked ? 'unlocked' : 'locked' }}">
