@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { examsApi, type Exam } from '../../api/exams'
-import { fromContentBlock } from '../../api/questions'
+import QuestionContentView from '../../components/QuestionContentView.vue'
 import Toast from '../../components/Toast.vue'
 import { showToast } from '../../stores/toast'
 
@@ -122,7 +122,8 @@ onMounted(async () => {
           <div class="flex items-start gap-3">
             <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-semibold text-indigo-600">{{ i + 1 }}</span>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900">{{ fromContentBlock(q.question) || `Sual #${q.id}` }}</p>
+              <QuestionContentView :blocks="q.question" />
+              <p v-if="!q.question?.length" class="text-sm font-medium text-gray-900">Sual #{{ q.id }}</p>
               <div class="mt-1 flex flex-wrap items-center gap-2">
                 <span :class="q.type === 'open' ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'" class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium">
                   {{ q.type === 'open' ? 'Açıq' : 'Test' }}

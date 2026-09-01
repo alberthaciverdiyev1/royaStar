@@ -10,6 +10,7 @@ import type { Column } from '../../components/Table.vue'
 import Pagination from '../../components/Pagination.vue'
 import SearchInput from '../../components/SearchInput.vue'
 import Modal from '../../components/Modal.vue'
+import QuestionContentView from '../../components/QuestionContentView.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import Toast from '../../components/Toast.vue'
 import { showToast } from '../../stores/toast'
@@ -460,8 +461,9 @@ const columns: Column[] = [
                 @change="toggleQuestion(q.id)"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <span class="text-sm text-gray-700 flex-1 min-w-0 truncate">
-                {{ q.question?.[0]?.content || `Sual #${q.id}` }}
+              <span class="flex-1 min-w-0 flex items-center gap-2">
+                <QuestionContentView :blocks="q.question" compact />
+                <span v-if="!q.question?.length" class="truncate text-sm text-gray-700">Sual #{{ q.id }}</span>
               </span>
               <span class="shrink-0 text-xs text-gray-400">{{ q.type === 'open' ? 'Açıq' : 'Test' }}</span>
             </label>

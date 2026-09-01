@@ -10,6 +10,7 @@ import {
 } from '../../api/questions'
 import Table from '../../components/Table.vue'
 import type { Column } from '../../components/Table.vue'
+import QuestionContentView from '../../components/QuestionContentView.vue'
 import Pagination from '../../components/Pagination.vue'
 import SearchInput from '../../components/SearchInput.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
@@ -131,10 +132,8 @@ const columns: Column[] = [
   {
     key: 'question',
     label: 'Sual',
-    render: (q: any) => {
-      const text = fromContentBlock(q.question)
-      return text.length > 60 ? text.slice(0, 60) + '...' : text
-    },
+    render: (q: any) =>
+      h(QuestionContentView, { blocks: q.question, compact: true }),
   },
   {
     key: 'lesson_name',
