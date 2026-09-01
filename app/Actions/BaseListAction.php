@@ -87,6 +87,12 @@ abstract class BaseListAction
         $this->applyFilters($query, $params);
         $this->applyOrder($query, $this->defaultOrder(), $params);
 
-        return $query->paginate((int) config('pagination.per_page', 20));
+        // Respect the per_page param when provided, otherwise fall back to the configured default.
+        $perPage = (int) config('pagination.per_page', 20);
+        if (!empty($params['per_page'])) {
+            $perPage = (int) $params['per_page'];
+        }
+
+        return $query->paginate($perPage);
     }
 }

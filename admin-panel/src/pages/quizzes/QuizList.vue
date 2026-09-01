@@ -49,6 +49,9 @@ const modalLessons = ref<Lesson[]>([])
 
 // Available questions for selected lesson in modal
 const availableQuestions = ref<Question[]>([])
+const availableMeta = ref<PaginationMeta | null>(null)
+const availablePage = ref(1)
+const questionLoading = ref(false)
 
 // Delete state
 const deleteTarget = ref<Quiz | null>(null)
@@ -101,11 +104,37 @@ watch(modalLessonId, async (id) => {
 })
 
 async function loadQuestionsForLesson(lessonId: number) {
+  availableQuestions.value = []
+  availableMeta.value = null
+  availablePage.value = 1
+  questionLoading.value = true
   try {
-    const res = await questionsApi.list({ lesson_id: lessonId, per_page: 500 })
+    const res = await questionsApi.list({ lesson_id: lessonId, per_page: 15, page: 1 })
     availableQuestions.value = res.data
+    availableMeta.value = res.meta
   } catch {
     availableQuestions.value = []
+    availableMeta.value = null
+  } finally {
+    questionLoading.value = false
+  }
+}
+
+async function loadMoreQuestions() {
+  if (!modalLessonId.value || questionLoading.value || !availableMeta.value) return
+  const nextPage = availablePage.value + 1
+  if (nextPage > availableMeta.value.last_page) return
+
+  questionLoading.value = true
+  try {
+    const res = await questionsApi.list({ lesson_id: modalLessonId.value, per_page: 15, page: nextPage })
+    availableQuestions.value = [...availableQuestions.value, ...res.data]
+    availableMeta.value = res.meta
+    availablePage.value = nextPage
+  } catch {
+    showToast({ type: 'error', text: 'Daha çox sual yüklənərkən xəta baş verdi' })
+  } finally {
+    questionLoading.value = false
   }
 }
 
@@ -411,26 +440,41 @@ const columns: Column[] = [
         <label class="block text-sm font-medium text-gray-700 mb-2">
           Suallar ({{ selectedQuestionIds.length }} seçildi)
         </label>
-        <div v-if="availableQuestions.length === 0" class="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-4 text-center text-sm text-gray-400">
+        <div v-if="questionLoading && availableQuestions.length === 0" class="flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50/50 p-4 text-sm text-gray-400">
+          <span class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+          Suallar yüklənir...
+        </div>
+        <div v-else-if="availableQuestions.length === 0" class="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-4 text-center text-sm text-gray-400">
           Bu dərsdə heç bir sual tapılmadı
         </div>
-        <div v-else class="max-h-60 overflow-y-auto rounded-xl border border-gray-200 divide-y divide-gray-100">
-          <label
-            v-for="q in availableQuestions"
-            :key="q.id"
-            class="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
+        <div v-else class="rounded-xl border border-gray-200 divide-y divide-gray-100">
+          <div class="max-h-60 overflow-y-auto divide-y divide-gray-100">
+            <label
+              v-for="q in availableQuestions"
+              :key="q.id"
+              class="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors"
+            >
+              <input
+                type="checkbox"
+                :checked="selectedQuestionIds.includes(q.id)"
+                @change="toggleQuestion(q.id)"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <span class="text-sm text-gray-700 flex-1 min-w-0 truncate">
+                {{ q.question?.[0]?.content || `Sual #${q.id}` }}
+              </span>
+              <span class="shrink-0 text-xs text-gray-400">{{ q.type === 'open' ? 'Açıq' : 'Test' }}</span>
+            </label>
+          </div>
+          <button
+            v-if="availableMeta && availablePage < availableMeta.last_page"
+            @click="loadMoreQuestions"
+            :disabled="questionLoading"
+            class="flex w-full items-center justify-center gap-2 rounded-b-xl bg-gray-50 px-4 py-2.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
           >
-            <input
-              type="checkbox"
-              :checked="selectedQuestionIds.includes(q.id)"
-              @change="toggleQuestion(q.id)"
-              class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-            />
-            <span class="text-sm text-gray-700 flex-1 min-w-0 truncate">
-              {{ q.question?.[0]?.content || `Sual #${q.id}` }}
-            </span>
-            <span class="shrink-0 text-xs text-gray-400">{{ q.type === 'open' ? 'Açıq' : 'Test' }}</span>
-          </label>
+            <span v-if="questionLoading" class="h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+            {{ questionLoading ? 'Yüklənir...' : 'Daha çox yüklə' }}
+          </button>
         </div>
       </div>
 
