@@ -54,6 +54,23 @@ const availableMeta = ref<PaginationMeta | null>(null)
 const availablePage = ref(1)
 const questionLoading = ref(false)
 
+// Question preview modal state
+const previewQuestion = ref<Question | null>(null)
+
+const DIFFICULTY_OPTIONS: Record<number, string> = {
+  1: 'Başlanğıc',
+  2: 'Elementar',
+  3: 'Orta',
+  4: 'Qabaqcıl',
+  5: 'Ekspert',
+}
+
+function getVariantContent(q: Question, letter: string): string {
+  const field = `variant_${letter.toLowerCase()}` as keyof Question
+  const blocks = q[field] as { type: string; content: string }[] | null
+  return blocks?.[0]?.content || ''
+}
+
 // Delete state
 const deleteTarget = ref<Quiz | null>(null)
 const deleting = ref(false)
@@ -466,6 +483,14 @@ const columns: Column[] = [
                 <span v-if="!q.question?.length" class="truncate text-sm text-gray-700">Sual #{{ q.id }}</span>
               </span>
               <span class="shrink-0 text-xs text-gray-400">{{ q.type === 'open' ? 'Açıq' : 'Test' }}</span>
+              <button
+                type="button"
+                @click.stop="previewQuestion = q"
+                title="Sualı böyük gör"
+                class="rounded-lg border border-gray-200 px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors"
+              >
+                Göstər
+              </button>
             </label>
           </div>
           <button
@@ -493,6 +518,54 @@ const columns: Column[] = [
           class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
           {{ saving ? 'Saxlanılır...' : editingQuiz ? 'Yadda saxla' : 'Yarat' }}
+        </button>
+      </div>
+    </div>
+  </Modal>
+
+  <!-- Question Preview Modal -->
+  <Modal
+    :open="!!previewQuestion"
+    :title="'Sualın tam görünüşü'"
+    size="lg"
+    @close="previewQuestion = null"
+  >
+    <div v-if="previewQuestion" class="space-y-4">
+      <!-- Badges -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span :class="previewQuestion.type === 'open' ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'" class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium">
+          {{ previewQuestion.type === 'open' ? 'Açıq' : 'Test' }}
+        </span>
+        <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+          Çətinlik: {{ DIFFICULTY_OPTIONS[previewQuestion.difficulty_level] || previewQuestion.difficulty_level }}
+        </span>
+        <span v-if="previewQuestion.right_answer" class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+          Cavab: {{ previewQuestion.right_answer.toUpperCase() }}
+        </span>
+      </div>
+
+      <!-- Question text + image/audio -->
+      <QuestionContentView :blocks="previewQuestion.question" />
+
+      <!-- Test variants -->
+      <div v-if="previewQuestion.type !== 'open'" class="space-y-1.5">
+        <template v-for="letter in ['A', 'B', 'C', 'D', 'E']" :key="letter">
+          <div
+            v-if="getVariantContent(previewQuestion, letter)"
+            class="flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2"
+          >
+            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-600">{{ letter }}</span>
+            <span class="text-sm text-gray-800">{{ getVariantContent(previewQuestion, letter) }}</span>
+          </div>
+        </template>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button
+          @click="previewQuestion = null"
+          class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          Bağla
         </button>
       </div>
     </div>
