@@ -183,9 +183,9 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <!-- Bank -->
-      <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
+      <div class="rounded-xl border border-gray-200 bg-white overflow-hidden lg:col-span-2">
         <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3 bg-gray-50">
           <h2 class="text-base font-semibold text-gray-900">Sual bankı</h2>
           <div class="flex gap-1.5">
@@ -240,7 +240,7 @@ onMounted(async () => {
       </div>
 
       <!-- Selected order -->
-      <div>
+      <div class="lg:col-span-3">
         <QuestionOrderList :questions="items" @reorder="onReorder" @remove="removeItem">
           <template #default="{ q }">
             <div class="min-w-0">

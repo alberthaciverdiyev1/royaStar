@@ -60,7 +60,7 @@ function onDragEnd() {
       Hələ sual seçilməyib
     </div>
 
-    <div v-else class="divide-y divide-indigo-100/70 max-h-56 overflow-y-auto">
+    <div v-else class="divide-y divide-indigo-100/70 max-h-[26rem] overflow-y-auto">
       <div
         v-for="(q, i) in props.questions"
         :key="q.id"
@@ -70,15 +70,15 @@ function onDragEnd() {
         @drop.prevent="onDrop(i)"
         @dragend="onDragEnd"
         :class="[
-          'flex items-center gap-2 px-3 py-2 transition-colors',
+          'flex items-center gap-3 px-3 py-3 transition-colors',
           dragIndex === i ? 'opacity-40' : 'hover:bg-white',
           overIndex === i && dragIndex !== i && dragIndex !== null
             ? 'bg-indigo-200/60'
             : '',
         ]"
       >
-        <span class="cursor-grab shrink-0 select-none text-indigo-400 active:cursor-grabbing" title="Sürüklə">⠿</span>
-        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+        <span class="cursor-grab shrink-0 select-none text-indigo-400 active:cursor-grabbing text-xl leading-none" title="Sürüklə">⠿</span>
+        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
           {{ i + 1 }}
         </span>
         <div class="min-w-0 flex-1">
