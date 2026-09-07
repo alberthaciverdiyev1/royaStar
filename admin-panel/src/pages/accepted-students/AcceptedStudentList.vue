@@ -273,9 +273,9 @@ onMounted(fetchStudents)
     <!-- Header -->
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900">Universitetə qəbul olanlar</h1>
+        <h1 class="text-2xl font-bold text-slate-900">Uğurlu Tələbələr</h1>
         <p class="mt-1 text-sm text-slate-500">
-          Tanıtım üçün qəbul olan şagirdlər. Bu qeydlər yalnız göstərişdir — giriş hüququ vermir.
+          Tanıtım üçün uğurlu tələbələr. Bu qeydlər yalnız göstərişdir — giriş hüququ vermir.
         </p>
       </div>
 

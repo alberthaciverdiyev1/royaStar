@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
   { to: '/exams', label: 'İmtahanlar', icon: 'exam' },
   { to: '/stars', label: 'Ulduzlar', icon: 'star' },
   { to: '/students', label: 'Şagirdlər', icon: 'student' },
-  { to: '/accepted-students', label: 'Qəbul olanlar', icon: 'graduation' },
+  { to: '/accepted-students', label: 'Uğurlu Tələbələr', icon: 'graduation' },
   { to: '/users', label: 'İstifadəçilər', icon: 'users' },
   { to: '/website-texts', label: 'Sayt Mətnləri', icon: 'text' },
 ]
