@@ -15,7 +15,14 @@ class Quiz extends Model
     protected $fillable = ['name', 'lesson_id', 'type'];
 
     public function lesson() { return $this->belongsTo(Lesson::class); }
-    public function questions() { return $this->belongsToMany(Question::class, 'quiz_questions'); }
+    public function questions()
+    {
+        return $this->belongsToMany(Question::class, 'quiz_questions')
+            ->withPivot('order')
+            ->orderBy('quiz_questions.order')
+            ->orderBy('quiz_questions.id')
+            ->withTimestamps();
+    }
 
     /**
      * Whether a student of the given grade may view/take this quiz.

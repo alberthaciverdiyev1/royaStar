@@ -11,6 +11,7 @@ import Pagination from '../../components/Pagination.vue'
 import SearchInput from '../../components/SearchInput.vue'
 import Modal from '../../components/Modal.vue'
 import QuestionContentView from '../../components/QuestionContentView.vue'
+import QuestionOrderList from '../../components/QuestionOrderList.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import Toast from '../../components/Toast.vue'
 import { showToast } from '../../stores/toast'
@@ -39,7 +40,7 @@ const editingQuiz = ref<Quiz | null>(null)
 const modalName = ref('')
 const modalType = ref('topic_based')
 const modalLessonId = ref<number | null>(null)
-const selectedQuestionIds = ref<number[]>([])
+const selectedQuestions = ref<Question[]>([])
 const saving = ref(false)
 const formError = ref('')
 
@@ -177,13 +178,26 @@ async function fetchQuizzes() {
   }
 }
 
-function toggleQuestion(id: number) {
-  const idx = selectedQuestionIds.value.indexOf(id)
+function toggleQuestion(q: Question) {
+  const idx = selectedQuestions.value.findIndex((s) => s.id === q.id)
   if (idx === -1) {
-    selectedQuestionIds.value.push(id)
+    selectedQuestions.value.push(q)
   } else {
-    selectedQuestionIds.value.splice(idx, 1)
+    selectedQuestions.value.splice(idx, 1)
   }
+}
+
+function isSelected(id: number) {
+  return selectedQuestions.value.some((s) => s.id === id)
+}
+
+function removeSelected(id: number) {
+  const idx = selectedQuestions.value.findIndex((s) => s.id === id)
+  if (idx !== -1) selectedQuestions.value.splice(idx, 1)
+}
+
+function onReorderQuestions(list: Question[]) {
+  selectedQuestions.value = list
 }
 
 function openCreate() {
@@ -193,7 +207,7 @@ function openCreate() {
   modalTopicId.value = null
   modalLessonId.value = null
   modalLessons.value = []
-  selectedQuestionIds.value = []
+  selectedQuestions.value = []
   availableQuestions.value = []
   formError.value = ''
   modalOpen.value = true
@@ -211,9 +225,10 @@ async function openEdit(quiz: Quiz) {
   try {
     const res = await quizzesApi.show(quiz.id)
     const full = res.data
-    selectedQuestionIds.value = full.questions?.map((q) => q.id) || []
+    // Keep full Question objects so the reorder panel can render them.
+    selectedQuestions.value = full.questions || []
   } catch {
-    selectedQuestionIds.value = []
+    selectedQuestions.value = []
   }
 
   // Load available questions for the lesson
@@ -245,7 +260,7 @@ async function handleSave() {
       name: modalName.value,
       type: modalType.value,
       lesson_id: modalLessonId.value!,
-      question_ids: selectedQuestionIds.value,
+      question_ids: selectedQuestions.value.map((q) => q.id),
     }
 
     if (editingQuiz.value) {
@@ -456,7 +471,7 @@ const columns: Column[] = [
       <!-- Questions -->
       <div v-if="modalLessonId">
         <label class="block text-sm font-medium text-gray-700 mb-2">
-          Suallar ({{ selectedQuestionIds.length }} seçildi)
+          Suallar ({{ selectedQuestions.length }} seçildi)
         </label>
         <div v-if="questionLoading && availableQuestions.length === 0" class="flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50/50 p-4 text-sm text-gray-400">
           <span class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
@@ -474,8 +489,8 @@ const columns: Column[] = [
             >
               <input
                 type="checkbox"
-                :checked="selectedQuestionIds.includes(q.id)"
-                @change="toggleQuestion(q.id)"
+                :checked="isSelected(q.id)"
+                @change="toggleQuestion(q)"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
               <span class="flex-1 min-w-0 flex items-center gap-2">
@@ -504,6 +519,17 @@ const columns: Column[] = [
           </button>
         </div>
       </div>
+
+      <!-- Selected order (drag to reorder) -->
+      <QuestionOrderList
+        :questions="selectedQuestions"
+        @reorder="onReorderQuestions"
+        @remove="removeSelected"
+      >
+        <template #default="{ q }">
+          <QuestionContentView :blocks="(q as any).question" compact />
+        </template>
+      </QuestionOrderList>
 
       <div class="flex justify-end gap-3 pt-2">
         <button

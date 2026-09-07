@@ -27,7 +27,11 @@ class UpdateQuizAction extends BaseUpdateAction
     protected function afterUpdate($model): void
     {
         if ($this->hasQuestionIds) {
-            $model->questions()->sync($this->questionIds);
+            $questions = [];
+            foreach ($this->questionIds as $i => $id) {
+                $questions[$id] = ['order' => $i + 1];
+            }
+            $model->questions()->sync($questions);
             $model->load('questions');
         }
     }

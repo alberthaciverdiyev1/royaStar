@@ -25,7 +25,11 @@ class StoreQuizAction extends BaseStoreAction
     protected function afterCreate($model): void
     {
         if (!empty($this->questionIds)) {
-            $model->questions()->attach($this->questionIds);
+            $questions = [];
+            foreach ($this->questionIds as $i => $id) {
+                $questions[$id] = ['order' => $i + 1];
+            }
+            $model->questions()->sync($questions);
             $model->load('questions');
         }
     }

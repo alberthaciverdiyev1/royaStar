@@ -11,6 +11,7 @@ import type { Column } from '../../components/Table.vue'
 import Pagination from '../../components/Pagination.vue'
 import SearchInput from '../../components/SearchInput.vue'
 import Modal from '../../components/Modal.vue'
+import QuestionOrderList from '../../components/QuestionOrderList.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import Toast from '../../components/Toast.vue'
 import { showToast } from '../../stores/toast'
@@ -40,7 +41,7 @@ const modalGradeId = ref<number | null>(null)
 const modalDuration = ref(60)
 const modalPassingScore = ref(50)
 const modalDescription = ref('')
-const selectedQuestionIds = ref<number[]>([])
+const selectedQuestions = ref<Question[]>([])
 const saving = ref(false)
 const formError = ref('')
 
@@ -140,13 +141,26 @@ async function loadAllQuestions() {
   }
 }
 
-function toggleQuestion(id: number) {
-  const idx = selectedQuestionIds.value.indexOf(id)
+function toggleQuestion(q: Question) {
+  const idx = selectedQuestions.value.findIndex((s) => s.id === q.id)
   if (idx === -1) {
-    selectedQuestionIds.value.push(id)
+    selectedQuestions.value.push(q)
   } else {
-    selectedQuestionIds.value.splice(idx, 1)
+    selectedQuestions.value.splice(idx, 1)
   }
+}
+
+function isSelected(id: number) {
+  return selectedQuestions.value.some((s) => s.id === id)
+}
+
+function removeSelected(id: number) {
+  const idx = selectedQuestions.value.findIndex((s) => s.id === id)
+  if (idx !== -1) selectedQuestions.value.splice(idx, 1)
+}
+
+function onReorderQuestions(list: Question[]) {
+  selectedQuestions.value = list
 }
 
 function openCreate() {
@@ -160,7 +174,7 @@ function openCreate() {
   modalTopicId.value = null
   modalLessonId.value = null
   modalLessons.value = []
-  selectedQuestionIds.value = []
+  selectedQuestions.value = []
   availableQuestions.value = []
   showAllQuestions.value = false
   formError.value = ''
@@ -182,9 +196,10 @@ async function openEdit(exam: Exam) {
 
   try {
     const res = await examsApi.show(exam.id)
-    selectedQuestionIds.value = res.data.questions?.map((q) => q.id) || []
+    // Keep full Question objects so the reorder panel can render them.
+    selectedQuestions.value = res.data.questions || []
   } catch {
-    selectedQuestionIds.value = []
+    selectedQuestions.value = []
   }
 
   formError.value = ''
@@ -216,7 +231,7 @@ async function handleSave() {
       duration_minutes: modalDuration.value,
       passing_score: modalPassingScore.value,
       description: modalDescription.value || undefined,
-      question_ids: selectedQuestionIds.value,
+      question_ids: selectedQuestions.value.map((q) => q.id),
     }
 
     if (editingExam.value) {
@@ -511,8 +526,8 @@ const columns: Column[] = [
           >
             <input
               type="checkbox"
-              :checked="selectedQuestionIds.includes(q.id)"
-              @change="toggleQuestion(q.id)"
+              :checked="isSelected(q.id)"
+              @change="toggleQuestion(q)"
               class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
             />
             <span class="text-sm text-gray-700 flex-1 min-w-0 truncate">
@@ -521,8 +536,15 @@ const columns: Column[] = [
             <span class="shrink-0 text-xs text-gray-400">{{ q.type === 'open' ? 'Açıq' : 'Test' }}</span>
           </label>
         </div>
-        <p class="mt-1.5 text-xs text-gray-400">{{ selectedQuestionIds.length }} sual seçildi</p>
+        <p class="mt-1.5 text-xs text-gray-400">{{ selectedQuestions.length }} sual seçildi</p>
       </div>
+
+      <!-- Selected order (drag to reorder) -->
+      <QuestionOrderList
+        :questions="selectedQuestions"
+        @reorder="onReorderQuestions"
+        @remove="removeSelected"
+      />
 
       <div class="flex justify-end gap-3 pt-2">
         <button
