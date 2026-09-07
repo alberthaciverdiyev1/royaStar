@@ -28,6 +28,7 @@ return [
             'nav.exam'       => 'Exam',
             'nav.achievements' => 'Achievements',
             'nav.badges'     => 'Badges',
+            'nav.accepted'   => 'Accepted Students',
             'nav.profile'    => 'Profile',
             'nav.login'      => 'Log In',
             'nav.signup'     => 'Sign Up',
@@ -86,6 +87,12 @@ return [
             'home.cta.desc'        => 'Join hundreds of students already learning with Teacher Roya. Your English adventure starts here — for free.',
             'home.cta.btn_1'       => 'Create Free Account',
             'home.cta.btn_2'       => 'I Already Have an Account',
+            'home.accepted.tag'    => 'Success Stories',
+            'home.accepted.title_1' => 'Students Who Reached',
+            'home.accepted.title_hl' => 'University',
+            'home.accepted.desc'   => 'Proud of our graduates who scored high on the university entrance exam. Only the top students are shown here.',
+            'home.accepted.points_label' => 'Points',
+            'home.accepted.btn'    => 'See All Students',
         ],
     ],
 
@@ -532,6 +539,22 @@ return [
             'welcome.profile_title'   => 'Setup Profile',
             'welcome.profile_desc'    => 'Set your avatar',
             'welcome.footer_hint'     => 'Navigate through the grammar galaxies using the navigation bar below',
+        ],
+    ],
+
+    'accepted' => [
+        'label' => 'Accepted Students Page',
+        'icon'  => 'school',
+        'keys'  => [
+            'accepted.page_title'   => 'Accepted Students - Roya\'s Stars',
+            'accepted.badge'        => 'Our Success',
+            'accepted.title_1'      => 'From Our Classrooms to',
+            'accepted.title_hl'     => 'University',
+            'accepted.desc'         => 'These are the students who mastered their lessons with Roya and scored high on the university entrance exam. Congratulations to every one of them!',
+            'accepted.points_label' => 'Points',
+            'accepted.empty_title'  => 'Coming Soon',
+            'accepted.empty_desc'   => 'Our students are working hard to reach university. Check back soon to see the new accepted students!',
+            'accepted.home'         => 'Back to Home',
         ],
     ],
 ];

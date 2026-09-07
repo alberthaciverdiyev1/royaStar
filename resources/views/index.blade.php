@@ -199,6 +199,96 @@
     </div>
 </section>
 
+<!-- ════════════ ACCEPTED STUDENTS (TOP) ════════════ -->
+@if(isset($topAccepted) && $topAccepted->isNotEmpty())
+<section class="landing-section fade-up pt0" id="accepted">
+    <style>
+        .accepted-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 1.1rem;
+            margin-top: 2.5rem;
+            text-align: left;
+        }
+        .accepted-card {
+            position: relative;
+            border-radius: 22px;
+            padding: 1.4rem 1.1rem 1.1rem;
+            background: linear-gradient(160deg, rgb(var(--surface-container-high))/0.65, rgb(var(--surface-container-lowest)));
+            border: 1px solid rgb(var(--surface-container-high));
+            box-shadow: 0 14px 40px -22px rgb(0 0 0 / 0.45);
+            transition: transform .2s ease, box-shadow .2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .accepted-card:hover { transform: translateY(-5px); box-shadow: 0 24px 44px -22px rgb(0 0 0 / 0.5); }
+        .accepted-card__img {
+            width: 84px; height: 84px; border-radius: 50%;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)));
+            color: #fff; font-weight: 800; font-size: 1.6rem;
+            border: 3px solid rgb(var(--surface-container-lowest));
+            box-shadow: 0 8px 20px -10px rgb(var(--secondary) / 0.7);
+        }
+        .accepted-card__img img { width: 100%; height: 100%; object-fit: cover; }
+        .accepted-card h3 { margin: 0.9rem 0 0.2rem; font-weight: 800; font-size: 1.02rem; color: rgb(var(--on-surface)); line-height: 1.25; }
+        .accepted-card__points {
+            margin-top: 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.4rem 0.85rem; border-radius: 999px;
+            background: rgb(var(--secondary)); color: #fff; font-weight: 800; font-size: 1.05rem;
+            box-shadow: 0 10px 24px -10px rgb(var(--secondary) / 0.7);
+        }
+        .accepted-card__points .material-symbols-outlined { font-size: 18px; }
+        .accepted-card__points small { font-weight: 600; opacity: .85; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; }
+        .accepted-more-btn {
+            display: inline-flex; align-items: center; gap: .55rem;
+            margin-top: 2.4rem; padding: .85rem 1.7rem; border-radius: 999px;
+            color: #fff; font-weight: 800; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+            background: rgb(var(--primary)); box-shadow: 0 16px 34px -14px rgb(var(--primary) / 0.75);
+            transition: transform .2s ease; text-decoration: none;
+        }
+        .accepted-more-btn:hover { transform: translateY(-2px); }
+        .accepted-card__points small { margin-left: 2px; }
+    </style>
+
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <span class="section-tag">
+            <span class="material-symbols-outlined icon--sm">school</span>
+            {{ text('home.accepted.tag') }}
+        </span>
+        <h2 class="section-title">{{ text('home.accepted.title_1') }} <span class="hl">{{ text('home.accepted.title_hl') }}</span></h2>
+        <p class="section-desc mx-auto">{{ text('home.accepted.desc') }}</p>
+
+        <div class="accepted-grid">
+            @foreach($topAccepted as $student)
+            <div class="accepted-card">
+                <div class="accepted-card__img">
+                    @if($student->image && (str_contains($student->image, '/') || str_contains($student->image, 'http')))
+                        <img src="{{ $student->image }}" alt="{{ e(trim($student->name . ' ' . ($student->surname ?? ''))) }}" loading="lazy">
+                    @else
+                        <span>{{ mb_strtoupper(mb_substr($student->name, 0, 1)) }}</span>
+                    @endif
+                </div>
+                <h3>{{ e(trim($student->name . ' ' . ($student->surname ?? ''))) }}</h3>
+                <div class="accepted-card__points">
+                    <span class="material-symbols-outlined">star</span>
+                    <strong>{{ $student->exam_points }}</strong>
+                    <small>{{ text('home.accepted.points_label') }}</small>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <a href="{{ route('accepted-students') }}" class="accepted-more-btn">
+            <span class="material-symbols-outlined">school</span>
+            {{ text('home.accepted.btn') }}
+        </a>
+    </div>
+</section>
+@endif
+
 <!-- ════════════ CTA ════════════ -->
 <section class="fade-up pb-section">
     <div class="cta">

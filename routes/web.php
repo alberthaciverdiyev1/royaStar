@@ -24,6 +24,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/topics', [CurriculumController::class, 'topics'])->name('topics');
 Route::get('/topics/{topic}', [CurriculumController::class, 'topicDetail'])->name('topics.detail');
 
+// Accepted students showcase (public)
+Route::get('/accepted-students', [HomeController::class, 'acceptedStudents'])->name('accepted-students');
+
 // Authenticated student routes
 Route::middleware('auth')->group(function () {
     // Lesson

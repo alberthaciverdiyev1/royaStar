@@ -100,6 +100,12 @@
                         <span>{{ text('nav.achievements') }}</span>
                     </div>
                 </a>
+                <a href="{{ route('accepted-students') }}" class="no-underline">
+                    <div class="{{ $currentPath === 'accepted-students' ? $desktopActive : $desktopInactive }}">
+                        <span class="material-symbols-outlined !text-lg">school</span>
+                        <span>{{ text('nav.accepted') }}</span>
+                    </div>
+                </a>
             </nav>
 
             <div class="flex justify-end flex-shrink-0 items-center gap-2">
@@ -163,6 +169,12 @@
             <div class="{{ $currentPath === 'achievements' ? $mobileActive : $mobileInactive }}">
                 <span class="material-symbols-outlined !text-2xl">military_tech</span>
                 <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.badges') }}</span>
+            </div>
+        </a>
+        <a href="{{ route('accepted-students') }}" class="no-underline">
+            <div class="{{ $currentPath === 'accepted-students' ? $mobileActive : $mobileInactive }}">
+                <span class="material-symbols-outlined !text-2xl">school</span>
+                <span class="text-3xs font-bold uppercase tracking-widest mt-0.5">{{ text('nav.accepted') }}</span>
             </div>
         </a>
         <a href="{{ route('profile') }}" class="no-underline">

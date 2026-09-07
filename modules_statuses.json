@@ -12,5 +12,6 @@
     "User": true,
     "Star": true,
     "Exam": true,
-    "Banner": true
+    "Banner": true,
+    "AcceptedStudent": true
 }

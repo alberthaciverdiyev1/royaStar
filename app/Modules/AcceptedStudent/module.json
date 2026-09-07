@@ -1,0 +1,10 @@
+{
+    "name": "AcceptedStudent",
+    "alias": "acceptedstudent",
+    "description": "University-accepted students showcase with custom exam points (non-login promotional records)",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}
