@@ -11,7 +11,6 @@ import type { Column } from '../../components/Table.vue'
 import Pagination from '../../components/Pagination.vue'
 import SearchInput from '../../components/SearchInput.vue'
 import Modal from '../../components/Modal.vue'
-import QuestionOrderList from '../../components/QuestionOrderList.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import Toast from '../../components/Toast.vue'
 import { showToast } from '../../stores/toast'
@@ -152,15 +151,6 @@ function toggleQuestion(q: Question) {
 
 function isSelected(id: number) {
   return selectedQuestions.value.some((s) => s.id === id)
-}
-
-function removeSelected(id: number) {
-  const idx = selectedQuestions.value.findIndex((s) => s.id === id)
-  if (idx !== -1) selectedQuestions.value.splice(idx, 1)
-}
-
-function onReorderQuestions(list: Question[]) {
-  selectedQuestions.value = list
 }
 
 function openCreate() {
@@ -536,15 +526,10 @@ const columns: Column[] = [
             <span class="shrink-0 text-xs text-gray-400">{{ q.type === 'open' ? 'Açıq' : 'Test' }}</span>
           </label>
         </div>
-        <p class="mt-1.5 text-xs text-gray-400">{{ selectedQuestions.length }} sual seçildi</p>
+        <p class="mt-1.5 text-xs text-indigo-600">
+          {{ selectedQuestions.length }} sual seçildi — sıralama üçün imtahan səhifəsindən istifadə edin.
+        </p>
       </div>
-
-      <!-- Selected order (drag to reorder) -->
-      <QuestionOrderList
-        :questions="selectedQuestions"
-        @reorder="onReorderQuestions"
-        @remove="removeSelected"
-      />
 
       <div class="flex justify-end gap-3 pt-2">
         <button

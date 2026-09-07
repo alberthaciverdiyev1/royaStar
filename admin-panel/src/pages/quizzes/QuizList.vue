@@ -11,7 +11,6 @@ import Pagination from '../../components/Pagination.vue'
 import SearchInput from '../../components/SearchInput.vue'
 import Modal from '../../components/Modal.vue'
 import QuestionContentView from '../../components/QuestionContentView.vue'
-import QuestionOrderList from '../../components/QuestionOrderList.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import Toast from '../../components/Toast.vue'
 import { showToast } from '../../stores/toast'
@@ -189,15 +188,6 @@ function toggleQuestion(q: Question) {
 
 function isSelected(id: number) {
   return selectedQuestions.value.some((s) => s.id === id)
-}
-
-function removeSelected(id: number) {
-  const idx = selectedQuestions.value.findIndex((s) => s.id === id)
-  if (idx !== -1) selectedQuestions.value.splice(idx, 1)
-}
-
-function onReorderQuestions(list: Question[]) {
-  selectedQuestions.value = list
 }
 
 function openCreate() {
@@ -520,16 +510,9 @@ const columns: Column[] = [
         </div>
       </div>
 
-      <!-- Selected order (drag to reorder) -->
-      <QuestionOrderList
-        :questions="selectedQuestions"
-        @reorder="onReorderQuestions"
-        @remove="removeSelected"
-      >
-        <template #default="{ q }">
-          <QuestionContentView :blocks="(q as any).question" compact />
-        </template>
-      </QuestionOrderList>
+      <p v-if="selectedQuestions.length" class="text-xs text-indigo-600">
+        {{ selectedQuestions.length }} sual seçildi — sıralama üçün quiz səhifəsindən istifadə edin.
+      </p>
 
       <div class="flex justify-end gap-3 pt-2">
         <button
