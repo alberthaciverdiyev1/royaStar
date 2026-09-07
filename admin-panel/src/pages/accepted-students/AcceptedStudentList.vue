@@ -375,8 +375,8 @@ onMounted(fetchStudents)
               </span>
             </td>
             <td class="px-5 py-4 whitespace-nowrap">
-              <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-black text-amber-700 border border-amber-200">
-                ⭐ {{ s.exam_points }}
+              <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-sm font-black text-amber-700 border border-amber-200">
+                {{ s.exam_points }}
               </span>
             </td>
             <td class="px-5 py-4 whitespace-nowrap">
@@ -500,17 +500,14 @@ onMounted(fetchStudents)
           <!-- Points -->
           <div class="space-y-1.5">
             <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Bal (Qəbul imtahanı) *</label>
-            <div class="relative">
-              <input
-                v-model.number="form.exam_points"
-                type="number"
-                min="0"
-                max="1000"
-                placeholder="0"
-                class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 pl-10 text-sm font-black text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-              <span class="absolute left-3.5 top-2.5 text-amber-500 text-lg">⭐</span>
-            </div>
+            <input
+              v-model.number="form.exam_points"
+              type="number"
+              min="0"
+              max="1000"
+              placeholder="0"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
             <p class="text-xs text-slate-400">Sahədən qazanılan ulduzlarla əlaqəsi yoxdur — əl ilə daxil edilir.</p>
           </div>
 

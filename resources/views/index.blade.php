@@ -273,7 +273,6 @@
                 </div>
                 <h3>{{ e(trim($student->name . ' ' . ($student->surname ?? ''))) }}</h3>
                 <div class="accepted-card__points">
-                    <span class="material-symbols-outlined">star</span>
                     <strong>{{ $student->exam_points }}</strong>
                     <small>{{ text('home.accepted.points_label') }}</small>
                 </div>
