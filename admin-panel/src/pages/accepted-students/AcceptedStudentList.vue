@@ -117,12 +117,37 @@ function onPickImage(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
+  input.value = ''
+  if (!file.type.startsWith('image/')) {
+    showToast({ type: 'error', text: 'Zəhmət olmasa şəkil seçin' })
+    return
+  }
   const reader = new FileReader()
   reader.onload = (e) => {
-    form.value.image = (e.target?.result as string) || null
+    const src = e.target?.result as string
+    const img = new Image()
+    img.onload = () => {
+      // Downscale huge photos so the upload stays small and consistent.
+      const MAX = 900
+      let { width, height } = img
+      if (width > height && width > MAX) {
+        height = Math.round((height * MAX) / width)
+        width = MAX
+      } else if (height > MAX) {
+        width = Math.round((width * MAX) / height)
+        height = MAX
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      canvas.getContext('2d')?.drawImage(img, 0, 0, width, height)
+      const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+      form.value.image = canvas.toDataURL(mime, 0.85)
+    }
+    img.onerror = () => showToast({ type: 'error', text: 'Şəkil oxunarkən xəta baş verdi' })
+    img.src = src
   }
   reader.readAsDataURL(file)
-  input.value = ''
 }
 
 function clearImage() {

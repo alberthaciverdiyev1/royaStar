@@ -14,7 +14,7 @@ class StoreAcceptedStudentRequest extends FormRequest
             'user_id' => 'nullable|exists:users,id',
             'name' => 'required|string|max:255',
             'surname' => 'nullable|string|max:255',
-            'image' => 'nullable|string|max:5000',
+            'image' => 'nullable|string|max:20000000',
             'exam_points' => 'nullable|integer|min:0|max:1000',
             'is_active' => 'nullable|boolean',
         ];
