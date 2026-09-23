@@ -1,24 +1,25 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
  * Before the project moved to its current domain (config('app.url')),
- * uploaded assets and rich-text content stored absolute URLs pointing at the
- * legacy hosts below. This migration rewrites only the host part of those URLs
- * so existing images/questions keep working on the new domain.
+ * uploaded assets and rich-text/JSON content stored absolute URLs pointing at
+ * the legacy hosts below.
+ *
+ * We only rewrite the bare hostname (e.g. "royastar.foxsoft.agency" →
+ * "royastar.name.az") instead of a full "https://host" string. This also
+ * matches hosts embedded inside JSON (escaped as "https:\/\/host\/…") and
+ * covers both http/https and protocol-relative URLs.
  */
 return new class extends Migration
 {
-    /** Legacy absolute hosts baked into stored values. */
+    /** Legacy hostnames baked into stored values. */
     private const LEGACY_HOSTS = [
-        'https://royastar.foxsoft.agency',
-        'http://royastar.foxsoft.agency',
-        'https://royastar.jobing.az',
-        'http://royastar.jobing.az',
+        'royastar.foxsoft.agency',
+        'royastar.jobing.az',
     ];
 
     /** table => column pairs that may contain absolute URLs to the site itself. */
@@ -29,9 +30,9 @@ return new class extends Migration
 
     public function up(): void
     {
-        $target = rtrim((string) config('app.url'), '/');
+        $newHost = $this->currentHost();
 
-        if ($target === '') {
+        if ($newHost === '') {
             return;
         }
 
@@ -44,9 +45,12 @@ return new class extends Migration
                 DB::table($table)
                     ->where($column, 'like', '%'.$host.'%')
                     ->update([
-                        $column => DB::raw(
-                            sprintf('REPLACE(%s, %s, %s)', $column, DB::getPdo()->quote($host), DB::getPdo()->quote($target))
-                        ),
+                        $column => DB::raw(sprintf(
+                            'REPLACE(%s, %s, %s)',
+                            $column,
+                            DB::getPdo()->quote($host),
+                            DB::getPdo()->quote($newHost),
+                        )),
                     ]);
             }
         }
@@ -55,5 +59,12 @@ return new class extends Migration
     public function down(): void
     {
         // One-way data normalisation — nothing to revert.
+    }
+
+    private function currentHost(): string
+    {
+        $url = rtrim((string) config('app.url'), '/');
+
+        return (string) (parse_url($url, PHP_URL_HOST) ?: $url);
     }
 };
