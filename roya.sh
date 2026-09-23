@@ -9,8 +9,8 @@ set -euo pipefail
 APP_DIR="/var/www/royaStar"
 BACKUP_DIR="/root/backups/royastar"
 NVM_DIR="${NVM_DIR:-/root/.nvm}"
-WEB_SITE="royastar.foxsoft.agency"
-ADMIN_SITE="royadmin.foxsoft.agency"
+WEB_SITE="royastar.name.az"
+ADMIN_SITE="admin.royastar.name.az"
 
 SKIP_BACKUP=0
 if [[ "${1:-}" == "--skip-backup" ]]; then SKIP_BACKUP=1; fi
