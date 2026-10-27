@@ -13,5 +13,6 @@
     "Star": true,
     "Exam": true,
     "Banner": true,
-    "AcceptedStudent": true
+    "AcceptedStudent": true,
+    "Popup": true
 }

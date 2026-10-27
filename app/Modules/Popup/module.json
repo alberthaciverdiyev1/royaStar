@@ -1,0 +1,10 @@
+{
+    "name": "Popup",
+    "alias": "popup",
+    "description": "Home page popups with text and/or image, dismissible by visitors",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}

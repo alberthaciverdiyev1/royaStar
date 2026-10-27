@@ -309,6 +309,7 @@
         </div>
     </div>
 </section>
+@include('partials.popup')
 @endsection
 
 @push('scripts')

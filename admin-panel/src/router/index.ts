@@ -35,6 +35,7 @@ const routes = [
       { path: 'stars', name: 'Stars', component: () => import('../pages/stars/StarList.vue') },
       { path: 'students', name: 'Students', component: () => import('../pages/students/StudentList.vue') },
       { path: 'accepted-students', name: 'AcceptedStudents', component: () => import('../pages/accepted-students/AcceptedStudentList.vue') },
+      { path: 'popups', name: 'Popups', component: () => import('../pages/popups/PopupList.vue') },
       { path: 'users', name: 'Users', component: () => import('../pages/users/UserList.vue') },
       { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/UserList.vue') },
       { path: 'website-texts', name: 'WebsiteTexts', component: () => import('../pages/settings/WebsiteTexts.vue') },
