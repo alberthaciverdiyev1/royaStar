@@ -16,6 +16,11 @@ class StoreAcceptedStudentAction extends BaseStoreAction
 
     protected function beforeCreate(array $data): array
     {
-        return $this->persistImage($data);
+        $data = $this->persistImage($data);
+
+        // An explicit null skips the column default and violates NOT NULL.
+        $data['exam_points'] = $data['exam_points'] ?? 0;
+
+        return $data;
     }
 }

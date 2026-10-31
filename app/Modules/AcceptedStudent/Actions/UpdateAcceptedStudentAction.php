@@ -16,6 +16,12 @@ class UpdateAcceptedStudentAction extends BaseUpdateAction
 
     protected function beforeUpdate(array $data): array
     {
-        return $this->persistImage($data);
+        $data = $this->persistImage($data);
+
+        if (array_key_exists('exam_points', $data) && $data['exam_points'] === null) {
+            $data['exam_points'] = 0;
+        }
+
+        return $data;
     }
 }
