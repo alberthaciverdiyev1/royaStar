@@ -34,9 +34,16 @@ class AuthController extends Controller
 
     public function loginPost(Request $request)
     {
+        // A login attempt must not inherit state from a session that was
+        // already open (stale auth/CSRF/intended data). This is the same
+        // cleanup a manual logout does, done automatically so the first
+        // attempt behaves like a fresh one.
+        $this->forgetCurrentSession($request);
+
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
+            'remember' => 'sometimes|boolean',
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -51,7 +58,9 @@ class AuthController extends Controller
             return redirect()->route('pending');
         }
 
-        Auth::login($user);
+        // "Remember me" keeps the session alive via the remember_token cookie
+        // instead of expiring when the browser closes.
+        Auth::login($user, $request->boolean('remember'));
 
         // Web students earn the daily-login / streak stars too (the API login
         // flow already does this via LoginAction).
@@ -81,6 +90,10 @@ class AuthController extends Controller
 
     public function signupPost(Request $request)
     {
+        // Same as loginPost: never carry an existing session into a new
+        // registration.
+        $this->forgetCurrentSession($request);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -132,6 +145,27 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        $response = redirect()->route('home');
+
+        // The API token cookie outlives the session; drop it too, otherwise
+        // it lingers and is picked up by TokenFromCookie on later API calls.
+        if ($request->cookie('royastar_token')) {
+            $response->withCookie(cookie()->forget('royastar_token'));
+        }
+
+        return $response;
+    }
+
+    /**
+     * Clear any state left over from a previously authenticated session
+     * before starting a fresh login/registration.
+     */
+    private function forgetCurrentSession(Request $request): void
+    {
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
     }
 }

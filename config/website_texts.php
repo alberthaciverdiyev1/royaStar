@@ -446,6 +446,7 @@ return [
             'login.email_placeholder' => 'example@roya.edu',
             'login.password'         => 'Password',
             'login.forgot'           => 'Forgot?',
+            'login.remember'         => 'Remember me',
             'login.login_now'        => 'Login Now',
             'login.no_account'       => "Don't have an account?",
             'login.signup_cta'       => "Sign up for Teacher Roya's Stars",

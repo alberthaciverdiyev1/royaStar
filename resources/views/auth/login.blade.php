@@ -51,6 +51,13 @@
                 @error('password') <span class="text-error text-3xs font-black uppercase tracking-widest">{{ $message }}</span> @enderror
             </div>
 
+            <div class="flex items-center px-2">
+                <label class="inline-flex cursor-pointer items-center gap-2 text-2xs font-black uppercase tracking-widest text-[rgb(var(--on-surface))/0.5] hover:text-[rgb(var(--on-surface))/0.8]">
+                    <input type="checkbox" name="remember" value="1" @checked(old('remember')) class="h-4 w-4 rounded accent-[rgb(var(--primary))]" />
+                    {{ text('login.remember') }}
+                </label>
+            </div>
+
             @if(session('success'))
             <div class="bg-[rgb(var(--success))/0.1] text-[rgb(var(--success))] text-2xs font-black uppercase tracking-widest px-5 py-4 rounded-2xl border border-[rgb(var(--success))/0.2] text-center">
                 {{ session('success') }}
