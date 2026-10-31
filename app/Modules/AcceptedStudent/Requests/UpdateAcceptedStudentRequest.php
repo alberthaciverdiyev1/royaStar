@@ -15,7 +15,7 @@ class UpdateAcceptedStudentRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'surname' => 'nullable|string|max:255',
             'image' => 'nullable|string|max:20000000',
-            'exam_points' => 'nullable|integer|min:0|max:1000',
+            'exam_points' => 'nullable|numeric|decimal:0,2|min:0|max:1000',
             'is_active' => 'nullable|boolean',
         ];
     }

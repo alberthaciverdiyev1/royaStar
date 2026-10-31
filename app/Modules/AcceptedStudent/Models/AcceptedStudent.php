@@ -19,7 +19,7 @@ class AcceptedStudent extends Model
     protected function casts(): array
     {
         return [
-            'exam_points' => 'integer',
+            'exam_points' => 'float',
             'is_active' => 'boolean',
         ];
     }
