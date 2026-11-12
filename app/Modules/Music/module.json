@@ -1,0 +1,10 @@
+{
+    "name": "Music",
+    "alias": "music",
+    "description": "Site-wide background music player — YouTube/audio links with per-page targeting",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}

@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="turbo-cache-control" content="no-cache">
     @vite('resources/css/app.css')
     <link href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}" rel="stylesheet">
 
@@ -18,6 +19,76 @@
             var theme = 'default';
             try { theme = localStorage.getItem('theme') || 'default'; } catch(e) {}
             document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    {{-- Turbo Drive keeps the floating music player alive between pages. --}}
+    <script src="{{ asset('js/turbo.js') }}?v={{ filemtime(public_path('js/turbo.js')) }}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.Turbo) window.Turbo.start();
+        });
+
+        // Turbo swaps the body without a native DOMContentLoaded, so legacy
+        // page scripts are re-initialised with a synthetic event. External
+        // scripts of the new page (Plyr, …) must finish loading first — the
+        // native event guaranteed that before Turbo.
+        (function () {
+            var navigated = false;
+            var loadedScripts = new WeakSet();
+
+            document.addEventListener('load', function (event) {
+                if (event.target && event.target.tagName === 'SCRIPT') {
+                    loadedScripts.add(event.target);
+                }
+            }, true);
+
+            document.addEventListener('error', function (event) {
+                if (event.target && event.target.tagName === 'SCRIPT') {
+                    loadedScripts.add(event.target);
+                }
+            }, true);
+
+            document.addEventListener('turbo:before-render', function () {
+                navigated = true;
+            });
+
+            document.addEventListener('turbo:load', function () {
+                if (!navigated) return;
+                navigated = false;
+
+                var pending = [];
+                document.body.querySelectorAll('script[src]').forEach(function (script) {
+                    if (!loadedScripts.has(script)) pending.push(script);
+                });
+
+                var fired = false;
+
+                function fire() {
+                    if (fired) return;
+                    fired = true;
+                    document.dispatchEvent(new Event('DOMContentLoaded', { bubbles: true }));
+                }
+
+                if (pending.length === 0) {
+                    fire();
+                    return;
+                }
+
+                var remaining = pending.length;
+                var settle = function () {
+                    remaining--;
+                    if (remaining <= 0) fire();
+                };
+
+                pending.forEach(function (script) {
+                    script.addEventListener('load', settle, { once: true });
+                    script.addEventListener('error', settle, { once: true });
+                });
+
+                // Never stall page initialisation on a broken third-party script.
+                window.setTimeout(fire, 3000);
+            });
         })();
     </script>
 
@@ -185,6 +256,8 @@
         </a>
     </nav>
     @endif
+
+    @include('partials.music-player')
 
     @stack('scripts')
 </body>

@@ -30,6 +30,7 @@ const navItems: NavItem[] = [
   { to: '/students', label: 'Şagirdlər', icon: 'student' },
   { to: '/accepted-students', label: 'Uğurlu Tələbələr', icon: 'graduation' },
   { to: '/popups', label: 'Popuplar', icon: 'popup' },
+  { to: '/music', label: 'Musiqi', icon: 'music' },
   { to: '/users', label: 'İstifadəçilər', icon: 'users' },
   { to: '/website-texts', label: 'Sayt Mətnləri', icon: 'text' },
 ]
