@@ -22,7 +22,7 @@ class AuthController extends Controller
     public function login()
     {
         if (Auth::check()) {
-            return redirect()->route('topics');
+            return redirect($this->resumeUrl(Auth::user()));
         }
 
         return view('auth.login', [
@@ -70,13 +70,30 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('topics'));
+        // Resume where the student left off last time (e.g. a lesson or quiz),
+        // falling back to the topics list for a first-time visitor.
+        return redirect()->intended($this->resumeUrl($user));
+    }
+
+    /**
+     * Internal path of the last learning page the user visited, if it is
+     * still safe to redirect to.
+     */
+    private function resumeUrl(User $user): string
+    {
+        $path = $user->last_page_url;
+
+        if (is_string($path) && str_starts_with($path, '/') && !str_starts_with($path, '//')) {
+            return $path;
+        }
+
+        return route('topics');
     }
 
     public function signup()
     {
         if (Auth::check()) {
-            return redirect()->route('topics');
+            return redirect($this->resumeUrl(Auth::user()));
         }
 
         return view('auth.signup', [
@@ -128,7 +145,7 @@ class AuthController extends Controller
     public function pending()
     {
         if (Auth::check()) {
-            return redirect()->route('topics');
+            return redirect($this->resumeUrl(Auth::user()));
         }
 
         return view('auth.pending', [

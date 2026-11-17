@@ -28,7 +28,7 @@ Route::get('/topics/{topic}', [CurriculumController::class, 'topicDetail'])->nam
 Route::get('/accepted-students', [HomeController::class, 'acceptedStudents'])->name('accepted-students');
 
 // Authenticated student routes
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'track-last-page'])->group(function () {
     // Lesson
     Route::get('/lesson/{id}', [CurriculumController::class, 'lesson'])->name('lesson');
     Route::post('/lesson/{id}/rate', [CurriculumController::class, 'lessonRate'])->name('lesson.rate');

@@ -19,7 +19,7 @@ class User extends Authenticatable
     protected string $guard_name = 'api';
 
     protected $fillable = [
-        'name', 'surname', 'phone', 'avatar', 'type', 'email', 'password', 'is_approved',
+        'name', 'surname', 'phone', 'avatar', 'type', 'email', 'password', 'is_approved', 'last_page_url',
     ];
 
     protected $hidden = [

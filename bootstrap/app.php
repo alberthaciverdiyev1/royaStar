@@ -38,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'non-admin' => \App\Http\Middleware\NonAdminMiddleware::class,
+            'track-last-page' => \App\Http\Middleware\TrackLastPage::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
