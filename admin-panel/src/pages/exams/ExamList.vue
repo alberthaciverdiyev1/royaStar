@@ -13,6 +13,7 @@ import SearchInput from '../../components/SearchInput.vue'
 import Modal from '../../components/Modal.vue'
 import ConfirmDialog from '../../components/ConfirmDialog.vue'
 import Toast from '../../components/Toast.vue'
+import QuestionFormContent from '../../components/QuestionFormContent.vue'
 import { showToast } from '../../stores/toast'
 import type { PaginationMeta } from '../../api/types'
 import { h } from 'vue'
@@ -51,6 +52,7 @@ const modalLessons = ref<Lesson[]>([])
 const modalLessonId = ref<number | null>(null)
 const showAllQuestions = ref(false)
 const loadingAllQuestions = ref(false)
+const newQuestionOpen = ref(false)
 
 // Available questions for selected lesson in modal
 const availableQuestions = ref<Question[]>([])
@@ -126,6 +128,13 @@ async function loadQuestionsForLesson(lessonId: number) {
   }
 }
 
+async function refreshQuestionsForLesson(lessonId: number) {
+  try {
+    const res = await questionsApi.list({ lesson_id: lessonId, per_page: 500 })
+    availableQuestions.value = res.data
+  } catch { /* keep the current list */ }
+}
+
 async function loadAllQuestions() {
   showAllQuestions.value = true
   loadingAllQuestions.value = true
@@ -137,6 +146,28 @@ async function loadAllQuestions() {
     availableQuestions.value = []
   } finally {
     loadingAllQuestions.value = false
+  }
+}
+
+function onQuestionCreated(q: Question) {
+  // The new question is always added as selected, so the exam picks it up on save.
+  if (!selectedQuestions.value.some((s) => s.id === q.id)) {
+    selectedQuestions.value.push(q)
+  }
+  // Show it at the top of the picker right away.
+  if (!availableQuestions.value.some((a) => a.id === q.id)) {
+    availableQuestions.value.unshift(q)
+  }
+  newQuestionOpen.value = false
+  showToast({ type: 'success', text: 'Sual yaradıldı və imtahana əlavə edildi' })
+
+  // If a lesson is selected, reload from the API so the list stays in sync.
+  if (modalLessonId.value) {
+    refreshQuestionsForLesson(modalLessonId.value).then(() => {
+      if (!availableQuestions.value.some((a) => a.id === q.id)) {
+        availableQuestions.value.unshift(q)
+      }
+    })
   }
 }
 
@@ -167,6 +198,7 @@ function openCreate() {
   selectedQuestions.value = []
   availableQuestions.value = []
   showAllQuestions.value = false
+  newQuestionOpen.value = false
   formError.value = ''
   modalOpen.value = true
 }
@@ -183,6 +215,7 @@ async function openEdit(exam: Exam) {
   modalLessonId.value = null
   modalLessons.value = []
   showAllQuestions.value = false
+  newQuestionOpen.value = false
 
   try {
     const res = await examsApi.show(exam.id)
@@ -464,20 +497,31 @@ const columns: Column[] = [
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="block text-sm font-medium text-gray-700">Suallar</label>
-          <button
-            v-if="!showAllQuestions"
-            @click="loadAllQuestions"
-            class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
-          >
-            Bütün sualları yüklə
-          </button>
-          <button
-            v-else
-            @click="showAllQuestions = false; modalTopicId = null; modalLessonId = null; availableQuestions = []"
-            class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
-          >
-            Fənn / dərs seç
-          </button>
+          <div class="flex items-center gap-3">
+            <button
+              v-if="!showAllQuestions"
+              @click="loadAllQuestions"
+              class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              Bütün sualları yüklə
+            </button>
+            <button
+              v-else
+              @click="showAllQuestions = false; modalTopicId = null; modalLessonId = null; availableQuestions = []"
+              class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              Fənn / dərs seç
+            </button>
+            <button
+              @click="newQuestionOpen = true"
+              class="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Yeni sual
+            </button>
+          </div>
         </div>
 
         <!-- Cascade filters (hidden in all-questions mode) -->
@@ -501,7 +545,7 @@ const columns: Column[] = [
       </div>
 
       <!-- Questions list -->
-      <div v-if="modalLessonId || showAllQuestions">
+      <div v-if="modalLessonId || showAllQuestions || availableQuestions.length">
         <div v-if="loadingAllQuestions" class="flex items-center justify-center py-8">
           <div class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
         </div>
@@ -547,6 +591,21 @@ const columns: Column[] = [
         </button>
       </div>
     </div>
+  </Modal>
+
+  <!-- Nested modal: create a question without leaving the exam form -->
+  <Modal
+    :open="newQuestionOpen"
+    title="Yeni sual"
+    size="xl"
+    @close="newQuestionOpen = false"
+  >
+    <QuestionFormContent
+      :initial-topic-id="modalTopicId"
+      :initial-lesson-id="modalLessonId"
+      @saved="onQuestionCreated"
+      @cancel="newQuestionOpen = false"
+    />
   </Modal>
 
   <!-- Delete Confirmation -->

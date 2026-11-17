@@ -4,7 +4,7 @@ import { watch, onUnmounted } from 'vue'
 const props = withDefaults(defineProps<{
   open: boolean
   title: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }>(), {
   size: 'md',
 })
@@ -17,14 +17,25 @@ const widths: Record<string, string> = {
   sm: 'max-w-sm',
   md: 'max-w-lg',
   lg: 'max-w-2xl',
+  xl: 'max-w-5xl',
 }
 
+// Modals can be nested (e.g. "new question" inside "new exam"), so track how
+// many are open instead of toggling body overflow per instance.
+let openCount = 0
+
 watch(() => props.open, (val) => {
-  document.body.style.overflow = val ? 'hidden' : ''
+  if (val) {
+    openCount++
+  } else if (openCount > 0) {
+    openCount--
+  }
+  document.body.style.overflow = openCount > 0 ? 'hidden' : ''
 })
 
 onUnmounted(() => {
-  document.body.style.overflow = ''
+  if (props.open && openCount > 0) openCount--
+  document.body.style.overflow = openCount > 0 ? 'hidden' : ''
 })
 
 function onKeydown(e: KeyboardEvent) {
@@ -49,9 +60,9 @@ function onBackdropClick() {
       />
       <div
         :class="widths[size]"
-        class="relative w-full rounded-2xl bg-white shadow-2xl transition-all"
+        class="relative flex w-full max-h-[calc(100vh-2rem)] flex-col rounded-2xl bg-white shadow-2xl transition-all"
       >
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+        <div class="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
           <button
             @click="onBackdropClick"
@@ -62,7 +73,7 @@ function onBackdropClick() {
             </svg>
           </button>
         </div>
-        <div class="px-6 py-4">
+        <div class="min-h-0 flex-1 overflow-y-auto px-6 py-4">
           <slot />
         </div>
       </div>
