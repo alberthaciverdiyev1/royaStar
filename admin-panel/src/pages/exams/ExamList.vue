@@ -158,7 +158,7 @@ function onQuestionCreated(q: Question) {
   if (!availableQuestions.value.some((a) => a.id === q.id)) {
     availableQuestions.value.unshift(q)
   }
-  newQuestionOpen.value = false
+  // Modal açık kalır; seçimler (Mövzu/Dərs) korunur, art arda soru eklenebilir.
   showToast({ type: 'success', text: 'Sual yaradıldı və imtahana əlavə edildi' })
 
   // If a lesson is selected, reload from the API so the list stays in sync.
@@ -603,6 +603,7 @@ const columns: Column[] = [
     <QuestionFormContent
       :initial-topic-id="modalTopicId"
       :initial-lesson-id="modalLessonId"
+      reset-after-save
       @saved="onQuestionCreated"
       @cancel="newQuestionOpen = false"
     />

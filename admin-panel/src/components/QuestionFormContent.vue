@@ -16,10 +16,13 @@ const props = withDefaults(defineProps<{
   questionId?: number | null
   initialTopicId?: number | null
   initialLessonId?: number | null
+  /** Kayıttan sonra formu kapatmadan yalnızca içeriği temizle, seçimleri koru. */
+  resetAfterSave?: boolean
 }>(), {
   questionId: null,
   initialTopicId: null,
   initialLessonId: null,
+  resetAfterSave: false,
 })
 
 const emit = defineEmits<{
@@ -84,6 +87,23 @@ function resetForm() {
   explanationBlocks.value = []
   explanationVideoUrl.value = ''
   difficulty.value = 3
+  formError.value = ''
+}
+
+// Yalnızca soru içeriğini temizler; topic/lesson ve form seçimleri korunur.
+// Art arda aynı derse soru eklerken kullanılır.
+function clearContent() {
+  const vt = variantType.value
+  questionBlocks.value = [{ type: 'text', content: '' }]
+  variantABlocks.value = [{ type: vt, content: '' }]
+  variantBBlocks.value = [{ type: vt, content: '' }]
+  variantCBlocks.value = [{ type: vt, content: '' }]
+  variantDBlocks.value = [{ type: vt, content: '' }]
+  variantEBlocks.value = [{ type: vt, content: '' }]
+  rightAnswer.value = ''
+  openAnswerBlocks.value = [{ type: 'text', content: '' }]
+  explanationBlocks.value = []
+  explanationVideoUrl.value = ''
   formError.value = ''
 }
 
@@ -246,6 +266,7 @@ async function handleSave() {
     } else {
       const res = await questionsApi.create(payload)
       showToast({ type: 'success', text: 'Sual yaradıldı' })
+      if (props.resetAfterSave) clearContent()
       emit('saved', res.data)
     }
   } catch (err: any) {
