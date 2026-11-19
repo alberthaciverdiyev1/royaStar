@@ -12,6 +12,12 @@ const editingId = computed(() => route.params.id ? Number(route.params.id) : nul
 function goBack() {
   router.push('/questions')
 }
+
+// Yeni sual rejiminde kayıttan sonra form açık kalır (art arda ekleme için);
+// düzenleme modunda ise kayıttan sonra listeye dönülür.
+function onSaved() {
+  if (editingId.value) goBack()
+}
 </script>
 
 <template>
@@ -40,7 +46,8 @@ function goBack() {
   <div class="w-full max-w-7xl">
     <QuestionFormContent
       :question-id="editingId"
-      @saved="goBack"
+      reset-after-save
+      @saved="onSaved"
       @cancel="goBack"
     />
   </div>
