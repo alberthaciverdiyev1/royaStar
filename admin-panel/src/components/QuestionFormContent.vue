@@ -39,6 +39,46 @@ const selectedLessonId = ref<number | null>(null)
 const loading = ref(true)
 const skipLessonWatch = ref(false)
 
+// Son kullanılan seçimleri tarayıcıda sakla; yeni sual formuna dönüldüğünde
+// (sayfa yenilense veya başka sayfaya gidilse bile) aynı seçimlerle devam edilir.
+const PREFS_KEY = 'question_form_prefs'
+
+type FormPrefs = {
+  topicId: number | null
+  lessonId: number | null
+  questionType: 'regular' | 'open'
+  variantType: ContentBlock['type']
+  difficulty: number
+  answerType: string
+}
+
+function loadPrefs(): Partial<FormPrefs> {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+function savePrefs() {
+  try {
+    const prefs: FormPrefs = {
+      topicId: selectedTopicId.value,
+      lessonId: selectedLessonId.value,
+      questionType: questionType.value,
+      variantType: variantType.value,
+      difficulty: difficulty.value,
+      answerType: answerType.value,
+    }
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs))
+  } catch {
+    // localStorage kullanılamıyorsa (gizli sekme, engellenmiş depolama) sessizce yoksay
+  }
+}
+
 // Form state
 const questionBlocks = ref<ContentBlock[]>([])
 const questionType = ref<'regular' | 'open'>('regular')
@@ -157,6 +197,12 @@ watch(selectedTopicId, async () => {
   }
 })
 
+// Seçimler her değiştiğinde (kaydettikten sonra da) tarayıcıya yaz.
+watch(
+  [selectedTopicId, selectedLessonId, questionType, variantType, difficulty, answerType],
+  savePrefs,
+)
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -177,13 +223,33 @@ onMounted(async () => {
       populateForm(q)
       skipLessonWatch.value = false
     } else {
-      // New question: start empty — the admin picks the lesson from within the form.
+      // Yeni sual: son kullanılan seçimleri localStorage'dan geri yükle.
+      const prefs = loadPrefs()
       resetForm()
+
+      if (prefs.questionType === 'regular' || prefs.questionType === 'open') {
+        questionType.value = prefs.questionType
+      }
+      const prefVariant = VARIANT_TYPE_OPTIONS.find((o) => o.value === prefs.variantType)
+      if (prefVariant) onVariantTypeChange(prefVariant.value)
+      if (typeof prefs.difficulty === 'number' && prefs.difficulty >= 1 && prefs.difficulty <= 5) {
+        difficulty.value = prefs.difficulty
+      }
+      if (prefs.answerType === 'exact' || prefs.answerType === 'similar') {
+        answerType.value = prefs.answerType
+      }
+
       skipLessonWatch.value = true
-      selectedTopicId.value = props.initialTopicId ?? null
-      if (selectedTopicId.value) {
-        await loadLessons(selectedTopicId.value)
-        selectedLessonId.value = props.initialLessonId ?? null
+      // Prop ile gelen topic/lesson (ör. imtahandan açılan modal) her zaman önceliklidir.
+      const preferredTopicId = topics.value.some((t) => t.id === prefs.topicId) ? prefs.topicId! : null
+      const topicId = props.initialTopicId ?? preferredTopicId
+      selectedTopicId.value = topicId
+      if (topicId) {
+        await loadLessons(topicId)
+        const preferredLessonId = props.initialLessonId ?? prefs.lessonId ?? null
+        selectedLessonId.value = lessons.value.some((l) => l.id === preferredLessonId)
+          ? preferredLessonId
+          : null
       } else {
         selectedLessonId.value = null
         lessons.value = []
