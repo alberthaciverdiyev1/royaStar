@@ -16,14 +16,13 @@ class UpdateLessonAction extends BaseUpdateAction
 
     protected function afterUpdate(Model $model): void
     {
-        $videos = request()->input('videos');
-        if (empty($videos)) {
+        if (!request()->has('videos')) {
             return;
         }
 
         $model->videos()->delete();
 
-        foreach ($videos as $video) {
+        foreach (request()->input('videos', []) as $video) {
             Video::create([
                 'lesson_id' => $model->id,
                 'youtube_url' => $video['youtube_url'],
