@@ -95,6 +95,8 @@ const explanationVideoUrl = ref('')
 const difficulty = ref<number>(3)
 const saving = ref(false)
 const formError = ref('')
+const submitted = ref(false)
+const serverErrors = ref<Record<string, string>>({})
 
 const DIFFICULTY_OPTIONS = [
   { value: 1, label: 'Başlanğıc' },
@@ -128,6 +130,8 @@ function resetForm() {
   explanationVideoUrl.value = ''
   difficulty.value = 3
   formError.value = ''
+  submitted.value = false
+  serverErrors.value = {}
 }
 
 // Yalnızca soru içeriğini temizler; topic/lesson ve form seçimleri korunur.
@@ -145,6 +149,8 @@ function clearContent() {
   explanationBlocks.value = []
   explanationVideoUrl.value = ''
   formError.value = ''
+  submitted.value = false
+  serverErrors.value = {}
 }
 
 function populateForm(q: Question) {
@@ -201,6 +207,26 @@ watch(selectedTopicId, async () => {
 watch(
   [selectedTopicId, selectedLessonId, questionType, variantType, difficulty, answerType],
   savePrefs,
+)
+
+// Herhangi bir alan düzenlendiğinde önceki sunucu hataları geçersiz olur.
+watch(
+  () => JSON.stringify([
+    selectedLessonId.value,
+    questionBlocks.value,
+    variantABlocks.value,
+    variantBBlocks.value,
+    variantCBlocks.value,
+    variantDBlocks.value,
+    variantEBlocks.value,
+    rightAnswer.value,
+    openAnswerBlocks.value,
+    answerType.value,
+    explanationVideoUrl.value,
+  ]),
+  () => {
+    if (Object.keys(serverErrors.value).length) serverErrors.value = {}
+  },
 )
 
 onMounted(async () => {
@@ -299,29 +325,73 @@ function buildPayload() {
   return payload
 }
 
-function validate(): string {
-  if (!hasContent(questionBlocks.value)) return 'Sual mətni tələb olunur'
-  if (!selectedLessonId.value) return 'Dərs seçilməlidir'
-  if (questionType.value === 'regular') {
-    if (!hasContent(variantABlocks.value)) return 'Variant A tələb olunur'
-    if (!hasContent(variantBBlocks.value)) return 'Variant B tələb olunur'
-    if (!hasContent(variantCBlocks.value)) return 'Variant C tələb olunur'
-    if (!rightAnswer.value) return 'Düzgün cavab seçilməlidir'
-  } else {
-    if (!hasContent(openAnswerBlocks.value)) return 'Açıq cavab tələb olunur'
+function isValidUrl(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
   }
-  return ''
+}
+
+// Backend'deki zorunlu alanlarla birebir eşleşen istemci taraflı doğrulama.
+// Anahtarlar StoreQuestionRequest kurallarıyla aynıdır; hatalar ilgili input'un altında gösterilir.
+const clientErrors = computed<Record<string, string>>(() => {
+  const errors: Record<string, string> = {}
+
+  if (!hasContent(questionBlocks.value)) errors.question = 'Sual mətni tələb olunur'
+  if (!selectedLessonId.value) errors.lesson_id = 'Dərs seçilməlidir'
+
+  if (questionType.value === 'regular') {
+    if (!hasContent(variantABlocks.value)) errors.variant_a = 'Variant A tələb olunur'
+    if (!hasContent(variantBBlocks.value)) errors.variant_b = 'Variant B tələb olunur'
+    if (!hasContent(variantCBlocks.value)) errors.variant_c = 'Variant C tələb olunur'
+    if (!rightAnswer.value) errors.right_answer = 'Düzgün cavab seçilməlidir'
+  } else {
+    if (!hasContent(openAnswerBlocks.value)) errors.open_answer = 'Açıq cavab tələb olunur'
+    if (!answerType.value) errors.answer_type = 'Cavab növü seçilməlidir'
+  }
+
+  if (explanationVideoUrl.value.trim() && !isValidUrl(explanationVideoUrl.value.trim())) {
+    errors.explanation_video_url = 'Düzgün URL daxil edin'
+  }
+
+  return errors
+})
+
+// Gösterilecek hata: istemci hatası sunucu hatasından önce gelir.
+// Hatalar ancak submit denendikten sonra görünür.
+function showError(field: string): string {
+  if (!submitted.value) return ''
+  return clientErrors.value[field] || serverErrors.value[field] || ''
+}
+
+// Laravel 422 yanıtını alan adına indirger: "variant_a.0.content" → "variant_a".
+function mapServerErrors(errData: any): Record<string, string> {
+  const mapped: Record<string, string> = {}
+  const raw = errData?.errors
+  if (raw && typeof raw === 'object') {
+    for (const [key, messages] of Object.entries(raw)) {
+      const field = key.split('.')[0]
+      if (!mapped[field]) mapped[field] = (messages as string[])[0]
+    }
+  } else if (errData?.message) {
+    mapped._general = errData.message
+  }
+  return mapped
 }
 
 async function handleSave() {
-  const err = validate()
-  if (err) {
-    formError.value = err
+  submitted.value = true
+  serverErrors.value = {}
+  formError.value = ''
+
+  // Zorunlu alanlardan biri eksikse istek hiç gönderilmez; hatalar input altında gösterilir.
+  if (Object.keys(clientErrors.value).length > 0) {
     return
   }
 
   saving.value = true
-  formError.value = ''
   try {
     const payload = buildPayload()
 
@@ -337,11 +407,15 @@ async function handleSave() {
     }
   } catch (err: any) {
     const errData = err?.response?.data
-    const msg = errData?.errors
-      ? (Object.values(errData.errors) as string[]).flat().join('; ')
-      : errData?.message || 'Xəta baş verdi'
-    formError.value = msg
-    showToast({ type: 'error', text: msg })
+    if (err?.response?.status === 422) {
+      // Backend doğrulama hataları ilgili alanların altında gösterilir.
+      serverErrors.value = mapServerErrors(errData)
+      if (serverErrors.value._general) formError.value = serverErrors.value._general
+    } else {
+      const msg = errData?.message || 'Xəta baş verdi'
+      formError.value = msg
+      showToast({ type: 'error', text: msg })
+    }
   } finally {
     saving.value = false
   }
@@ -390,6 +464,7 @@ const availableVariants = computed(() => {
             <option :value="null">Dərs seçin...</option>
             <option v-for="l in lessons" :key="l.id" :value="l.id">{{ l.name }}</option>
           </select>
+          <p v-if="showError('lesson_id')" class="mt-1 text-xs text-red-500">{{ showError('lesson_id') }}</p>
         </div>
       </div>
     </div>
@@ -432,6 +507,7 @@ const availableVariants = computed(() => {
           Sual mətni <span class="text-red-400">*</span>
         </label>
         <ContentBlockEditor v-model="questionBlocks" placeholder="Sual mətnini daxil edin" />
+        <p v-if="showError('question')" class="mt-1 text-xs text-red-500">{{ showError('question') }}</p>
       </div>
     </div>
 
@@ -476,6 +552,7 @@ const availableVariants = computed(() => {
             :variant-type="variantType"
             @update:model-value="variantABlocks[0] = $event"
           />
+          <p v-if="showError('variant_a')" class="mt-1 text-xs text-red-500">{{ showError('variant_a') }}</p>
         </div>
 
         <!-- Variant B -->
@@ -496,6 +573,7 @@ const availableVariants = computed(() => {
             :variant-type="variantType"
             @update:model-value="variantBBlocks[0] = $event"
           />
+          <p v-if="showError('variant_b')" class="mt-1 text-xs text-red-500">{{ showError('variant_b') }}</p>
         </div>
 
         <!-- Variant C -->
@@ -516,6 +594,7 @@ const availableVariants = computed(() => {
             :variant-type="variantType"
             @update:model-value="variantCBlocks[0] = $event"
           />
+          <p v-if="showError('variant_c')" class="mt-1 text-xs text-red-500">{{ showError('variant_c') }}</p>
         </div>
 
         <!-- Variant D -->
@@ -574,6 +653,7 @@ const availableVariants = computed(() => {
             {{ letter.toUpperCase() }}
           </button>
         </div>
+        <p v-if="showError('right_answer')" class="mt-1 text-xs text-red-500">{{ showError('right_answer') }}</p>
       </div>
     </div>
 
@@ -584,6 +664,7 @@ const availableVariants = computed(() => {
           Cavab <span class="text-red-400">*</span>
         </label>
         <ContentBlockEditor v-model="openAnswerBlocks" placeholder="Düzgün cavabı daxil edin" />
+        <p v-if="showError('open_answer')" class="mt-1 text-xs text-red-500">{{ showError('open_answer') }}</p>
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Cavab növü</label>
@@ -594,6 +675,7 @@ const availableVariants = computed(() => {
           <option value="exact">Eyni (exact)</option>
           <option value="similar">Oxşar (similar)</option>
         </select>
+        <p v-if="showError('answer_type')" class="mt-1 text-xs text-red-500">{{ showError('answer_type') }}</p>
       </div>
     </div>
 
@@ -626,6 +708,7 @@ const availableVariants = computed(() => {
           placeholder="https://www.youtube.com/watch?v=..."
           class="w-full rounded-xl border border-gray-200 bg-white py-2.5 px-3 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:outline-none focus:ring-2 focus:border-indigo-400 focus:ring-indigo-100"
         />
+        <p v-if="showError('explanation_video_url')" class="mt-1 text-xs text-red-500">{{ showError('explanation_video_url') }}</p>
         <p class="mt-1 text-xs text-gray-400">
           YouTube və ya birbaşa video linki. Şagird sualı cavabladıqdan sonra bu video göstərilir.
         </p>
