@@ -1,0 +1,10 @@
+{
+    "name": "Notification",
+    "alias": "notification",
+    "description": "In-site notifications and Web Push for new lesson videos, quizzes and exams",
+    "priority": 0,
+    "providers": [],
+    "aliases": [],
+    "files": [],
+    "requires": []
+}
