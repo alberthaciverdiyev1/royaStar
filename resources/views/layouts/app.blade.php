@@ -195,7 +195,7 @@
                             {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         @endif
                     </div>
-                    <span class="text-3xs md:text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))] opacity-70 group-hover:opacity-100 transition-opacity">{{ auth()->user()->name }}</span>
+                    <span class="hidden md:inline text-3xs md:text-2xs font-black uppercase tracking-widest text-[rgb(var(--primary))] opacity-70 group-hover:opacity-100 transition-opacity">{{ auth()->user()->name }}</span>
                 </a>
                 @else
                 <a href="{{ route('login') }}" class="text-[rgb(var(--on-surface))] opacity-50 hover:opacity-100 font-bold text-xs uppercase tracking-widest no-underline px-3 py-2 transition-all">

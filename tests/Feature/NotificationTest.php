@@ -176,6 +176,68 @@ it('does not let a student read another student notification', function () {
     )->toBe(1);
 });
 
+it('does not notify for actions that admins disabled', function () {
+    $this->actingAs($this->admin)
+        ->putJson('/api/admin/notification-settings', [
+            'notify_lesson_video' => false,
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.notify_lesson_video', false);
+
+    app(StoreVideoAction::class)->execute([
+        'lesson_id' => $this->lesson->id,
+        'youtube_url' => 'https://youtu.be/aaaaaaaaaaa',
+        'name' => 'Yeni video',
+    ]);
+
+    expect(Notification::count())->toBe(0);
+
+    // Re-enabling the action makes new videos notify again.
+    $this->actingAs($this->admin)
+        ->putJson('/api/admin/notification-settings', [
+            'notify_lesson_video' => true,
+        ])
+        ->assertOk();
+
+    app(StoreVideoAction::class)->execute([
+        'lesson_id' => $this->lesson->id,
+        'youtube_url' => 'https://youtu.be/bbbbbbbbbbb',
+        'name' => 'Başqa video',
+    ]);
+
+    expect(Notification::count())->toBe(1);
+});
+
+it('lists sent notifications for admins with recipient counts and deletes them', function () {
+    app(StoreVideoAction::class)->execute([
+        'lesson_id' => $this->lesson->id,
+        'youtube_url' => 'https://youtu.be/aaaaaaaaaaa',
+        'name' => 'Yeni video',
+    ]);
+
+    $notification = Notification::first();
+
+    $response = $this->actingAs($this->admin)
+        ->getJson('/api/admin/notifications')
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $notification->id)
+        ->assertJsonPath('data.0.recipients_count', 1)
+        ->assertJsonPath('data.0.read_count', 0);
+
+    expect($response->json('meta.total'))->toBe(1);
+
+    $this->actingAs($this->admin)
+        ->getJson('/api/admin/notification-settings')
+        ->assertOk()
+        ->assertJsonPath('data.notify_quiz', true);
+
+    $this->actingAs($this->admin)
+        ->deleteJson("/api/admin/notifications/{$notification->id}")
+        ->assertOk();
+
+    expect(Notification::count())->toBe(0);
+});
+
 it('renders the notification centre and stores push subscriptions', function () {
     app(StoreVideoAction::class)->execute([
         'lesson_id' => $this->lesson->id,

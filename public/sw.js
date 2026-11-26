@@ -20,8 +20,8 @@ self.addEventListener('push', function (event) {
     var title = payload.title || 'RoyaStar';
     var options = {
         body: payload.body || '',
-        icon: payload.icon || '/favicon.ico',
-        badge: payload.icon || '/favicon.ico',
+        icon: payload.icon || '/images/notifications/icon-192.png',
+        badge: payload.badge || '/images/notifications/badge-96.png',
         tag: payload.tag || undefined,
         data: { url: payload.url || '/notifications' },
         vibrate: [80, 40, 80],

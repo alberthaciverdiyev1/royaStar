@@ -5,6 +5,7 @@ namespace App\Modules\Notification\Services;
 use App\Modules\Exam\Models\Exam;
 use App\Modules\Lesson\Models\Video;
 use App\Modules\Notification\Models\Notification;
+use App\Modules\Notification\Models\NotificationSetting;
 use App\Modules\Quiz\Models\Quiz;
 use App\Modules\User\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,10 @@ class NotificationService
      */
     public function notifyVideo(Video $video): ?Notification
     {
+        if (! NotificationSetting::current()->notify_lesson_video) {
+            return null;
+        }
+
         $lesson = $video->lesson;
         if (! $lesson) {
             return null;
@@ -55,6 +60,10 @@ class NotificationService
      */
     public function notifyQuiz(Quiz $quiz): ?Notification
     {
+        if (! NotificationSetting::current()->notify_quiz) {
+            return null;
+        }
+
         $quiz->loadMissing('lesson.topic.grades');
 
         $gradeIds = $quiz->lesson?->topic?->grades?->pluck('id')->all() ?? [];
@@ -74,6 +83,10 @@ class NotificationService
      */
     public function notifyExam(Exam $exam): ?Notification
     {
+        if (! NotificationSetting::current()->notify_exam) {
+            return null;
+        }
+
         $gradeIds = $exam->grade_id ? [$exam->grade_id] : [];
 
         return $this->notify(
@@ -131,6 +144,7 @@ class NotificationService
             'body' => $body,
             'url' => $url,
             'icon' => config('webpush.icon'),
+            'badge' => config('webpush.badge'),
             'tag' => 'rs-notification-'.$notification->id,
         ];
 

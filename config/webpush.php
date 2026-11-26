@@ -19,6 +19,8 @@ return [
 
     'private_key' => env('VAPID_PRIVATE_KEY'),
 
-    'icon' => env('VAPID_ICON', '/favicon.ico'),
+    'icon' => env('VAPID_ICON', '/images/notifications/icon-192.png'),
+
+    'badge' => env('VAPID_BADGE', '/images/notifications/badge-96.png'),
 
 ];

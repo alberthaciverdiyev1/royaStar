@@ -36,6 +36,7 @@ const routes = [
       { path: 'students', name: 'Students', component: () => import('../pages/students/StudentList.vue') },
       { path: 'accepted-students', name: 'AcceptedStudents', component: () => import('../pages/accepted-students/AcceptedStudentList.vue') },
       { path: 'popups', name: 'Popups', component: () => import('../pages/popups/PopupList.vue') },
+      { path: 'notifications', name: 'Notifications', component: () => import('../pages/notifications/NotificationList.vue') },
       { path: 'music', name: 'Music', component: () => import('../pages/music/MusicList.vue') },
       { path: 'users', name: 'Users', component: () => import('../pages/users/UserList.vue') },
       { path: 'users/pending', name: 'PendingUsers', component: () => import('../pages/users/UserList.vue') },
