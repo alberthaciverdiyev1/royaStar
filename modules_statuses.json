@@ -15,5 +15,6 @@
     "Banner": true,
     "AcceptedStudent": true,
     "Popup": true,
-    "Music": true
+    "Music": true,
+    "Notification": true
 }

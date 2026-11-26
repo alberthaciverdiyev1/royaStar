@@ -11,11 +11,16 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         foreach (Module::allEnabled() as $module) {
-            $routeFile = $module->getPath() . '/Routes/api.php';
+            $routeFile = $module->getPath().'/Routes/api.php';
             if (file_exists($routeFile)) {
                 Route::prefix('api')
                     ->middleware(['api', 'auth:sanctum'])
                     ->group($routeFile);
+            }
+
+            $webRouteFile = $module->getPath().'/Routes/web.php';
+            if (file_exists($webRouteFile)) {
+                Route::middleware('web')->group($webRouteFile);
             }
         }
     }

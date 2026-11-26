@@ -13,6 +13,7 @@
     <meta name="turbo-cache-control" content="no-cache">
     @vite('resources/css/app.css')
     <link href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}" rel="stylesheet">
+    <link href="{{ asset('css/notifications.css') }}?v={{ filemtime(public_path('css/notifications.css')) }}" rel="stylesheet">
 
     <script>
         (function() {
@@ -181,6 +182,7 @@
 
             <div class="flex justify-end flex-shrink-0 items-center gap-2">
                 @auth
+                @include('partials.notification-bell')
                 <a href="{{ route('profile') }}" class="flex items-center gap-2 group no-underline">
                     <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[rgb(var(--primary-fixed))] flex items-center justify-center text-white font-bold text-2xs border-2 border-white shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
                         @if(!empty(auth()->user()->avatar))
@@ -258,6 +260,10 @@
     @endif
 
     @include('partials.music-player')
+
+    @auth
+        @include('partials.notification-push')
+    @endauth
 
     @stack('scripts')
 </body>

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Modules\Music\ViewComposers\MusicPlayerComposer;
+use App\Modules\Notification\ViewComposers\NotificationBellComposer;
 use App\Modules\User\Models\User;
 use App\Modules\User\Policies\UserPolicy;
 use Carbon\Carbon;
@@ -28,5 +29,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Supplies the page-targeted playlist to the global site layout.
         View::composer('layouts.app', MusicPlayerComposer::class);
+
+        // Supplies the header bell's unread count and latest notifications.
+        View::composer('layouts.app', NotificationBellComposer::class);
     }
 }
